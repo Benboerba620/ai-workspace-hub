@@ -72,7 +72,8 @@
 
 ## 可选模块
 
-> 一键部署见 `system/skills/deploy-modules.md`（"帮我安装博客抓取 / 日报监控 / 假设追踪"）。
+> 一键部署见 `system/skills/deploy-modules.md`（"帮我安装博客抓取 / 日报监控"）。
+> 假设追踪是**基座自带能力**（见下方「基座自带」段），不在可选模块里。
 
 ### pod2wiki（博客 / 播客抓取，输入槽）
 
@@ -97,11 +98,12 @@
   - `output/daily-watchlist/`
   - `hypothesis/`
 
-### hypothesis-tracker（假设追踪，决策层）
+## 基座自带
 
-- status: `planned`
-- repo: `https://github.com/Benboerba620/hypothesis-tracker`
-- project_path: `./hypothesis-tracker`
+### 假设追踪（决策层，无需安装）
+
+- status: `enabled`
+- 契约: `system/integrations/hypothesis-tracker.md`
 - reads_from:
   - `hypothesis/`
   - `wiki/`

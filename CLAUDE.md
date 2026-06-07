@@ -45,14 +45,14 @@ Claude 读 `system/skills/pdf-ingest.md` → 自检并 `pip install pypdf` → �
 
 基座预留两类槽位，"接现成项目"和"自己 DIY"长同一个样（skill + 可选 script + 在 `workspace-config` 登记一行）。新增模块照 `system/skills/_template.md` 和 `system/integrations/_template.md` 抄。
 
-官方模块一键部署：用户说"帮我安装博客抓取 / 日报监控 / 假设追踪" → 执行 `system/skills/deploy-modules.md`（git clone + 接线到 wiki）。
+官方模块一键部署：用户说"帮我安装博客抓取 / 日报监控" → 执行 `system/skills/deploy-modules.md`（git clone + 接线到 wiki）。
 
 - personal wiki：默认核心，位于 `wiki/`。
 - research（研究闭环）：基座能力，wiki + websearch 零依赖起步，见 `system/skills/research.md`。
+- 假设追踪：基座自带，`hypothesis/` 记假设与证据（一假设一 `H*.md`），复盘结论回写 `wiki/explorations/`，不需要装模块，契约见 `system/integrations/hypothesis-tracker.md`。
 - pdf-ingest：输入能力，参考样板，见 `system/skills/pdf-ingest.md`。
 - pod2wiki（博客/播客抓取）：可选输入模块，见 `system/integrations/pod2wiki.md`。
 - daily-watchlist（日报监控）：可选输出模块，见 `system/integrations/daily-watchlist.md`。
-- hypothesis-tracker（假设追踪）：可选决策模块，见 `system/integrations/hypothesis-tracker.md`。
 
 ## 系统维护（防臃肿）
 

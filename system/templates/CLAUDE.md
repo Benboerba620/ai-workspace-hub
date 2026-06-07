@@ -61,7 +61,8 @@
 按需开启，"喊一句 agent 自装"：
 
 - 能力（如 PDF 摄入）：见 `system/skills/`，自建照 `system/skills/_template.md`。
-- 官方模块一键部署（博客抓取 / 日报监控 / 假设追踪）：见 `system/skills/deploy-modules.md`，自接外部项目照 `system/integrations/_template.md`。
+- 官方模块一键部署（博客抓取 / 日报监控）：见 `system/skills/deploy-modules.md`，自接外部项目照 `system/integrations/_template.md`。
+- 假设追踪：基座自带，`hypothesis/` 记假设/证据、复盘回写 `wiki/explorations/`，无需安装。
 
 ## 系统维护
 

@@ -96,7 +96,7 @@ system/scripts/
 - `system/skills/_template.md` -> `system/skills/_template.md`（新增能力照抄）
 - `system/integrations/pod2wiki.md` -> `system/integrations/pod2wiki.md`
 - `system/integrations/daily-watchlist.md` -> `system/integrations/daily-watchlist.md`
-- `system/integrations/hypothesis-tracker.md` -> `system/integrations/hypothesis-tracker.md`
+- `system/integrations/hypothesis-tracker.md` -> `system/integrations/hypothesis-tracker.md`（基座自带假设追踪的文件契约）
 - `system/integrations/_template.md` -> `system/integrations/_template.md`（新增模块照抄）
 - `system/scripts/pdf_to_md.py` -> `system/scripts/pdf_to_md.py`（PDF 可选能力，按需）
 - `requirements-pdf.txt` -> `requirements-pdf.txt`（PDF 可选能力，按需）
@@ -159,7 +159,7 @@ personal wiki 是默认核心模块。如果用户已有 wiki，不要复制旧 
 
 用户答应某个 → 执行 `system/skills/deploy-modules.md` 的部署流程（clone → 读契约 → 接线到 wiki → 跑模块自带安装 → 验证）。用户说"以后再说" → 跳过，不阻塞，不要把 `status` 之外的东西写死。
 
-> 还有一个 `hypothesis-tracker`（假设追踪）默认不主动问，新人用基座自带的 `hypothesis/` 即可；想要时说"帮我安装假设追踪"。
+> 假设追踪是**基座自带能力**，不是要另装的模块：`hypothesis/` 记假设与证据（一假设一 `H*.md`），复盘结论回写 `wiki/explorations/`。开箱即用，无需安装。
 
 ### Step 6：完成后告诉用户怎么验证
 

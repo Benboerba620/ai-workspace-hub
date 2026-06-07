@@ -27,6 +27,7 @@
 
 ## 最近更新
 
+- `0.2.1`：假设追踪改为**基座自带**（`hypothesis/` + 复盘回写 `wiki/explorations/`，无需安装）；移除指向私有 repo 的失效链接。
 - `0.2.0`：新增 research 研究闭环（wiki + websearch + 可选数据源 → 模板输出 → 确认后回写 wiki）；机械零件收进 `system/`，顶层目录 13→8；新增 ARCHITECTURE.md。
 - `0.1.0`：首个 Codex-first / Claude-compatible 最小基座（personal wiki + first-ingest + PDF smoke path）。
 
@@ -104,6 +105,8 @@ agent 会（见 `system/skills/research.md`）：**先查 `wiki/` 已有结论�
 
 想接自己的数据源（tushare / gangtise / 自有 API）？在 `workspace-config` 的 `data_sources:` 段登记一行、key 走环境变量即可；没配的数字 agent 会标 `[待验证]` 而不是编造。
 
+**假设追踪也是基座自带**——做研究或复盘时，agent 把假设和证据记进 `hypothesis/`（一条假设一个 `H*.md`），结论成熟后回写 `wiki/explorations/`。这条决策闭环开箱即用，不需要安装任何模块。
+
 ---
 
 ## 架构：基座五件套 + 两类槽位
@@ -142,7 +145,7 @@ flowchart LR
 | **输入槽** | 把外部材料变成 `wiki/` 可读输入 | pdf-ingest、pod2wiki | 接自己的爬虫 / 导入器 |
 | **输出槽** | 消费知识库产出报告，可回写证据 | research（基座自带）、daily-watchlist | 接自己的写作 / 报告流 |
 
-**关键：接现成项目和自己 DIY 长一模一样**——都是 `system/skills/{名}.md`（怎么用 + 怎么自装）+ 可选 `system/scripts/` + 在 `workspace-config` 登记一行。所以下面那些 `output/`、`monitoring/`、`hypothesis/` 目录现在是空的，它们**不是没做完的功能，就是等你插东西的槽**。
+**关键：接现成项目和自己 DIY 长一模一样**——都是 `system/skills/{名}.md`（怎么用 + 怎么自装）+ 可选 `system/scripts/` + 在 `workspace-config` 登记一行。所以下面那些 `output/`、`monitoring/` 目录现在多半是空的，它们**不是没做完的功能，就是等你插东西的槽**。
 
 ---
 
@@ -160,7 +163,6 @@ flowchart LR
 | [karpathy-claude-wiki](https://github.com/Benboerba620/karpathy-claude-wiki) | 知识库底座 | 默认核心 | 提供 `wiki/` schema 和 ingest 规则 |
 | [pod2wiki](https://github.com/Benboerba620/pod2wiki) | 输入槽 | "帮我安装博客抓取" | 把播客 / RSS / 博客写入 `wiki/sources/`、`wiki/raw/podcasts/` |
 | [daily-watchlist](https://github.com/Benboerba620/daily-watchlist) | 输出槽 | "帮我安装日报监控" | 读股票池，写日报到 `output/`，证据回写 `hypothesis/` |
-| [hypothesis-tracker](https://github.com/Benboerba620/hypothesis-tracker) | 决策层 | "帮我安装假设追踪" | 读写 `hypothesis/`，复盘结论沉淀 `wiki/explorations/` |
 
 接满之后能跑出的一条完整闭环（可选，不是基座必需）：
 
@@ -254,7 +256,8 @@ my-ai-workspace/
 ├── wiki/                        # 知识库：_schema + raw/sources/entities/concepts/explorations
 ├── inbox/                       # 输入
 ├── output/                      # 输出
-├── monitoring/ · hypothesis/    # 输出槽预留
+├── monitoring/                  # 输出槽预留（daily-watchlist）
+├── hypothesis/                   # 基座自带：假设/证据/复盘
 ├── requirements-pdf.txt         # 可选能力(pdf)依赖
 └── system/                      # 机器零件箱（日常不用直接读）
     ├── skills/                  #   能力（含 _template.md）

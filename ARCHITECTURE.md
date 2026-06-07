@@ -36,7 +36,6 @@ flowchart TB
 
     subgraph OUTSLOT["输出槽 · 可选模块"]
         DW["daily-watchlist（日报监控）"]
-        HT["hypothesis-tracker（假设追踪 · 决策层）"]
     end
 
     DS(["可选数据源<br/>websearch · tushare · gangtise · 自有 API<br/>没配就标 [待验证] 不编造"])
@@ -117,7 +116,7 @@ workspace-mvp-hub/
 ├── monitoring/                     # 【输出槽预留】监控对象（日报输入）
 │   └── watchlist.md
 │
-├── hypothesis/                     # 【输出槽预留】假设/证据/复盘
+├── hypothesis/                     # 【基座自带】假设/证据/复盘（research、复盘自动写入）
 │   └── README.md
 │
 ├── requirements-pdf.txt            # 可选能力(pdf)依赖，agent 首次用时自装
@@ -135,7 +134,7 @@ workspace-mvp-hub/
 │   │   ├── personal-wiki.md        #     默认知识库核心
 │   │   ├── pod2wiki.md             #     输入槽：博客/播客抓取
 │   │   ├── daily-watchlist.md      #     输出槽：日报监控
-│   │   ├── hypothesis-tracker.md   #     决策层：假设追踪
+│   │   ├── hypothesis-tracker.md   #     基座自带：假设追踪文件契约
 │   │   └── _template.md            #     自接外部项目照抄
 │   ├── scripts/
 │   │   └── pdf_to_md.py            #   可选能力(pdf)的脚本
@@ -147,7 +146,7 @@ workspace-mvp-hub/
 └── _archive/                       # 瘦身归档区（mv 进来，不硬删）
 ```
 
-> 标【输出槽预留】的 `monitoring/`、`hypothesis/` 现在基本是空的——它们不是没做完的功能，**就是等你插模块的槽**。装上 daily-watchlist / hypothesis-tracker 后才会有内容。
+> 标【输出槽预留】的 `monitoring/` 现在基本是空的——它不是没做完的功能，**就是等你插 daily-watchlist 的槽**，装上才会有内容。`hypothesis/` 则是**基座自带**目录：做研究 / 复盘时 agent 自动往里写假设和证据，无需安装任何模块。
 
 ---
 

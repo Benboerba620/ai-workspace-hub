@@ -37,11 +37,11 @@
   - `output/daily-watchlist/`
   - `hypothesis/`
 
-## hypothesis-tracker
+## 假设追踪（基座自带）
 
-- status: `planned`
-- project_path:
-- role: 可选决策层，管理假设 / 证据 / 复盘
+- status: `enabled`
+- role: 基座自带决策层，管理假设 / 证据 / 复盘（无需 clone 外部 repo）
+- 契约: `system/integrations/hypothesis-tracker.md`
 - reads_from:
   - `hypothesis/`
   - `wiki/`

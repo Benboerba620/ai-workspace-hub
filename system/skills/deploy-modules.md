@@ -9,8 +9,9 @@
 |---|---|
 | "帮我安装博客抓取" / "装 pod2wiki" / "我想抓播客和博客" | pod2wiki |
 | "帮我安装日报监控" / "装 daily-watchlist" / "我要每日盯盘日报" | daily-watchlist |
-| "帮我安装假设追踪" / "装 hypothesis-tracker" | hypothesis-tracker |
 | "部署官方模块" / "把模块都装上" | 逐个询问后部署 |
+
+> 假设追踪不在此表：它是**基座自带能力**（`hypothesis/` + 复盘回写 `wiki/explorations/`），开箱即用，无需 clone。契约见 `system/integrations/hypothesis-tracker.md`。
 
 ## 模块登记表（唯一事实源）
 
@@ -18,7 +19,6 @@
 |---|---|---|---|---|---|
 | 博客/播客抓取 | pod2wiki | `https://github.com/Benboerba620/pod2wiki` | `./pod2wiki/` | 输入 | `system/integrations/pod2wiki.md` |
 | 日报监控 | daily-watchlist | `https://github.com/Benboerba620/daily-watchlist` | `./daily-watchlist/` | 输出 | `system/integrations/daily-watchlist.md` |
-| 假设追踪 | hypothesis-tracker | `https://github.com/Benboerba620/hypothesis-tracker` | `./hypothesis-tracker/` | 决策 | `system/integrations/hypothesis-tracker.md` |
 
 ## 部署步骤（对每个要装的模块）
 
@@ -49,7 +49,7 @@
         │
         └─→ output/daily-watchlist  +  证据回写 hypothesis/
                                             │
-                              假设追踪(hypothesis-tracker) 读写 hypothesis/
+                              基座自带的假设追踪 读写 hypothesis/，复盘回写 wiki/explorations/
 ```
 
 输入模块只管把材料变成 wiki 可读页面；输出模块消费 wiki 产报告、回写证据。基座（wiki + output + hypothesis）始终是中枢，模块只接口子。

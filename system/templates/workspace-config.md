@@ -107,10 +107,10 @@
   - `output/daily-watchlist/`
   - `hypothesis/`
 
-### hypothesis-tracker
+### 假设追踪（基座自带，无需安装）
 
-- status: `planned`
-- project_path:
+- status: `enabled`
+- 契约: `system/integrations/hypothesis-tracker.md`
 - reads_from:
   - `hypothesis/`
   - `wiki/`
