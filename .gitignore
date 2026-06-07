@@ -1,0 +1,24 @@
+# 密钥 / 环境变量（research 等可选数据源的 key 走环境变量，绝不进 repo）
+.env
+.env.*
+!.env.example
+
+# 回收站 / 临时
+_trash/
+_tmp/
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 可选能力生成的中间产物（按需保留时可删此行）
+inbox/sample-ai-workspace.md
+
+# OS / 编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
