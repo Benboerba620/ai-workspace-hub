@@ -1,8 +1,9 @@
 # Active Context
 
-> 最近 1-2 周仍值得继续带入对话的上下文。最小试跑时，Codex 可以在这里追加一行。
+> 工作记忆，支撑“今天停、明天接”的断点续传（协议见 `AGENTS.md` / `CLAUDE.md` 的「active-context：断点续传」段）。
+> 只保留最近 1-2 周仍值得带入对话的上下文，单条一行。结束时 agent 自动往下面追一行，开场说“继续”时 agent 顺着最新一条的「续接锚点」接上。
 
-## Recent
+## 最近对话延续
 
 - **2026-06-05：first-ingest smoke test（DONE）** -> 已用 `inbox/first-note.md` 完成输入 -> raw/source/concept/exploration/output 闭环；主要产物 `wiki/sources/2026-06-05-first-note.md` 和 `output/first-ingest/2026-06-05-smoke-test.md`；下一步用真实文章或播客笔记复测。
 - **2026-06-05：personal wiki schema（DONE）** -> 已新增 `wiki/_schema.md`，确定 raw/source/entity/concept/exploration/output 分类决策树；入口文件已要求摄入前读取 schema。

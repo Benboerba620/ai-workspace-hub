@@ -27,6 +27,7 @@
 
 ## 最近更新
 
+- `0.2.2`：**active-context 断点续传**落地——开场说"继续"自动接上、收尾自动记一行，AGENTS / CLAUDE 写明两条自动触发规则。
 - `0.2.1`：假设追踪改为**基座自带**（`hypothesis/` + 复盘回写 `wiki/explorations/`，无需安装）；移除指向私有 repo 的失效链接。
 - `0.2.0`：新增 research 研究闭环（wiki + websearch + 可选数据源 → 模板输出 → 确认后回写 wiki）；机械零件收进 `system/`，顶层目录 13→8；新增 ARCHITECTURE.md。
 - `0.1.0`：首个 Codex-first / Claude-compatible 最小基座（personal wiki + first-ingest + PDF smoke path）。
@@ -187,17 +188,24 @@ pod2wiki → wiki → daily-watchlist → output/today → hypothesis → wiki
 
 ---
 
-## active-context：短期工作记忆
+## active-context：短期工作记忆 + 断点续传
 
 `active-context.md` 不是长期记忆，也不是历史档案。它只回答一个问题：
 
 > 当前最值得 AI agent 继续记住的上下文是什么？
 
+它最实用的地方是**断点续传——今天停、明天接**，两条规则 agent 自动执行、不用你提醒：
+
+- **今天到此**：你说一句"今天先到这吧 / 明天继续 / 暂停"，或一段工作刚落盘、刚做完一个决策，agent 就会往 `active-context.md` 追**一行**，记下主题、状态、产物文件和"下次从哪接"。
+- **明天接上**：第二天你只要说一句"继续 / 接着昨天的"，agent 第一件事就是读 `active-context.md`，顺着最新那条的「续接锚点」直接接上，你不用重新交代上下文。
+
 建议保留最近 1-2 周，单条一行：
 
 ```markdown
-- **2026-06-05：xxx 研究（PAUSED）** -> 已完成 A；下一步确认 B。
+- **2026-06-05：xxx 研究（PAUSED）** -> output/research/xxx.md；已完成 A；续接锚点：下一步确认 B。
 ```
+
+> 协议细节写在 `AGENTS.md` / `CLAUDE.md` 的「active-context：断点续传」段——agent 照着那两条规则走，所以这套行为开箱即用。
 
 ## friction-log：记录摩擦，不记录情绪
 
