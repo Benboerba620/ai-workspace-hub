@@ -22,10 +22,12 @@
 | `wiki/_schema.md` | ~200 |
 | `system/interfaces/README.md` | ~80 |
 
-### B. active-context 卫生
+### B. active-context 卫生（断点续传协议的周度兜底）
 
-- 有没有 **超过 14 天**、状态已 `DONE` 还没归档的条目 → 建议剪到 `_archive/` 或删。
-- 总行数有没有超 50 → 建议浓缩。
+正常情况下 agent 写断点时已按协议**内联自动剪**（>14 天或 >20 条移到 `workspace/meta/active-context-archive-YYYY-MM.md`）。本检查是兜底，万一漏剪就点出来：
+
+- 「最近对话延续」段有没有 **超过 14 天**还没归档的条目 → 建议移到 `active-context-archive-YYYY-MM.md`。
+- 段内条目有没有超 20 条 / 总行数有没有超 50 → 建议把最旧的剪到归档。
 - 同一主题有没有重复堆叠多条 → 建议合并成一条。
 
 ### C. AGENTS / CLAUDE 同源漂移
@@ -50,7 +52,7 @@
 
 ```markdown
 - **发现**：active-context 现 78 行，超 50 行软上限
-- **建议**：把 5 月已 DONE 的 9 条剪到 _archive/active-context-2026-05.md
+- **建议**：把 5 月已 DONE 的 9 条剪到 `workspace/meta/active-context-archive-2026-05.md`
 - **影响范围**：减轻每次 session 的工作记忆负担约 30 行
 - **破坏性**：需用户确认（涉及移动文件）
 ```

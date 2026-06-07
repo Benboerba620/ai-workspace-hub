@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3 - 2026-06-07
+
+### 改进
+
+- **active-context 上限与自动清理**：给断点续传协议补上"内联自动剪"。agent 写断点时自检「最近对话延续」段，把**超过 14 天或超过 20 条**的旧条目整行移到 `workspace/meta/active-context-archive-YYYY-MM.md`（保留续接锚点）——零脚本、自动执行、不等手动体检。`structure-health` 的 active-context 检查改为**周度兜底**（万一内联没剪到位才点出来），并对齐归档路径。
+
 ## 0.2.2 - 2026-06-07
 
 ### 改进
