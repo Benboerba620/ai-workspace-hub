@@ -1,0 +1,41 @@
+# Hypothesis Tracker 配置
+
+hypothesis:
+  directory: hypothesis
+  prefix: "H"
+  default_certainty: 50
+  signals:
+    positive: "🟢"
+    neutral: "🟡"
+    negative: "🔴"
+  thresholds:
+    high: 80
+    medium: 50
+
+trading:
+  enabled: true
+  trades_file: portfolio/trades.csv
+  holdings_file: portfolio/holdings.csv
+  journal_directory: portfolio/journal
+  markets:
+    - {id: us, name: "US Stock", currency: USD}
+    - {id: cn, name: "A-Share", currency: CNY}
+    - {id: hk, name: "HK Stock", currency: HKD}
+
+risk_rules:
+  max_single_stock_pct: 30
+  max_single_thesis_pct: 50
+  max_positions: 8
+  min_cash_pct: 10
+  max_add_count: 3
+  stop_loss_required: true
+
+rules:
+  file: config/hypothesis-tracker.rules.md
+  auto_propose_threshold: 3
+
+obsidian:
+  enabled: false
+  bases_file: hypothesis/hypothesis-tracker.base
+
+language: cn

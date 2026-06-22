@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.0 - 2026-06-22
+
+### 新增
+
+- **All-in-One 集成**：pod2wiki（播客/博客摄入）和 daily-watchlist（日报监控）代码合并进 `tools/podcast/` 和 `tools/daily-watch/`，一次 clone 拿到全部六大能力。原始独立 repo 继续存在。
+- **screen 快速筛选**（基座能力）：给定主题 → websearch 候选 → 拉数据 → 过滤 → 表格 + Top 5 分析。内置两个预设模板（价值股 / AI 产业链）。无 API 时降级为纯 websearch。
+- **Longbridge 数据源**：新增 Longbridge 为默认免费数据源（HK + US 行情），与 tushare（A 股）并列为零成本起步选项。FMP 降为付费可选。
+- **统一 config/ 目录**：所有工具的用户配置文件统一放在 `config/`（不入 git）。
+
+### 改进
+
+- **README 重写**：从"最小种子 + 槽位"改为"all-in-one 六大能力"。
+- **INSTALL 简化**：移除"选模块"步骤，全量安装是唯一路径。
+- **ARCHITECTURE 更新**：架构图和目录结构反映 tools/ + 数据源层。
+- **AGENTS.md / CLAUDE.md 路由表扩展**：新增 podcast、daily-watch、screen 三条路由。
+- **workspace-config 更新**：新增数据源段（Longbridge/tushare/FMP）+ screen 能力 + podcast/daily-watch 内置登记。
+
+### 移除
+
+- `system/skills/deploy-modules.md`（不再需要 clone 外部模块）。
+- 文档中"外部模块 clone"流程和相关引导。
+
 ## 0.2.4 - 2026-06-22
 
 ### 修复

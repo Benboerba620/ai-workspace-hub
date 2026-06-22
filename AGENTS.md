@@ -1,6 +1,6 @@
 # AI Workspace Instructions
 
-这个 repo 本身就是一个最小可运行的 AI research workspace。Codex 进入本目录后，先读本文件，再读 `workspace/workspace-config.md`。
+这个 repo 是一个 all-in-one AI 研究工作系统，包含六大能力。Codex 进入本目录后，先读本文件，再读 `workspace/workspace-config.md`。
 
 ## 工作方式
 
@@ -11,24 +11,41 @@
 
 ## 核心路由
 
-简单优先：先读 `workspace/workspace-config.md`。非简单任务按其中“三条简单规则”执行。
+先读 `workspace/workspace-config.md`。非简单任务按其中"三条简单规则"执行。
 
 | 场景 | 先读 | 主要写入 |
 |---|---|---|
 | 开始工作 | `workspace/workspace-config.md` | 按任务决定 |
 | 继续上下文 | `workspace/meta/active-context.md` | `workspace/meta/active-context.md` |
-| 摄入材料 | `wiki/_schema.md` + `system/integrations/personal-wiki.md`；笔记走 `system/skills/first-ingest.md`，PDF 走 `system/skills/pdf-ingest.md` | `wiki/raw/` / `wiki/sources/` / `wiki/concepts/` / `wiki/explorations/` |
-| 生成输出 | `workspace/meta/active-context.md` + 相关 `wiki/` 文件 | `output/` |
-| 研究主题 | `wiki/` 已有页面 + websearch + 可选数据源；流程走 `system/skills/research.md` | `output/research/` → 确认后回写 `wiki/explorations/` |
-| 监控/复盘 | `monitoring/` + `hypothesis/` | `output/` + `hypothesis/` |
+| 摄入材料 | `wiki/_schema.md` + `system/integrations/personal-wiki.md`；笔记走 `system/skills/first-ingest.md`，PDF 走 `system/skills/pdf-ingest.md` | `wiki/` |
+| 研究主题 | `system/skills/research.md` + `wiki/` + websearch | `output/research/` → 确认后回写 `wiki/explorations/` |
+| 快速筛选 | `system/skills/screen.md` | `output/screen/` |
+| 播客摄入 | `system/skills/podcast.md` | `wiki/sources/` + `wiki/raw/podcasts/` + `output/pod2wiki/` |
+| 日报监控 | `system/skills/daily-watch.md` | `daily-watchlist-reports/` + `hypothesis/` |
+| 管理股票池 | `system/skills/daily-watch-import.md` | `config/daily-watchlist-watchlist.md` |
+| 假设操作 | `system/skills/daily-watch-ht.md` | `hypothesis/` + `portfolio/` |
+| 生成输出 | `workspace/meta/active-context.md` + 相关 wiki 文件 | `output/` |
 | 遇到摩擦 | 相关文件 | `workspace/meta/friction-log.md` |
+
+## 六大能力
+
+| 能力 | 说明 | Skill 文件 | 需要 API? |
+|---|---|---|---|
+| wiki | 知识库（基座核心） | `system/integrations/personal-wiki.md` | 否 |
+| research | 研究闭环 | `system/skills/research.md` | 否（websearch） |
+| screen | 快速筛选 | `system/skills/screen.md` | 可选（Longbridge/tushare/FMP） |
+| hypothesis | 假设追踪 | `system/integrations/hypothesis-tracker.md` | 否 |
+| podcast | 播客/博客摄入 | `system/skills/podcast.md` | 需要 LLM key |
+| daily-watch | 日报监控 | `system/skills/daily-watch.md` | 可选（Longbridge/tushare/FMP） |
+
+工具代码在 `tools/` 目录下。首次使用时 agent 检查依赖，缺什么自动 `pip install`。
 
 ## active-context：断点续传
 
-`workspace/meta/active-context.md` 是工作记忆，支撑“今天停、明天接”。只记最近 1-2 周仍有价值的上下文，单条一行。两条规则配套，**自动执行，不必询问用户**：
+`workspace/meta/active-context.md` 是工作记忆，支撑"今天停、明天接"。只记最近 1-2 周仍有价值的上下文，单条一行。两条规则配套，**自动执行，不必询问用户**：
 
-- **续接（开场自动读）**：用户开场出现“继续 / 接着 / 昨天 / 上次”等延续信号 → 第一动作就是读 `active-context.md`，顺着最新一条的「续接锚点」接上，不要让用户重新交代上下文。
-- **断点（结束自动写）**：满足任一条件即在「最近对话延续」段追加一行——① 用户说“今天到此 / 先到这吧 / 明天继续 / 暂停 / 保存进度”；② 一段工作落盘、做出决策、或长对话自然收尾。
+- **续接（开场自动读）**：用户开场出现"继续 / 接着 / 昨天 / 上次"等延续信号 → 第一动作就是读 `active-context.md`，顺着最新一条的「续接锚点」接上，不要让用户重新交代上下文。
+- **断点（结束自动写）**：满足任一条件即在「最近对话延续」段追加一行——① 用户说"今天到此 / 先到这吧 / 明天继续 / 暂停 / 保存进度"；② 一段工作落盘、做出决策、或长对话自然收尾。
 
 格式（一条一行）：
 
@@ -38,7 +55,7 @@
 
 状态标签：`PAUSED` 半成品 / `DONE` 完成 / `决策` 决定。
 
-**上限与自动清理（写断点时顺手做，不另外问用户）**：「最近对话延续」段按 14 天滚动、最多约 20 条。每次追加新行后自检——① 把**超过 14 天**的条目整行移到 `workspace/meta/active-context-archive-YYYY-MM.md`（不丢续接锚点）；② 若移完仍超 20 条，再把最旧的几条一并移到归档，直到段内 ≤ 20 条。同日同主题用“改”不用“新增”，避免堆叠。
+**上限与自动清理（写断点时顺手做，不另外问用户）**：「最近对话延续」段按 14 天滚动、最多约 20 条。每次追加新行后自检——① 把**超过 14 天**的条目整行移到 `workspace/meta/active-context-archive-YYYY-MM.md`（不丢续接锚点）；② 若移完仍超 20 条，再把最旧的几条一并移到归档，直到段内 ≤ 20 条。同日同主题用"改"不用"新增"，避免堆叠。
 
 ## 最小试跑（基座，零依赖）
 
@@ -48,26 +65,20 @@
 
 Codex 应该创建一篇 `wiki/sources/YYYY-MM-DD-first-note.md`，并在 `workspace/meta/active-context.md` 记录本次试跑结果。这条链路只读写 markdown，不需要安装任何依赖。
 
-## 可选能力（喊一句，agent 自己装）
+## 数据源
 
-基座之外的能力按需开启，agent 读对应 skill 后自行安装依赖，不需要用户预先配置环境。例如 PDF：
+配置在 `config/*.env` 中，配了才用，没配降级不报错。
 
-> 帮我开启 PDF 摄入，把 `inbox/sample-ai-workspace.pdf` 整理进 wiki。
+| 数据源 | 市场 | env key | 费用 |
+|--------|------|---------|------|
+| Longbridge | HK + US | `LONGBRIDGE_APP_KEY` 等 | 免费 |
+| tushare | A 股 | `TUSHARE_TOKEN` | 免费额度 |
+| FMP | 全球 | `FMP_API_KEY` | 免费 250 次/天 |
 
-Codex 读 `system/skills/pdf-ingest.md` → 自检并 `pip install pypdf` → 跑 `python system/scripts/pdf_to_md.py` → 按 `wiki/_schema.md` 摄入。
-
-## 模块与槽位
-
-基座预留两类槽位，"接现成项目"和"自己 DIY"长同一个样（skill + 可选 script + 在 `workspace-config` 登记一行）。新增模块照 `system/skills/_template.md` 和 `system/integrations/_template.md` 抄。
-
-官方模块一键部署：用户说"帮我安装博客抓取 / 日报监控" → 执行 `system/skills/deploy-modules.md`（git clone + 接线到 wiki）。
-
-- personal wiki：默认核心，位于 `wiki/`。
-- research（研究闭环）：基座能力，wiki + websearch 零依赖起步，见 `system/skills/research.md`。
-- 假设追踪：基座自带，`hypothesis/` 记假设与证据（一假设一 `H*.md`），复盘结论回写 `wiki/explorations/`，不需要装模块，契约见 `system/integrations/hypothesis-tracker.md`。
-- pdf-ingest：输入能力，参考样板，见 `system/skills/pdf-ingest.md`。
-- pod2wiki（博客/播客抓取）：可选输入模块，见 `system/integrations/pod2wiki.md`。
-- daily-watchlist（日报监控）：可选输出模块，见 `system/integrations/daily-watchlist.md`。
+获取方式：
+- Longbridge：https://open.longbridge.com/zh-CN/skill/
+- tushare：https://tushare.pro/register
+- FMP：https://financialmodelingprep.com/
 
 ## 系统维护（防臃肿）
 

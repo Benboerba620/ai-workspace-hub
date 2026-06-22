@@ -41,7 +41,7 @@
 
    按需开启，"喊一句 agent 自装"：
    - 能力（如 PDF 摄入）见 `system/skills/`，自建照 `system/skills/_template.md`。
-   - 官方模块（博客抓取 / 日报监控 / 假设追踪）一键部署见 `system/skills/deploy-modules.md`，自接外部项目照 `system/integrations/_template.md`。
+   - 所有工具已内置（`tools/podcast/`、`tools/daily-watch/`），自建新工具照 `system/integrations/_template.md`。
    ```
 3. **完整保留核心路由表**——尤其「摄入材料」那一行里对 `system/skills/first-ingest.md`、`system/skills/pdf-ingest.md`、`system/integrations/personal-wiki.md` 的指针**绝不能删**：删了「最小试跑」段后，这一行就是这些 skill / 模块在日常必读文件里的**唯一入口**，删掉它们会变成孤岛。
 4. **保留**：工作方式（含删除/覆盖/推送前确认红线）、active-context / friction 规则、加规则前判断范围。

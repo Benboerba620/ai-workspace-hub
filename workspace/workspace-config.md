@@ -1,10 +1,10 @@
 # Workspace Config
 
-> 这是最小可运行配置。目标不是完整投研系统，而是让 Codex / Claude 能直接试跑一条输入 -> personal wiki 的路径。
+> 这个文件描述当前项目是什么、材料在哪里、输出写哪里。它是项目级配置，不是全局人格设定。
 
 ## 项目定位
 
-- name: `ai-workspace-hub`
+- name: `MY_AI_WORKSPACE`
 - primary_use: `research / writing / investing / podcast / mixed`
 - language: `zh-CN`
 
@@ -15,16 +15,38 @@
 | `inbox/` | 临时输入材料 |
 | `wiki/raw/` | 原始材料归档 |
 | `wiki/sources/` | 结构化来源页面 |
-| `wiki/entities/` | 实体档案 |
+| `wiki/entities/` | 公司、人、项目等实体 |
 | `wiki/concepts/` | 概念和主题 |
-| `wiki/explorations/` | 综合判断 |
-| `output/` | 报告、日报、文章草稿 |
-| `monitoring/` | 监控对象 |
+| `wiki/explorations/` | 综合判断和阶段性结论 |
+| `output/` | 报告、日报、文章草稿等输出 |
+| `monitoring/` | 监控对象和看板 |
 | `hypothesis/` | 假设、证据、复盘 |
-| `system/interfaces/` | 已部署模块的接口总览 |
-| `system/integrations/` | 模块接入契约（含 `_template.md`） |
-| `system/skills/` | 能力说明书（含 `_template.md`） |
+| `daily-watchlist-reports/` | 日报输出 |
+| `portfolio/` | 交易记录 |
+| `config/` | 用户配置文件（不入 git） |
+| `tools/` | 内置工具代码 |
+| `system/` | 机器零件箱 |
 | `workspace/meta/` | active-context 和 friction-log |
+
+## 输出约定
+
+所有输出都要尽量包含：
+
+1. 核心结论
+2. 关键证据
+3. 反方证据
+4. 待验证问题
+5. 下一步动作
+
+## 数据标注
+
+涉及事实或数字时，标注来源：
+
+- `[本地]` 来自本地文件
+- `[网页]` 来自联网资料
+- `[Longbridge]` / `[tushare]` / `[FMP]` 来自对应数据源 API
+- `[推测]` agent 的推理
+- `[待验证]` 尚未确认
 
 ## 简单规则
 
@@ -39,12 +61,13 @@
 - status: `enabled`
 - wiki_root: `./wiki`
 - source_schema: `karpathy-claude-wiki compatible`
-- schema_file: `wiki/_schema.md`
-- raw_dir: `wiki/raw/`
-- sources_dir: `wiki/sources/`
-- entities_dir: `wiki/entities/`
-- concepts_dir: `wiki/concepts/`
-- explorations_dir: `wiki/explorations/`
+- reads_from:
+  - `wiki/raw/`
+- writes_to:
+  - `wiki/sources/`
+  - `wiki/entities/`
+  - `wiki/concepts/`
+  - `wiki/explorations/`
 
 ### research（研究闭环）
 
@@ -52,55 +75,17 @@
 - skill: `system/skills/research.md`
 - inputs: `wiki/` + `websearch` + `data_sources`（可选）
 - writes_to: `output/research/` → 确认后回写 `wiki/explorations/`
-- focus_points: 默认 `业务/驱动因子, 竞争格局, 关键数据, 风险, 催化剂`（按需自定义这一行）
+- focus_points: 默认 `业务/驱动因子, 竞争格局, 关键数据, 风险, 催化剂`（按需自定义）
 
-## 可选数据源（research 外挂，配了才用）
+### screen（快速筛选）
 
-> 接入照 `system/integrations/_template.md`；key 走环境变量，**不要**写进 repo。没配的字段 research 会标 `[待验证]`。
+- status: `enabled`（基座能力，websearch + 可选数据源）
+- skill: `system/skills/screen.md`
+- inputs: `websearch` + `data_sources`（可选）
+- writes_to: `output/screen/`
+- presets: `价值股` / `AI产业链`
 
-### tushare（示例：A股行情 / 财务）
-
-- status: `planned`
-- env_key: `TUSHARE_TOKEN`
-- used_by: `system/skills/research.md`
-
-### gangtise（示例：卖方纪要）
-
-- status: `planned`
-- env_key: `GANGTISE_API_KEY`
-- used_by: `system/skills/research.md`
-
-## 可选模块
-
-> 一键部署见 `system/skills/deploy-modules.md`（"帮我安装博客抓取 / 日报监控"）。
-> 假设追踪是**基座自带能力**（见下方「基座自带」段），不在可选模块里。
-
-### pod2wiki（博客 / 播客抓取，输入槽）
-
-- status: `planned`
-- repo: `https://github.com/Benboerba620/pod2wiki`
-- project_path: `./pod2wiki`
-- writes_to:
-  - `wiki/sources/`
-  - `wiki/raw/podcasts/`
-  - `output/pod2wiki/`
-
-### daily-watchlist（日报监控，输出槽）
-
-- status: `planned`
-- repo: `https://github.com/Benboerba620/daily-watchlist`
-- project_path: `./daily-watchlist`
-- reads_from:
-  - `monitoring/`
-  - `wiki/entities/`
-  - `wiki/concepts/`
-- writes_to:
-  - `output/daily-watchlist/`
-  - `hypothesis/`
-
-## 基座自带
-
-### 假设追踪（决策层，无需安装）
+### 假设追踪（基座自带，无需安装）
 
 - status: `enabled`
 - 契约: `system/integrations/hypothesis-tracker.md`
@@ -111,12 +96,57 @@
   - `hypothesis/`
   - `wiki/explorations/`
 
-## 可选能力
+## 内置工具
 
-### pdf-ingest
+### podcast（播客/博客摄入）
 
-- status: `available`（按需自装）
-- slot: `input`
-- skill: `system/skills/pdf-ingest.md`
-- script: `system/scripts/pdf_to_md.py`
-- deps: `requirements-pdf.txt`（pypdf，agent 首次执行时自装）
+- status: `enabled`
+- skill: `system/skills/podcast.md`
+- project_path: `./tools/podcast`
+- writes_to:
+  - `wiki/sources/`
+  - `wiki/raw/podcasts/`
+  - `output/pod2wiki/`
+
+### daily-watch（日报监控）
+
+- status: `enabled`
+- skill: `system/skills/daily-watch.md`
+- project_path: `./tools/daily-watch`
+- reads_from:
+  - `config/daily-watchlist-watchlist.md`
+  - `monitoring/`
+  - `wiki/entities/`
+  - `wiki/concepts/`
+- writes_to:
+  - `daily-watchlist-reports/`
+  - `hypothesis/`
+
+## 数据源（配了才用，没配降级不报错）
+
+> key 走环境变量或 `config/*.env`，不要写进 repo。没配的字段 agent 会标 `[待验证]` 而不是编造。
+
+### longbridge（默认免费：HK + US 行情）
+
+- status: `planned`
+- env_keys: `LONGBRIDGE_APP_KEY`, `LONGBRIDGE_APP_SECRET`, `LONGBRIDGE_ACCESS_TOKEN`
+- markets: US, HK
+- used_by: `daily-watch`, `screen`, `research`
+- 获取方式: https://open.longbridge.com/zh-CN/skill/
+
+### tushare（默认免费：A 股行情 / 财务）
+
+- status: `planned`
+- env_key: `TUSHARE_TOKEN`
+- markets: CN (.SH/.SZ), HK (.HK)
+- used_by: `daily-watch`, `screen`, `research`
+- 获取方式: https://tushare.pro/register
+
+### fmp（付费可选：全球行情 / 财报 / 宏观）
+
+- status: `planned`
+- env_key: `FMP_API_KEY`
+- markets: US, HK, EU, JP, CN
+- used_by: `daily-watch`, `screen`, `research`
+- free_tier: 250 requests/day
+- 获取方式: https://financialmodelingprep.com/

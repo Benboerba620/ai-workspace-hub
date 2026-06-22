@@ -1,0 +1,14 @@
+# AI Workspace Hub - 合并依赖
+# 安装：pip install -r requirements.txt
+
+# 核心（daily-watch + screen + research 数据拉取）
+requests>=2.28.0
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# 播客摄入（podcast）
+yt-dlp>=2025.1.0
+youtube-transcript-api>=0.6.2
+# 可选：faster-whisper>=1.0.0  （音频转录，需要 ffmpeg）
+
+# PDF 摄入见 requirements-pdf.txt（可选）

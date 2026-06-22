@@ -1,0 +1,8 @@
+pyyaml>=6.0
+requests>=2.31
+yt-dlp>=2025.1.0
+youtube-transcript-api>=0.6.2
+# Optional: faster-whisper enables auto MP3 transcription for podcast RSS feeds
+# whose <description> is short. fetch_podcasts.py degrades gracefully if it is
+# missing and falls back to the RSS description text. ffmpeg must also be on PATH.
+faster-whisper>=1.0.0

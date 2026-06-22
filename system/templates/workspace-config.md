@@ -21,9 +21,11 @@
 | `output/` | 报告、日报、文章草稿等输出 |
 | `monitoring/` | 监控对象和看板 |
 | `hypothesis/` | 假设、证据、复盘 |
-| `system/interfaces/` | 已部署模块的接口总览 |
-| `system/integrations/` | 模块接入契约（含 `_template.md`） |
-| `system/skills/` | 能力说明书（含 `_template.md`） |
+| `daily-watchlist-reports/` | 日报输出 |
+| `portfolio/` | 交易记录 |
+| `config/` | 用户配置文件（不入 git） |
+| `tools/` | 内置工具代码 |
+| `system/` | 机器零件箱 |
 | `workspace/meta/` | active-context 和 friction-log |
 
 ## 输出约定
@@ -42,6 +44,7 @@
 
 - `[本地]` 来自本地文件
 - `[网页]` 来自联网资料
+- `[Longbridge]` / `[tushare]` / `[FMP]` 来自对应数据源 API
 - `[推测]` agent 的推理
 - `[待验证]` 尚未确认
 
@@ -74,38 +77,13 @@
 - writes_to: `output/research/` → 确认后回写 `wiki/explorations/`
 - focus_points: 默认 `业务/驱动因子, 竞争格局, 关键数据, 风险, 催化剂`（按需自定义）
 
-## 可选数据源（research 外挂，配了才用）
+### screen（快速筛选）
 
-> 接入照 `system/integrations/_template.md`；key 走环境变量，不要写进 repo。没配的字段 research 会标 `[待验证]`。
-
-### tushare（示例：A股行情 / 财务）
-
-- status: `planned`
-- env_key: `TUSHARE_TOKEN`
-- used_by: `system/skills/research.md`
-
-## 外挂项目
-
-### pod2wiki
-
-- status: `optional` / `enabled` / `planned`
-- project_path:
-- writes_to:
-  - `wiki/sources/`
-  - `wiki/raw/podcasts/`
-  - `output/pod2wiki/`
-
-### daily-watchlist
-
-- status: `planned`
-- project_path:
-- reads_from:
-  - `monitoring/`
-  - `wiki/entities/`
-  - `wiki/concepts/`
-- writes_to:
-  - `output/daily-watchlist/`
-  - `hypothesis/`
+- status: `enabled`（基座能力，websearch + 可选数据源）
+- skill: `system/skills/screen.md`
+- inputs: `websearch` + `data_sources`（可选）
+- writes_to: `output/screen/`
+- presets: `价值股` / `AI产业链`
 
 ### 假设追踪（基座自带，无需安装）
 
@@ -117,3 +95,58 @@
 - writes_to:
   - `hypothesis/`
   - `wiki/explorations/`
+
+## 内置工具
+
+### podcast（播客/博客摄入）
+
+- status: `enabled`
+- skill: `system/skills/podcast.md`
+- project_path: `./tools/podcast`
+- writes_to:
+  - `wiki/sources/`
+  - `wiki/raw/podcasts/`
+  - `output/pod2wiki/`
+
+### daily-watch（日报监控）
+
+- status: `enabled`
+- skill: `system/skills/daily-watch.md`
+- project_path: `./tools/daily-watch`
+- reads_from:
+  - `config/daily-watchlist-watchlist.md`
+  - `monitoring/`
+  - `wiki/entities/`
+  - `wiki/concepts/`
+- writes_to:
+  - `daily-watchlist-reports/`
+  - `hypothesis/`
+
+## 数据源（配了才用，没配降级不报错）
+
+> key 走环境变量或 `config/*.env`，不要写进 repo。没配的字段 agent 会标 `[待验证]` 而不是编造。
+
+### longbridge（默认免费：HK + US 行情）
+
+- status: `planned`
+- env_keys: `LONGBRIDGE_APP_KEY`, `LONGBRIDGE_APP_SECRET`, `LONGBRIDGE_ACCESS_TOKEN`
+- markets: US, HK
+- used_by: `daily-watch`, `screen`, `research`
+- 获取方式: https://open.longbridge.com/zh-CN/skill/
+
+### tushare（默认免费：A 股行情 / 财务）
+
+- status: `planned`
+- env_key: `TUSHARE_TOKEN`
+- markets: CN (.SH/.SZ), HK (.HK)
+- used_by: `daily-watch`, `screen`, `research`
+- 获取方式: https://tushare.pro/register
+
+### fmp（付费可选：全球行情 / 财报 / 宏观）
+
+- status: `planned`
+- env_key: `FMP_API_KEY`
+- markets: US, HK, EU, JP, CN
+- used_by: `daily-watch`, `screen`, `research`
+- free_tier: 250 requests/day
+- 获取方式: https://financialmodelingprep.com/

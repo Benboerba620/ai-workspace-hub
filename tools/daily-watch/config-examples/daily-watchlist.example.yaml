@@ -1,0 +1,33 @@
+# Daily Watchlist 配置
+# 可直接在此文件中按你的工作流调整默认行为。
+
+market: mixed  # us / cn / hk / mixed
+
+modules:
+  macro: true
+  earnings: true
+  focus_areas: true
+  wiki: auto
+
+reporting:
+  model_profile: domestic  # default / domestic
+  secondary_verify: true   # 使用国内模型时建议开启
+  theme_min_score: 3
+  theme_min_hits: 2
+
+thresholds:
+  large_cap_move: 3
+  small_cap_move: 7
+
+hypothesis_tracking:
+  enabled: true
+  directory: hypothesis
+  max_matches: 8
+  auto_writeback: true
+  suggest_new_hypothesis_threshold: 2
+
+focus_areas:
+  - name: "AI 与数据中心"
+    keywords: ["AI", "data center", "GPU", "inference", "LLM", "算力", "大模型"]
+    required_any: ["AI", "data center", "GPU", "inference", "LLM", "算力", "大模型"]
+    exclude: ["airline", "ceasefire", "military"]

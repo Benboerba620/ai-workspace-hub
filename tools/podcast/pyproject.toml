@@ -1,0 +1,30 @@
+[project]
+name = "pod2wiki"
+version = "0.1.0"
+description = "Turn podcasts and long-form RSS into LLM wiki source pages."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "pyyaml>=6.0",
+  "requests>=2.31",
+  "yt-dlp>=2025.1.0",
+  "youtube-transcript-api>=0.6.2",
+]
+
+[project.optional-dependencies]
+transcribe = ["faster-whisper>=1.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/Benboerba620/pod2wiki"
+Issues = "https://github.com/Benboerba620/pod2wiki/issues"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

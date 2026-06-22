@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""
+Daily Watchlist + Hypothesis Tracker 环境检查。
+"""
+
+from __future__ import annotations
+
+import os
+import sys
+from io import StringIO
+from pathlib import Path
+
+from workspace_paths import (
+    CONFIG_FILE_CANDIDATES,
+    ENV_FILE_CANDIDATES,
+    WATCHLIST_FILE_CANDIDATES,
+    resolve_config_path,
+    resolve_env_path,
+    resolve_holdings_path,
+    resolve_hypothesis_config_path,
+    resolve_hypothesis_dir,
+    resolve_journal_dir,
+    resolve_trades_path,
+    resolve_watchlist_path,
+)
+
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+OK = "[OK]"
+FAIL = "[FAIL]"
+WARN = "[WARN]"
+
+
+def check(name: str, passed: bool, msg: str = "") -> bool:
+    status = OK if passed else FAIL
+    detail = f" - {msg}" if msg else ""
+    print(f"  {status} {name}{detail}")
+    return passed
+
+
+def warn(name: str, msg: str = "") -> None:
+    detail = f" - {msg}" if msg else ""
+    print(f"  {WARN} {name}{detail}")
+
+
+def load_env_file(env_file: Path) -> None:
+    from dotenv import dotenv_values
+
+    raw_text = env_file.read_text(encoding="utf-8-sig")
+    parsed = dotenv_values(stream=StringIO(raw_text))
+    for key, value in parsed.items():
+        if value is not None and key not in os.environ:
+            os.environ[key] = value
+
+
+def main() -> int:
+    print("Daily Watchlist + Hypothesis Tracker 环境检查\n")
+    all_pass = True
+
+    version = sys.version_info
+    all_pass &= check(
+        "Python >= 3.10",
+        version >= (3, 10),
+        f"当前版本 {version.major}.{version.minor}.{version.micro}",
+    )
+
+    for pkg in ["requests", "dotenv", "yaml"]:
+        try:
+            __import__(pkg)
+            check(f"依赖包 {pkg}", True)
+        except ImportError:
+            real_name = {"dotenv": "python-dotenv", "yaml": "pyyaml"}.get(pkg, pkg)
+            all_pass &= check(f"依赖包 {pkg}", False, f"请执行 pip install {real_name}")
+
+    script_dir = Path(__file__).resolve().parent
+    try:
+        from workspace_paths import find_workspace_root
+        root = find_workspace_root(script_dir)
+    except FileNotFoundError:
+        root = script_dir.parent.parent
+    config_dir = root / "config"
+    env_file = resolve_env_path(config_dir)
+
+    all_pass &= check("config/ 目录", config_dir.exists())
+
+    if not env_file.exists():
+        all_pass &= check(
+            f"config/{ENV_FILE_CANDIDATES[0]}",
+            False,
+            f"请创建 {ENV_FILE_CANDIDATES[0]} 并填入 API Key",
+        )
+    else:
+        check(f"config/{env_file.name}", True)
+        load_env_file(env_file)
+
+        fmp_key = os.getenv("FMP_API_KEY", "")
+        if not fmp_key or fmp_key.startswith("your_"):
+            warn(
+                "FMP_API_KEY", "未配置（可选，可用 Longbridge 免费替代：https://open.longbridge.com/zh-CN/skill/）"
+            )
+        else:
+            try:
+                import requests
+
+                response = requests.get(
+                    f"https://financialmodelingprep.com/api/v3/quote/AAPL?apikey={fmp_key}",
+                    timeout=10,
+                )
+                data = response.json()
+                if isinstance(data, list) and data and "symbol" in data[0]:
+                    price = data[0].get("price", "?")
+                    check("FMP_API_KEY", True, f"可用（AAPL = ${price}）")
+                else:
+                    all_pass &= check(
+                        "FMP_API_KEY", False, f"返回异常：{str(data)[:100]}"
+                    )
+            except Exception as exc:  # noqa: BLE001
+                all_pass &= check("FMP_API_KEY", False, f"连接失败：{exc}")
+
+        ts_token = os.getenv("TUSHARE_TOKEN", "")
+        if ts_token and not ts_token.startswith("your_"):
+            try:
+                import tushare as ts
+
+                pro = ts.pro_api(ts_token)
+                pro.trade_cal(
+                    exchange="SSE", start_date="20260101", end_date="20260102"
+                )
+                check("TUSHARE_TOKEN", True, "可用")
+            except ImportError:
+                warn("TUSHARE_TOKEN", "已配置，但未安装 tushare（pip install tushare）")
+            except Exception as exc:  # noqa: BLE001
+                warn("TUSHARE_TOKEN", f"检查跳过：{exc}")
+        else:
+            warn("TUSHARE_TOKEN", "未配置（可选，仅 A 股/港股需要）")
+
+    config_file = resolve_config_path(config_dir)
+    if config_file.exists():
+        check(f"config/{config_file.name}", True)
+    else:
+        all_pass &= check(
+            f"config/{CONFIG_FILE_CANDIDATES[0]}",
+            False,
+            f"请创建 {CONFIG_FILE_CANDIDATES[0]}",
+        )
+
+    watchlist_file = resolve_watchlist_path(config_dir)
+    if watchlist_file.exists():
+        check(f"config/{watchlist_file.name}", True)
+    else:
+        all_pass &= check(
+            f"config/{WATCHLIST_FILE_CANDIDATES[0]}",
+            False,
+            f"请创建 {WATCHLIST_FILE_CANDIDATES[0]} 或通过 /dw-import 生成",
+        )
+
+    hypothesis_config = resolve_hypothesis_config_path(config_dir)
+    all_pass &= check(
+        "config/hypothesis-tracker.yaml",
+        hypothesis_config.exists(),
+        "内置假设跟踪配置缺失" if not hypothesis_config.exists() else "",
+    )
+
+    hypothesis_dir = resolve_hypothesis_dir(root)
+    all_pass &= check("hypothesis/", hypothesis_dir.exists())
+
+    journal_dir = resolve_journal_dir(root)
+    all_pass &= check("portfolio/journal/", journal_dir.exists())
+
+    trades_path = resolve_trades_path(root)
+    if not trades_path.exists():
+        warn("portfolio/trades.csv", "首次交易时自动创建")
+    else:
+        check("portfolio/trades.csv", True)
+
+    holdings_path = resolve_holdings_path(root)
+    if not holdings_path.exists():
+        warn("portfolio/holdings.csv", "首次交易时自动创建")
+    else:
+        check("portfolio/holdings.csv", True)
+
+    print()
+    if all_pass:
+        print(
+            "所有必要检查已通过。现在可以运行 "
+            "/dw-today、/ht-new、/ht-status、/ht-trade。"
+        )
+        return 0
+
+    print("仍有未完成项，请按上面的提示修复后再运行。")
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
