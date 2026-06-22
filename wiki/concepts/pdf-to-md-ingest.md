@@ -19,7 +19,7 @@ PDF to Markdown Ingest 是 personal wiki 的输入前处理流程：PDF 先转�
 
 ## 当前 MVP 能力
 
-`[本地]` PDF 是基座之外的**可选能力**，按 `system/skills/pdf-ingest.md`「喊一句 agent 自装」开启：
+`[本地]` PDF 是**可选能力**，按 `system/skills/pdf-ingest.md` 首次使用时 agent 自动安装依赖：
 
 ```text
 system/scripts/pdf_to_md.py   # pypdf，文本型 PDF

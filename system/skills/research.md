@@ -1,7 +1,7 @@
 # Research Skill（研究闭环）
 
 > 基座能力，零依赖即可起步：核心输入 = `wiki/` 已有知识 + websearch（Claude / Codex 都自带）。
-> 外挂数据源（tushare / gangtise / 自有 API）是**可选槽位**，配了就用，没配就跳过并标注 `[待验证]`，绝不编造数字。
+> 外挂数据源（tushare / gangtise / 自有 API）是**可选数据源**，配了就用，没配就跳过并标注 `[待验证]`，绝不编造数字。
 > 目标是形成闭环：**查已有 → 补外部 → 按要点输出 → 讨论升级 → 确认后回写 wiki**。
 
 ## 触发词
@@ -26,7 +26,7 @@
    - 避免重复研究：已有 exploration 覆盖的，先读它再决定要不要更新。
 2. **websearch（联网补充）**：wiki 不够时联网。每条结论标来源；抓不到全文就走 `WebFetch` / 代理，全失败标注"待人工搜索"。
 3. **可选数据源（用户自有 API）**：如 tushare（A股行情财务）、gangtise（卖方纪要）或用户自己的 API。
-   - 这些是**可选槽位**，照 `system/integrations/_template.md` 接入，在 `workspace/workspace-config.md` 的 `data_sources:` 段登记 endpoint / 取数方式（key 走环境变量，不写进 repo）。
+   - 这些是**可选数据源**，照 `system/integrations/_template.md` 接入，在 `workspace/workspace-config.md` 的 `data_sources:` 段登记 endpoint / 取数方式（key 走环境变量，不写进 repo）。
    - **没配置就跳过**，把需要它的数字标 `[待验证]` 并说明"需 {数据源} 补"，**不要编造**。
 
 ## 第 2 步：按研究要点输出
@@ -108,5 +108,5 @@ Wiki check: 查了 wiki/ 的 {x} 篇，{命中/未命中/有矛盾}。
 ## 边界与扩展
 
 - 核心链路（wiki + websearch）零依赖，开箱即用。
-- 接 tushare / gangtise / 自有 API：照 `system/integrations/_template.md` 写一份接入契约，`workspace-config` 登记一行，key 走环境变量。
+- 接数据源（Longbridge / tushare / FMP / 自有 API）：在 `workspace-config` 的 `data_sources:` 段登记，key 走环境变量或 `config/*.env`。
 - 想固化常用研究要点：编辑 `workspace/workspace-config.md` 的 `research:` 段，本 skill 会优先用用户要点。
