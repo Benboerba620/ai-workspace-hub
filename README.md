@@ -59,36 +59,31 @@ cd my-workspace
 
 ```text
 ai-workspace-hub/
-├── AGENTS.md / CLAUDE.md           # 路由：告诉 AI 看到什么信号读哪个文件（同源）
+├── AGENTS.md            # 路由文档：Codex 读这份
+├── CLAUDE.md            # 路由文档：Claude 读这份（与 AGENTS.md 同源）
 ├── workspace/
-│   ├── workspace-config.md         # 每次必读：项目配置 + 数据源登记
-│   └── meta/                       # 反馈 + 记忆
-│       ├── active-context.md       #   工作记忆：当前在做什么，明天从哪接
-│       └── friction-log.md         #   摩擦日志：哪里卡住了，用来改流程
+│   ├── workspace-config.md   # 项目配置 + 数据源登记（每次必读）
+│   └── meta/
+│       ├── active-context.md # 工作记忆：当前在做什么，明天从哪接
+│       └── friction-log.md   # 摩擦日志：哪里卡住了，用来改流程
 │
-│  ── 六步工作流，每步一个文件夹 ──
+├── inbox/                    # 临时丢进来的原始材料
+├── wiki/                     # 结构化知识库（来源 / 公司 / 概念 / 结论）
+├── output/                   # 研究报告、筛选结果等输出
+├── daily-watchlist-reports/  # 每日监控日报
+├── hypothesis/               # 投资假设 + 证据 + 复盘
+├── monitoring/               # 股票池、关注对象
+├── portfolio/                # 交易记录
 │
-├── inbox/                          # ① 收集：临时丢进来的原始材料
-├── wiki/                           # ② 沉淀：结构化知识库（来源/公司/概念/结论）
-├── output/                         # ③④ 研究 & 筛选的输出落点
-│   ├── research/                   #   研究报告
-│   └── screen/                     #   筛选结果
-├── daily-watchlist-reports/        # ⑤ 盯盘：每日监控日报
-├── hypothesis/                     # ⑥ 假设：投资逻辑 + 证据 + 复盘
-├── monitoring/                     #   盯盘的输入：股票池、关注对象
-├── portfolio/                      #   交易记录（假设追踪的延伸）
-│
-│  ── 机器零件，日常不用读 ──
-│
-├── config/                         # 用户配置：API key 等（不入 git）
-├── tools/                          # 内置工具代码
-│   ├── podcast/                    #   播客/博客摄入（Python 脚本）
-│   └── daily-watch/                #   日报监控 + 行情拉取（Python 脚本）
-├── system/                         # 零件箱
-│   ├── skills/                     #   能力说明书：每个能力怎么用
-│   ├── integrations/               #   内部接线：工具和知识库怎么连
-│   └── templates/                  #   安装时复制的模板文件
-└── requirements.txt                # Python 依赖（首次用工具时装）
+├── config/                   # 用户配置：API key 等（不入 git）
+├── tools/
+│   ├── podcast/              # 播客 / 博客摄入脚本
+│   └── daily-watch/          # 日报监控 + 行情拉取脚本
+├── system/
+│   ├── skills/               # 能力说明书：每个能力怎么用
+│   ├── integrations/         # 内部接线：工具和知识库怎么连
+│   └── templates/            # 安装时复制的模板文件
+└── requirements.txt          # Python 依赖（首次用工具时装）
 ```
 
 ---
