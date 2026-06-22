@@ -100,6 +100,7 @@ system/scripts/
 - `system/integrations/_template.md` -> `system/integrations/_template.md`（新增模块照抄）
 - `system/scripts/pdf_to_md.py` -> `system/scripts/pdf_to_md.py`（PDF 可选能力，按需）
 - `requirements-pdf.txt` -> `requirements-pdf.txt`（PDF 可选能力，按需）
+- `inbox/first-note.md` -> `inbox/first-note.md`（试跑用示例材料，README"直接试跑"段引用它）
 
 按用户用途替换模板里的占位符。
 
