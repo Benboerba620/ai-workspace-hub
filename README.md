@@ -27,11 +27,10 @@
 
 ## 最近更新
 
+- `0.2.4`：修复 INSTALL 路径试跑缺文件——Step 2 复制清单补上 `inbox/first-note.md`，两条安装路径都能直接跑通。
 - `0.2.3`：active-context 加**上限自动清理**——超 14 天 / 20 条的旧条目写断点时自动剪到归档（零脚本内联），structure-health 转为周度兜底。
 - `0.2.2`：**active-context 断点续传**落地——开场说"继续"自动接上、收尾自动记一行，AGENTS / CLAUDE 写明两条自动触发规则。
 - `0.2.1`：假设追踪改为**基座自带**（`hypothesis/` + 复盘回写 `wiki/explorations/`，无需安装）；移除指向私有 repo 的失效链接。
-- `0.2.0`：新增 research 研究闭环（wiki + websearch + 可选数据源 → 模板输出 → 确认后回写 wiki）；机械零件收进 `system/`，顶层目录 13→8；新增 ARCHITECTURE.md。
-- `0.1.0`：首个 Codex-first / Claude-compatible 最小基座（personal wiki + first-ingest + PDF smoke path）。
 
 > 完整历史见 [CHANGELOG.md](CHANGELOG.md)。
 

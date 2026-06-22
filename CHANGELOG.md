@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4 - 2026-06-22
+
+### 修复
+
+- **INSTALL 路径补上试跑材料**：走 `INSTALL-FOR-AI.md` 安装的用户 `inbox/` 是空的，README「直接试跑」段引用的 `first-note.md` 不存在导致跑不通。现在 Step 2 复制清单包含 `inbox/first-note.md`，两条安装路径都能直接试跑。
+
 ## 0.2.3 - 2026-06-07
 
 ### 改进
