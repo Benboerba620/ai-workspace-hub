@@ -15,7 +15,19 @@
 
 ---
 
-## 快速开始
+## 🚀 一键安装
+
+把下面这句话**直接发给你的 AI agent**（Codex / Claude Code / Cursor / Cline），它会自动读协议、问 3 个问题、建好整套系统：
+
+```text
+帮我按这个协议安装 AI Workspace Hub：
+https://github.com/Benboerba620/ai-workspace-hub/blob/main/INSTALL-FOR-AI.md
+```
+
+> **全程零依赖、不联网、不动你的旧资料。** Agent 装完会告诉你哪些免费 API key 可以配，配了对应能力就亮灯。
+
+<details>
+<summary>或者手动 clone 先试跑</summary>
 
 ```bash
 git clone https://github.com/Benboerba620/ai-workspace-hub.git my-workspace
@@ -28,24 +40,61 @@ cd my-workspace
 
 这条 note → wiki 链路纯 markdown 读写，**零依赖、不联网、任何 agent 都能跑**。这就是那个"先跑起来"的最小起点。
 
-> 想装进已有的工作区？把这句话发给 AI agent：`帮我按这个协议安装 AI Workspace Hub：https://github.com/Benboerba620/ai-workspace-hub/blob/main/INSTALL-FOR-AI.md`
+</details>
 
 ---
 
 ## 六步 × 六大能力
 
-| 工作流 | 能力 | 做什么 | 需要 API? |
-|--------|------|--------|-----------|
-| ① 收集材料 | **podcast** | YouTube/RSS/博客 → 双语摘要 → wiki | 需 LLM key |
-| ② 沉淀知识 | **wiki** | 材料摄入 → 按 schema 分类存储 | 否 |
-| ③ 做研究 | **research** | wiki + websearch → 结构化报告 → 回写知识库 | 否 |
-| ④ 筛选标的 | **screen** | 给主题 → 找候选 → 拉数据 → Top 5 分析 | 可选 |
-| ⑤ 日常盯盘 | **daily-watch** | 拉行情 → 检测异动 → 搜新闻 → 生成日报 | 可选 |
-| ⑥ 追踪假设 | **hypothesis** | 建假设 → 收集证据 → 复盘 → 回写知识库 | 否 |
+```
+  ┌─────────┐    ┌─────────┐    ┌─────────┐
+  │ ① 收集  │───▶│ ② 沉淀  │───▶│ ③ 研究  │
+  │ podcast │    │  wiki   │    │research │
+  └─────────┘    └────┬────┘    └─────────┘
+                      │
+              ┌───────┼───────┐
+              ▼       ▼       ▼
+        ┌─────────┐ ┌─────────┐ ┌─────────┐
+        │ ④ 筛选  │ │ ⑤ 盯盘  │ │ ⑥ 假设  │
+        │ screen  │ │daily-w. │ │hypothe. │
+        └─────────┘ └─────────┘ └────┬────┘
+                                     │
+                              复盘回写 wiki
+                            ──── 闭环 ────
+```
 
-**零 key 能跑**：wiki + research + hypothesis + screen（纯 websearch 模式）不需要任何 API key。
+| 步骤 | 能力 | 做什么 | 需要 API? |
+|:----:|------|--------|:---------:|
+| ① | **podcast** | YouTube / RSS / 博客 → 双语摘要 → wiki | 需 LLM key |
+| ② | **wiki** | 材料摄入 → 按 schema 分类存储 | 否 |
+| ③ | **research** | wiki + websearch → 结构化报告 → 回写知识库 | 否 |
+| ④ | **screen** | 给主题 → 找候选 → 拉数据 → Top 5 分析 | 可选 |
+| ⑤ | **daily-watch** | 拉行情 → 检测异动 → 搜新闻 → 生成日报 | 可选 |
+| ⑥ | **hypothesis** | 建假设 → 收集证据 → 复盘 → 回写知识库 | 否 |
 
-**配上免费 key 全部亮灯**：[Longbridge](https://open.longbridge.com/zh-CN/skill/)（港美股免费）+ [tushare](https://tushare.pro/register)（A 股免费）+ 一个 LLM key（[DeepSeek](https://platform.deepseek.com/) 等）。
+> **零 key 能跑**：wiki + research + hypothesis + screen（websearch 模式）不需要任何 API key。
+>
+> **配上免费 key 全部亮灯**：[Longbridge](https://open.longbridge.com/zh-CN/skill/)（港美股）+ [tushare](https://tushare.pro/register)（A 股）+ [DeepSeek](https://platform.deepseek.com/)（LLM）。
+
+---
+
+## 闭环怎么转
+
+```mermaid
+flowchart LR
+    subgraph LOOP[六步闭环]
+      A[① 收集<br/>podcast / inbox] --> B[② 沉淀<br/>wiki]
+      B --> C[③ 研究<br/>research]
+      B --> D[④ 筛选<br/>screen]
+      B --> E[⑤ 盯盘<br/>daily-watch]
+      C & D & E --> F[⑥ 假设<br/>hypothesis]
+      F -.->|复盘回写| B
+    end
+
+    YOU([你]) -.->|反馈 · 品味 · 方向| LOOP
+```
+
+研究、筛选、盯盘的产出喂进假设，假设复盘后回写知识库——闭环就在这接上了。**但闭环里最关键的一环是你**：你对 AI 产出的评价、追问、方向调整，才是系统进化的驱动力。
 
 ---
 
@@ -88,48 +137,28 @@ ai-workspace-hub/
 
 ---
 
-## 闭环怎么转
-
-```mermaid
-flowchart LR
-    subgraph LOOP[六步闭环]
-      A[① 收集<br/>podcast / inbox] --> B[② 沉淀<br/>wiki]
-      B --> C[③ 研究<br/>research]
-      B --> D[④ 筛选<br/>screen]
-      B --> E[⑤ 盯盘<br/>daily-watch]
-      C & D & E --> F[⑥ 假设<br/>hypothesis]
-      F -.->|复盘回写| B
-    end
-
-    YOU([你]) -.->|反馈 · 品味 · 方向| LOOP
-```
-
-研究、筛选、盯盘的产出喂进假设，假设复盘后回写知识库——闭环就在这接上了。**但闭环里最关键的一环是你**：你对 AI 产出的评价、追问、方向调整，才是系统进化的驱动力。
-
----
-
 ## 数据源
 
 | 数据源 | 市场 | 费用 | 获取方式 |
-|--------|------|------|---------|
-| **Longbridge** | HK + US | 免费 | [open.longbridge.com](https://open.longbridge.com/zh-CN/skill/) |
-| **tushare** | A 股 (.SH/.SZ) | 免费额度 | [tushare.pro](https://tushare.pro/register) |
-| **FMP** | 全球 | 免费 250 次/天 | [financialmodelingprep.com](https://financialmodelingprep.com/) |
+|--------|------|:----:|---------|
+| **Longbridge** | 🇭🇰 HK  🇺🇸 US | 免费 | [open.longbridge.com](https://open.longbridge.com/zh-CN/skill/) |
+| **tushare** | 🇨🇳 A 股 | 免费额度 | [tushare.pro](https://tushare.pro/register) |
+| **FMP** | 🌍 全球 | 免费 250 次/天 | [financialmodelingprep.com](https://financialmodelingprep.com/) |
 
-没配 → 自动降级到 websearch，数字标 `[待验证]`，不编造。
+> 没配 → 自动降级到 websearch，数字标 `[待验证]`，不编造。
 
 ---
 
 ## 第一周怎么用
 
 | 天数 | 动作 | 对应工作流 |
-|---|---|---|
-| Day 1 | clone，跑通 note → wiki | ①② 收集 + 沉淀 |
-| Day 2 | 放入 3-5 条材料，整理进知识库 | ①② 收集 + 沉淀 |
-| Day 3 | "帮我研究一下 {某公司}" | ③ 做研究 |
+|:----:|------|:----------:|
+| Day 1 | clone，跑通 note → wiki | ①② |
+| Day 2 | 放入 3-5 条材料，整理进知识库 | ①② |
+| Day 3 | "帮我研究一下 {某公司}" | ③ |
 | Day 4 | 配 Longbridge / tushare | 亮灯数据源 |
-| Day 5 | "帮我筛选 AI 产业链的股票" | ④ 筛选标的 |
-| Day 6 | 配 LLM key，扫一次播客 | ① 收集（进阶） |
+| Day 5 | "帮我筛选 AI 产业链的股票" | ④ |
+| Day 6 | 配 LLM key，扫一次播客 | ① |
 | Day 7 | 删一条没用的规则 | 防止系统变胖 |
 
 ---
@@ -151,7 +180,7 @@ flowchart LR
 2. 项目特有的？→ 写项目配置或 skill。
 3. 跨项目长期有效的？→ 才写进 `AGENTS.md` / `CLAUDE.md`。
 
-系统用久了一定会膨胀。context 即智能——配置越胖、模型越笨。所以得定期清理，让模型自己检查、自己清，你当监工就行（`system/skills/structure-health.md`）。
+> context 即智能——配置越胖、模型越笨。定期清理，让模型自己检查、自己清，你当监工就行。
 
 ---
 
