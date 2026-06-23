@@ -19,5 +19,6 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: ruff check system tools tests
       - run: python -m compileall -q system tools tests
+      - run: python system/scripts/check_workspace.py
       - run: python tools/podcast/scripts/fetch_podcasts.py --help
       - run: python tools/daily-watch/scripts/check_setup.py --init

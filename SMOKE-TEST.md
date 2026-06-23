@@ -1,6 +1,14 @@
 # Smoke Test
 
-## 基座（零依赖）
+## Core Mode（零 API / 零依赖）
+
+先运行总检查：
+
+```bash
+python3 system/scripts/check_workspace.py
+```
+
+预期：`Core Mode result: READY`。Enhanced Mode 里的 Python 版本、依赖包或 API key 警告不代表安装失败，只代表可选自动化暂未开启。
 
 用 Codex 或 Claude 打开本目录后，发送：
 
@@ -13,7 +21,7 @@
 3. `workspace/meta/active-context.md` 追加或更新一条试跑完成记录。
 4. 不需要联网，不需要任何依赖。
 
-## 播客工具（需 Python）
+## Enhanced Mode：播客工具（需 Python + 可选 LLM key）
 
 以下命令默认使用 `python3`，且需要 Python 3.10+。先运行 `python3 --version`；如果版本低于 3.10，请改用 `python3.10` / `python3.11` / `python3.12`，或安装新版 Python。如果你的环境只有 `python` 且版本 ≥3.10，把命令里的 `python3` 替换成 `python` 即可。
 
@@ -24,14 +32,16 @@ python3 tools/podcast/scripts/fetch_podcasts.py --help
 
 预期：输出帮助信息，无报错。
 
-## 日报工具（需 Python）
+如果没有 `LLM_API_KEY`，使用播客功能时应走 `--no-llm` 或低置信降级路径；这不影响 Core Mode。
+
+## Enhanced Mode：日报工具（需 Python + 可选行情 key）
 
 ```bash
 python3 -m pip install -r tools/daily-watch/requirements.txt
 python3 tools/daily-watch/scripts/check_setup.py --init
 ```
 
-预期：缺失的示例配置会被初始化；缺 API key 只显示警告，必要目录和依赖检查通过。
+预期：缺失的示例配置会被初始化；缺 API key 只显示警告或跳过对应数据源，必要目录和依赖检查通过。
 
 ## 自动测试
 
@@ -41,7 +51,7 @@ python3 -m unittest discover -s tests -v
 
 预期：安装器、路径识别、文档链接和仓库契约测试全部通过。
 
-## 快速筛选（零依赖）
+## 快速筛选（Core Mode 可用）
 
 > 帮我筛选一下价值股。
 

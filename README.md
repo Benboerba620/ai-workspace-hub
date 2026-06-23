@@ -10,7 +10,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/Benboerba620/ai-workspace-hub?style=social)](https://github.com/Benboerba620/ai-workspace-hub/stargazers)
 [![License](https://img.shields.io/github/license/Benboerba620/ai-workspace-hub)](LICENSE)
 
-[30 秒试跑](#30-秒试跑) · [一键交给 AI 安装](#一键交给-ai-安装) · [六大能力](#六大能力) · [工作原理](#为什么不是一个普通模板)
+[30 秒试跑](#30-秒试跑) · [Core / Enhanced](#core-mode--enhanced-mode) · [一键交给 AI 安装](#一键交给-ai-安装) · [六大能力](#六大能力) · [工作原理](#为什么不是一个普通模板)
 
 ⭐ 如果你也想让 AI 从“一次性聊天”进化成“长期工作系统”，欢迎点一下 Star。它会帮助更多研究员和 AI power user 发现这个项目。
 
@@ -19,6 +19,8 @@
 ---
 
 AI Workspace Hub 是一套 **AI-native research workspace**：一次 clone，就拿到知识库、研究、筛选、盯盘、播客摄入、假设追踪六大能力。
+
+核心工作流 **不需要 API key**：你可以先跑通 `inbox → wiki → output`，确认 AI agent 会读规则、会整理材料、会记录断点。API key 用于解锁播客摘要、行情数据、日报监控等增强自动化；如果你的目标是一开始就跑自动化流程，建议安装后马上填写自己的 API key。
 
 它不是又一个 prompt，也不是单一脚本工具。它更像一套给 AI agent 使用的“工作台协议”：文件夹存材料，入口文档告诉 agent 怎么做，skills 定义能力流程，tools 提供可选自动化，active-context 负责断点续传。
 
@@ -117,6 +119,33 @@ cd my-ai-workspace
 
 这条 note → wiki 链路只读写 Markdown，**不需要 API key，不需要联网，不需要安装依赖**。
 
+你也可以运行一次总检查，确认哪些能力已经可用：
+
+```bash
+python3 system/scripts/check_workspace.py
+```
+
+只要 Core Mode 显示 `READY`，就可以开始使用。Enhanced Mode 里的 API key 警告只是说明部分自动化暂未开启，不代表安装失败；如果你想让播客摘要、行情日报、自动监控真正跑起来，就需要继续填写自己的 API key。
+
+---
+
+## Core Mode / Enhanced Mode
+
+AI Workspace Hub 分成两档体验，避免新用户被 API 配置卡住。
+
+| 模式 | 是否需要 API key | 能做什么 | 适合什么时候 |
+|------|------------------|----------|--------------|
+| **Core Mode** | 不需要 | wiki 摄入、研究草稿、快速筛选、假设建档、断点续传 | 第一次试跑、日常 Markdown 工作流 |
+| **Enhanced Mode** | 建议填写自己的 key | 播客摘要、行情日报、A 股 / 全球市场数据、自动化监控 | 你想启用自动化流程时 |
+
+推荐顺序：
+
+1. 先用 Core Mode 跑通 `inbox/first-note.md → wiki/sources/`。
+2. 再运行 `python3 system/scripts/check_workspace.py` 看当前能力状态。
+3. 如果要启用播客 / 行情 / 日报 / 自动监控，把自己的 API key 填到本地 `config/*.env`。
+
+真实 API key 只应该保存在你的本地配置文件里，不要提交到 GitHub。
+
 ---
 
 ## 一键交给 AI 安装
@@ -130,7 +159,7 @@ https://github.com/Benboerba620/ai-workspace-hub/blob/main/INSTALL-FOR-AI.md
 
 agent 会按协议问 3 个问题，然后创建一套完整工作区：工作区放在哪里、主要用途是什么、是否已有 wiki。
 
-安装器默认安全：不覆盖已有文件、不默认安装 Python 依赖、不自动 commit / push；非空目录默认停止，只有你确认合并才补缺失文件。
+安装器默认安全：不覆盖已有文件、不默认安装 Python 依赖、不要求先配置 API key、不自动 commit / push；非空目录默认停止，只有你确认合并才补缺失文件。
 
 详细协议见 [INSTALL-FOR-AI.md](INSTALL-FOR-AI.md)。
 
@@ -204,6 +233,8 @@ ai-workspace-hub/
 
 重要边界：本项目不做自动交易，不承诺数据源永远免费，不把 AI 输出包装成投资建议。价格、财报、新闻、监管等动态信息需要当场验证；没有 key 时，无法验证的数字必须标 `[待验证]`。
 
+缺少 API key 时，项目应该优雅降级：Core Mode 继续可用，Enhanced Mode 中依赖数据源的部分显示警告或跳过，而不是让用户误以为整个工作区坏了。
+
 ---
 
 ## 第一周怎么用
@@ -213,7 +244,7 @@ ai-workspace-hub/
 | Day 1 | 跑通 `inbox/first-note.md → wiki` | 确认 agent 读得懂工作区 |
 | Day 2 | 放入 3-5 条真实材料 | 建立第一批知识库 |
 | Day 3 | 让 agent 研究一个公司 / 行业 | 生成第一篇结构化报告 |
-| Day 4 | 配 tushare / FMP，或另装 Longbridge Skill | 增强行情能力 |
+| Day 4 | 运行 `check_workspace.py`，按需配置 tushare / FMP，或另装 Longbridge Skill | 增强行情能力 |
 | Day 5 | 做一次主题筛选 | 形成候选池 |
 | Day 6 | 配 LLM key，扫一次播客 / 博客 | 建立外部信息流 |
 | Day 7 | 运行结构体检，删掉没用规则 | 防止系统变胖 |
@@ -223,12 +254,13 @@ ai-workspace-hub/
 ## 常用命令
 
 ```bash
+python3 system/scripts/check_workspace.py
 python3 -m unittest discover -s tests -v
 python3 tools/daily-watch/scripts/check_setup.py --init
 python3 tools/podcast/scripts/fetch_podcasts.py --help
 ```
 
-Python 工具需要 Python 3.10+。如果你的 `python3` 指向 3.9，请改用 `python3.10` / `python3.11` / `python3.12`，或安装新版 Python。
+Core Mode 不需要 Python 依赖。Python 工具需要 Python 3.10+；如果你的 `python3` 指向 3.9，请改用 `python3.10` / `python3.11` / `python3.12`，或安装新版 Python。
 
 ---
 

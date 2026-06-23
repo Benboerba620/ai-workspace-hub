@@ -10,6 +10,8 @@
 
 你要帮用户创建一个 all-in-one AI 研究工作系统，包含六大能力。
 
+安装分两档：Core Mode 是零 API 的 Markdown 工作流，安装后应立刻可用；Enhanced Mode 是播客摘要、行情数据、日报监控等自动化能力。如果用户只是试跑，可以先不填 key；如果用户明确想启用自动化，安装后应建议他填写自己的 API key。
+
 注意：如果用户只是想试跑本 repo，不需要安装。直接在 Codex 里打开本目录，然后执行 `SMOKE-TEST.md` 里的任务即可。
 
 完成后，用户应该得到：
@@ -35,6 +37,8 @@ my-ai-workspace/
 ├── system/interfaces/ / integrations/ / skills/ / scripts/ / templates/
 └── requirements.txt / requirements-pdf.txt
 ```
+
+完成安装不等于必须配完 API key。只要 Core Mode 可用，用户就可以先开始使用；但如果目标是播客摘要、行情日报、自动监控，API key 是推荐配置项。
 
 ---
 
@@ -80,7 +84,7 @@ python3 "{SOURCE_ROOT}/system/scripts/install_workspace.py" \
   --wiki-root "{wiki路径}"
 ```
 
-安装器成功后跳到 Step 3 检查结果。没有 Python 时，Agent 按下面的 Step 1-2 使用文件工具完成同样操作。
+安装器成功后跳到 Step 3 继续。没有 Python 时，Agent 按下面的 Step 1-2 使用文件工具完成同样操作。
 
 ### Step 1：手动创建目录（安装器不可用时）
 
@@ -153,6 +157,7 @@ system/templates/
 - `tools/daily-watch/` 整个目录（scripts/ config-examples/ templates/ requirements.txt pyproject.toml）
 - `system/scripts/pdf_to_md.py` -> `system/scripts/pdf_to_md.py`
 - `system/scripts/install_workspace.py` -> `system/scripts/install_workspace.py`
+- `system/scripts/check_workspace.py` -> `system/scripts/check_workspace.py`
 
 **依赖文件**：
 - `requirements.txt` -> `requirements.txt`
@@ -209,7 +214,23 @@ system/templates/
 
 如果没有现成 wiki，保留新建的最小 `wiki/` 目录。
 
-### Step 5：配置数据源
+### Step 5：运行 Core Mode 检查
+
+安装后先检查零 API 的核心工作流，不要先要求用户填写 API key：
+
+```bash
+python3 "{用户工作区}/system/scripts/check_workspace.py" --root "{用户工作区}"
+```
+
+判断方式：
+
+- `Core Mode result: READY`：安装成功，用户可以开始用 `inbox → wiki → output` 工作流。
+- Enhanced Mode 里的 API key 警告：只代表可选自动化未开启，不是安装失败。
+- 如果 Python 不可用，但核心文件都已经复制完成，也可以让用户直接用 AI agent 执行 `inbox/first-note.md → wiki` 的 Markdown 试跑。
+
+### Step 6：可选配置数据源（Enhanced Mode）
+
+只有用户想启用播客摘要、行情日报、A 股 / 全球市场数据时，才进入本步骤。不要把 API key 当成安装前置条件，但要明确告诉用户：自动化功能要稳定运行，建议填写自己的 API key。
 
 问用户追踪哪些市场，然后设置对应配置：
 
@@ -232,19 +253,19 @@ system/templates/
 
 Longbridge 不是上述脚本的环境变量数据源。它是独立 Agent Skill/CLI/MCP；用户需要时，按[官方安装说明](https://open.longbridge.com/zh-CN/skill/)另行安装和授权，可用于 screen / research 的行情查询。
 
-### Step 6：完成后告诉用户
+### Step 7：完成后告诉用户
 
 给用户 3 个可见结果：
 
 1. `AGENTS.md` 和 `CLAUDE.md` 已创建。
 2. `tools/podcast/` 和 `tools/daily-watch/` 已就位。
-3. `config/` 目录已准备好，列出需要填写的 API key。
+3. `check_workspace.py` 已显示 Core Mode 是否可用；如果用户还没填 API key，说明 Enhanced Mode 可之后再开。
 
 然后建议做第一件小任务：
 
 > 把一篇文章或一段笔记放进 `inbox/`，让 AI agent 帮你转成 `wiki/sources/` 页面。
 
-### Step 7：上手后提议瘦身
+### Step 8：上手后提议瘦身
 
 等用户跑通几次、不再需要上手引导，主动提议一次性瘦身：
 
@@ -256,6 +277,9 @@ Longbridge 不是上述脚本的环境变量数据源。它是独立 Agent Skill
 
 ## 安装原则
 
+- 不要把 API key 当成安装前提；先让 Core Mode 跑通。
+- 如果用户想启用自动化功能，要主动建议他配置自己的 API key。
+- 不要因为 Enhanced Mode 缺 key 就告诉用户“安装失败”。
 - 不要默认安装 Python 依赖（首次使用对应工具时再装）。
 - 不要声称安装过程不联网；取得源码需要联网，安装完成后的 Markdown 基座才可以离线运行。
 - 不要默认创建 Git commit。
