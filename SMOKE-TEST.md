@@ -46,3 +46,5 @@ python3 -m unittest discover -s tests -v
 > 帮我筛选一下价值股。
 
 预期：agent 用 websearch 找候选、输出表格到 `output/screen/`。
+
+<!-- 文件说明：最小可运行测试说明。 -->
