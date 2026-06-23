@@ -86,3 +86,5 @@ Codex 应该创建一篇 `wiki/sources/YYYY-MM-DD-first-note.md`，并在 `works
 
 - 装好上手后一次性瘦身：`system/skills/post-install-cleanup.md`（清安装脚手架 + 精简必读文件）。
 - 每周结构体检、给精简建议：`system/skills/structure-health.md`。
+
+<!-- 文件说明：Codex 入口路由和工作规则。 -->
