@@ -47,7 +47,7 @@ def transcribe_audio(path: Path, model_name: str = "medium", language: str = "en
     try:
         from faster_whisper import WhisperModel  # type: ignore
     except ImportError as exc:
-        raise RuntimeError('MP3 transcription requires: pip install "faster-whisper"') from exc
+        raise RuntimeError('MP3 transcription requires: python3 -m pip install "faster-whisper"') from exc
     model = WhisperModel(model_name, device="auto", compute_type="auto")
     segments, _info = model.transcribe(str(path), language=language)
     return "\n".join(segment.text.strip() for segment in segments if segment.text.strip())

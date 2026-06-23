@@ -2,8 +2,8 @@
 扫描 hypothesis markdown 文件并输出概览。
 
 Usage:
-  python scripts/sync_hypothesis.py
-  python scripts/sync_hypothesis.py --json
+  python3 scripts/sync_hypothesis.py
+  python3 scripts/sync_hypothesis.py --json
 """
 
 from __future__ import annotations

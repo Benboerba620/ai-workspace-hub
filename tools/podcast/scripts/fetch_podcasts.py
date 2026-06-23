@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import email.utils
-import hashlib
 import json
 import re
 import subprocess
@@ -1175,6 +1174,7 @@ def main() -> int:
     raw_pages: list[str] = []
     translation_pages: list[str] = []
     warnings: list[dict[str, Any]] = []
+    processing_errors: list[str] = []
     processed: list[dict[str, Any]] = []
     local_source_dir = OUTPUT / "sources"
 
@@ -1192,6 +1192,7 @@ def main() -> int:
             structured = summarize_item(item, config, args.locale, no_llm=args.no_llm)
         except (LLMError, json.JSONDecodeError) as exc:
             eprint(f"- LLM skipped: {item.get('title')} ({exc})")
+            processing_errors.append(f"{item.get('title')}: {exc}")
             continue
         raw_path = write_raw(item, wiki_root)
         raw_ref = str(raw_path.relative_to(wiki_root)).replace("\\", "/")
@@ -1242,7 +1243,7 @@ def main() -> int:
         except LLMError as exc:
             eprint(f"- insight log skipped: {exc}")
     payload = {
-        "ok": True,
+        "ok": not processing_errors,
         "items_found": len(items),
         "items_summarized": len(processed),
         "source_pages_count": len(source_pages),
@@ -1251,6 +1252,7 @@ def main() -> int:
         "translation_pages_written": translation_pages,
         "insight_log": insight_log_path,
         "verification_warnings": warnings,
+        "processing_errors": processing_errors,
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     eprint(textwrap.dedent(f"""
@@ -1259,7 +1261,7 @@ def main() -> int:
     - source pages written: {len(source_pages)}
     - verification warnings: {len(warnings)}
     """).strip())
-    return 0
+    return 1 if processing_errors else 0
 
 
 if __name__ == "__main__":

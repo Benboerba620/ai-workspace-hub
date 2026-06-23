@@ -44,7 +44,7 @@
 
 - `[本地]` 来自本地文件
 - `[网页]` 来自联网资料
-- `[Longbridge]` / `[tushare]` / `[FMP]` 来自对应数据源 API
+- `[tushare]` / `[FMP]` 来自日报脚本 API；`[Longbridge Skill]` 来自独立 Agent 扩展
 - `[推测]` agent 的推理
 - `[待验证]` 尚未确认
 
@@ -126,27 +126,28 @@
 
 > key 走环境变量或 `config/*.env`，不要写进 repo。没配的字段 agent 会标 `[待验证]` 而不是编造。
 
-### longbridge（默认免费：HK + US 行情）
+### longbridge-skill（外部 Agent 扩展）
 
-- status: `planned`
-- env_keys: `LONGBRIDGE_APP_KEY`, `LONGBRIDGE_APP_SECRET`, `LONGBRIDGE_ACCESS_TOKEN`
-- markets: US, HK
-- used_by: `daily-watch`, `screen`, `research`
-- 获取方式: https://open.longbridge.com/zh-CN/skill/
+- status: `optional-external`
+- auth: 独立安装后通过 Longbridge CLI / MCP 授权，不读取 `config/*.env`
+- markets: 以 Longbridge 官方当前支持范围为准
+- used_by: `screen`, `research`
+- note: 不是 `tools/daily-watch/` 的内置数据源
+- 安装方式: https://open.longbridge.com/zh-CN/skill/
 
-### tushare（默认免费：A 股行情 / 财务）
+### tushare（A 股行情 / 财务）
 
-- status: `planned`
+- status: `available-unconfigured`
 - env_key: `TUSHARE_TOKEN`
 - markets: CN (.SH/.SZ), HK (.HK)
 - used_by: `daily-watch`, `screen`, `research`
 - 获取方式: https://tushare.pro/register
 
-### fmp（付费可选：全球行情 / 财报 / 宏观）
+### fmp（可选：全球行情 / 财报 / 宏观）
 
-- status: `planned`
+- status: `available-unconfigured`
 - env_key: `FMP_API_KEY`
 - markets: US, HK, EU, JP, CN
 - used_by: `daily-watch`, `screen`, `research`
-- free_tier: 250 requests/day
+- pricing: 以 FMP 官方当前套餐为准
 - 获取方式: https://financialmodelingprep.com/

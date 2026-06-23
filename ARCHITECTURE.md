@@ -30,10 +30,14 @@ flowchart TB
         SCR["screen<br/>快速筛选"]
     end
 
-    subgraph DATA["数据源 · 配了才用"]
-        LB["Longbridge<br/>HK + US（免费）"]
-        TS["tushare<br/>A 股（免费）"]
-        FMP2["FMP<br/>全球（付费可选）"]
+    subgraph DATA["内置数据源 · 按需配置"]
+        TS["tushare<br/>A 股（可选）"]
+        FMP2["FMP<br/>全球（可选）"]
+        FB["Nasdaq 等<br/>降级源"]
+    end
+
+    subgraph EXT["外部 Agent 扩展 · 独立授权"]
+        LB["Longbridge Skill<br/>查询 · 筛选 · 研究"]
     end
 
     subgraph HYPO["假设追踪 · 基座自带"]
@@ -54,6 +58,8 @@ flowchart TB
     DATA -.->|"行情数据"| DW
     DATA -.->|"行情数据"| SCR
     DATA -.->|"按需"| RES
+    LB -.->|"按需调用"| SCR
+    LB -.->|"按需调用"| RES
 ```
 
 ### 怎么读这张图
@@ -62,7 +68,7 @@ flowchart TB
 - **粗箭头 `==>`** = 工具写入基座。
 - **虚线** = 反馈 / 回写 / 可选连接。
 - **基座(BASE)零依赖**：clone 下来立刻能跑 `inbox → wiki → output` + research。
-- **内置工具(TOOLS)**：代码在 `tools/` 下，首次使用时 agent 自动 `pip install`。
+- **内置工具(TOOLS)**：代码在 `tools/` 下，首次使用时 agent 用 `python3 -m pip install ...` 安装依赖；若环境只有 `python`，则替换成 `python -m pip ...`。
 - **数据源(DATA)**：配了才用，没配降级不报错。
 
 ---
@@ -84,12 +90,13 @@ flowchart TB
 
 | 数据源 | 市场 | 费用 | 用于 |
 |--------|------|------|------|
-| Longbridge | HK + US | 免费 | daily-watch, screen, research |
-| tushare | A 股 (.SH/.SZ) | 免费额度 | daily-watch, screen, research |
-| FMP | 全球 | 免费 250 次/天 | daily-watch, screen, research |
-| websearch | — | 免费 | 全部能力的兜底 |
+| tushare | A 股 (.SH/.SZ) | 按官方套餐 | daily-watch, screen, research |
+| FMP | 全球 | 按官方套餐 | daily-watch, screen, research |
+| Nasdaq / Finnhub / EOD / yfinance | 各自覆盖市场 | 各自规则 | daily-watch 降级源 |
+| websearch | — | Agent 自带 | 全部能力的兜底 |
+| Longbridge Skill | 以官方支持范围为准 | 独立安装与授权 | screen, research 外部扩展 |
 
-优先级：Longbridge → tushare → FMP → 备用链（Stooq/Finnhub/EOD/yfinance）。零 key 时所有能力降级到 websearch，数字标 `[待验证]`。
+日报脚本按市场使用 tushare / FMP，并在缺失或请求失败时尝试 Nasdaq、Finnhub、EOD、yfinance。零 Key 时仍生成报告骨架，Agent 可用 websearch 补充；Longbridge 不在日报脚本调用链中。
 
 ---
 

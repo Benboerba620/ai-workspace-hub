@@ -5,7 +5,9 @@ Daily Watchlist + Hypothesis Tracker 环境检查。
 
 from __future__ import annotations
 
+import argparse
 import os
+import shutil
 import sys
 from io import StringIO
 from pathlib import Path
@@ -32,6 +34,15 @@ if sys.stderr and hasattr(sys.stderr, "reconfigure"):
 OK = "[OK]"
 FAIL = "[FAIL]"
 WARN = "[WARN]"
+PIP_INSTALL = f"{sys.executable} -m pip install"
+
+CONFIG_EXAMPLE_MAPPINGS = {
+    "daily-watchlist.example.yaml": "daily-watchlist.yaml",
+    "daily-watchlist.env.example": "daily-watchlist.env",
+    "daily-watchlist.watchlist.example.md": "daily-watchlist-watchlist.md",
+    "hypothesis-tracker.example.yaml": "hypothesis-tracker.yaml",
+    "hypothesis-tracker.rules.example.md": "hypothesis-tracker.rules.md",
+}
 
 
 def check(name: str, passed: bool, msg: str = "") -> bool:
@@ -47,16 +58,57 @@ def warn(name: str, msg: str = "") -> None:
 
 
 def load_env_file(env_file: Path) -> None:
-    from dotenv import dotenv_values
-
     raw_text = env_file.read_text(encoding="utf-8-sig")
-    parsed = dotenv_values(stream=StringIO(raw_text))
-    for key, value in parsed.items():
-        if value is not None and key not in os.environ:
+    try:
+        from dotenv import dotenv_values
+
+        parsed = dotenv_values(stream=StringIO(raw_text))
+        for key, value in parsed.items():
+            if value is not None and key not in os.environ:
+                os.environ[key] = value
+        return
+    except ImportError:
+        # check_setup.py must stay readable even before dependencies are installed.
+        # This small fallback is enough for simple KEY=VALUE example env files.
+        pass
+
+    for line in raw_text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
             os.environ[key] = value
 
 
+def initialize_config(root: Path) -> list[Path]:
+    examples_dir = Path(__file__).resolve().parent.parent / "config-examples"
+    config_dir = root / "config"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    created: list[Path] = []
+    for source_name, target_name in CONFIG_EXAMPLE_MAPPINGS.items():
+        source = examples_dir / source_name
+        destination = config_dir / target_name
+        if not destination.exists():
+            shutil.copy2(source, destination)
+            created.append(destination)
+    return created
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--init",
+        action="store_true",
+        help="Copy missing example configuration files into config/ before checking",
+    )
+    return parser
+
+
 def main() -> int:
+    args = build_parser().parse_args()
     print("Daily Watchlist + Hypothesis Tracker 环境检查\n")
     all_pass = True
 
@@ -64,7 +116,14 @@ def main() -> int:
     all_pass &= check(
         "Python >= 3.10",
         version >= (3, 10),
-        f"当前版本 {version.major}.{version.minor}.{version.micro}",
+        (
+            f"当前版本 {version.major}.{version.minor}.{version.micro}"
+            if version >= (3, 10)
+            else (
+                f"当前版本 {version.major}.{version.minor}.{version.micro}；"
+                "请改用 python3.10 / python3.11 / python3.12，或安装新版 Python"
+            )
+        ),
     )
 
     for pkg in ["requests", "dotenv", "yaml"]:
@@ -73,7 +132,7 @@ def main() -> int:
             check(f"依赖包 {pkg}", True)
         except ImportError:
             real_name = {"dotenv": "python-dotenv", "yaml": "pyyaml"}.get(pkg, pkg)
-            all_pass &= check(f"依赖包 {pkg}", False, f"请执行 pip install {real_name}")
+            all_pass &= check(f"依赖包 {pkg}", False, f"请执行 {PIP_INSTALL} {real_name}")
 
     script_dir = Path(__file__).resolve().parent
     try:
@@ -81,6 +140,12 @@ def main() -> int:
         root = find_workspace_root(script_dir)
     except FileNotFoundError:
         root = script_dir.parent.parent
+    if args.init:
+        created = initialize_config(root)
+        if created:
+            print(f"已初始化 {len(created)} 个配置文件到 {root / 'config'}\n")
+        else:
+            print("配置文件已存在，没有覆盖。\n")
     config_dir = root / "config"
     env_file = resolve_env_path(config_dir)
 
@@ -98,9 +163,7 @@ def main() -> int:
 
         fmp_key = os.getenv("FMP_API_KEY", "")
         if not fmp_key or fmp_key.startswith("your_"):
-            warn(
-                "FMP_API_KEY", "未配置（可选，可用 Longbridge 免费替代：https://open.longbridge.com/zh-CN/skill/）"
-            )
+            warn("FMP_API_KEY", "未配置（可选；美股会尝试 Nasdaq 无 Key 降级源）")
         else:
             try:
                 import requests
@@ -131,7 +194,10 @@ def main() -> int:
                 )
                 check("TUSHARE_TOKEN", True, "可用")
             except ImportError:
-                warn("TUSHARE_TOKEN", "已配置，但未安装 tushare（pip install tushare）")
+                warn(
+                    "TUSHARE_TOKEN",
+                    f"已配置，但未安装 tushare（{PIP_INSTALL} -r tools/daily-watch/requirements-tushare.txt）",
+                )
             except Exception as exc:  # noqa: BLE001
                 warn("TUSHARE_TOKEN", f"检查跳过：{exc}")
         else:

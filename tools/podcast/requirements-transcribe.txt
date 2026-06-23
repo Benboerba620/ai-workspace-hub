@@ -1,0 +1,2 @@
+# Optional audio transcription stack. ffmpeg must also be available on PATH.
+faster-whisper>=1.0.0

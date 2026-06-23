@@ -9,7 +9,9 @@
 
 ## 前置条件
 
-1. 安装依赖：`pip install -r tools/podcast/requirements.txt`
+1. 安装依赖：`python3 -m pip install -r tools/podcast/requirements.txt`
+   - 需要 Python 3.10+。先运行 `python3 --version`；如果低于 3.10，改用 `python3.10` / `python3.11` / `python3.12`，或引导用户安装新版 Python
+   - 如果环境只有 `python` 且版本 ≥3.10，把命令里的 `python3` 替换成 `python`
 2. 配置文件（首次使用时复制）：
    - `cp tools/podcast/examples/config.ai-investing.yaml config/pod2wiki.config.yaml`
    - `cp tools/podcast/.env.example config/pod2wiki.env`
@@ -19,12 +21,14 @@ Agent 首次使用时检查上述条件，缺什么补什么。
 
 ## 运行命令
 
+先读取 `workspace/workspace-config.md` 的 `wiki_root`，把下面的 `{wiki_root}` 替换成实际路径。
+
 ```bash
-python tools/podcast/scripts/fetch_podcasts.py \
+python3 tools/podcast/scripts/fetch_podcasts.py \
   --config config/pod2wiki.config.yaml \
   --env-file config/pod2wiki.env \
   --output-dir output/pod2wiki \
-  --wiki-out wiki/sources \
+  --wiki-out {wiki_root}/sources \
   --days 7 \
   --write-insight-log
 ```
@@ -67,7 +71,7 @@ python tools/podcast/scripts/fetch_podcasts.py \
 ## 冒烟测试
 
 ```bash
-python tools/podcast/scripts/fetch_podcasts.py \
+python3 tools/podcast/scripts/fetch_podcasts.py \
   --config config/pod2wiki.config.yaml \
   --env-file config/pod2wiki.env \
   --days 1 --dry-run

@@ -15,9 +15,11 @@
 
 ## 播客工具（需 Python）
 
+以下命令默认使用 `python3`，且需要 Python 3.10+。先运行 `python3 --version`；如果版本低于 3.10，请改用 `python3.10` / `python3.11` / `python3.12`，或安装新版 Python。如果你的环境只有 `python` 且版本 ≥3.10，把命令里的 `python3` 替换成 `python` 即可。
+
 ```bash
-pip install -r tools/podcast/requirements.txt
-python tools/podcast/scripts/fetch_podcasts.py --help
+python3 -m pip install -r tools/podcast/requirements.txt
+python3 tools/podcast/scripts/fetch_podcasts.py --help
 ```
 
 预期：输出帮助信息，无报错。
@@ -25,11 +27,19 @@ python tools/podcast/scripts/fetch_podcasts.py --help
 ## 日报工具（需 Python）
 
 ```bash
-pip install -r tools/daily-watch/requirements.txt
-python tools/daily-watch/scripts/check_setup.py
+python3 -m pip install -r tools/daily-watch/requirements.txt
+python3 tools/daily-watch/scripts/check_setup.py --init
 ```
 
-预期：输出环境检查结果（缺 API key 会提示，不算失败）。
+预期：缺失的示例配置会被初始化；缺 API key 只显示警告，必要目录和依赖检查通过。
+
+## 自动测试
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+预期：安装器、路径识别、文档链接和仓库契约测试全部通过。
 
 ## 快速筛选（零依赖）
 

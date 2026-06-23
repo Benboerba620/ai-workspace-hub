@@ -22,7 +22,7 @@ def main() -> int:
         from pypdf import PdfReader
     except ModuleNotFoundError:
         print(
-            "Missing dependency: pypdf. Install with `python -m pip install -r requirements-pdf.txt`.",
+            f"Missing dependency: pypdf. Install with `{sys.executable} -m pip install -r requirements-pdf.txt`.",
             file=sys.stderr,
         )
         return 2
@@ -65,4 +65,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

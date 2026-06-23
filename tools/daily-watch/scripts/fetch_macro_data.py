@@ -6,7 +6,7 @@ Fetches macro market indicators: VIX, major indices, commodities, crypto.
 Data source: FMP (Financial Modeling Prep)
 
 Usage:
-    python fetch_macro_data.py
+    python3 fetch_macro_data.py
 
 Output: JSON to stdout. Logs to stderr.
 """
@@ -23,13 +23,19 @@ from typing import Any
 try:
     import requests
 except ImportError:
-    print("ERROR: requests not installed. Run: pip install requests", file=sys.stderr)
+    print(
+        f"ERROR: requests not installed. Run: {sys.executable} -m pip install requests",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 try:
     from dotenv import dotenv_values
 except ImportError:
-    print("ERROR: python-dotenv not installed. Run: pip install python-dotenv", file=sys.stderr)
+    print(
+        f"ERROR: python-dotenv not installed. Run: {sys.executable} -m pip install python-dotenv",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 from workspace_paths import find_workspace_root, resolve_config_dir, resolve_env_path
@@ -58,7 +64,8 @@ def load_env_file(env_path: Path) -> None:
 
 load_env_file(ENV_PATH)
 
-FMP_API_KEY = os.getenv("FMP_API_KEY", "")
+_raw_fmp_key = os.getenv("FMP_API_KEY", "").strip()
+FMP_API_KEY = "" if _raw_fmp_key.lower().startswith("your_") else _raw_fmp_key
 FMP_BASE = "https://financialmodelingprep.com/api/v3"
 
 MACRO_TICKERS = {
@@ -119,9 +126,27 @@ def main() -> None:
     configure_stdio()
 
     if not FMP_API_KEY:
-        print(f"ERROR: FMP_API_KEY not set in {ENV_PATH}", file=sys.stderr)
-        json.dump({"error": "FMP_API_KEY not set"}, sys.stdout)
-        sys.exit(1)
+        print(f"Warning: FMP_API_KEY not set in {ENV_PATH}; skipping macro data", file=sys.stderr)
+        json.dump(
+            {
+                "macro": {},
+                "sentiment": "Unknown",
+                "meta": {
+                    "timestamp": datetime.now().isoformat(),
+                    "missing_symbols": [
+                        VIX_SYMBOL,
+                        *MACRO_TICKERS["indices"],
+                        *MACRO_TICKERS["commodities"],
+                        *MACRO_TICKERS["crypto"],
+                        *MACRO_TICKERS["volatility"],
+                    ],
+                    "reason": "FMP_API_KEY not set",
+                },
+            },
+            sys.stdout,
+            ensure_ascii=False,
+        )
+        return
 
     result = {
         "macro": {},

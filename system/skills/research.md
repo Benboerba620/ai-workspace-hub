@@ -108,5 +108,5 @@ Wiki check: 查了 wiki/ 的 {x} 篇，{命中/未命中/有矛盾}。
 ## 边界与扩展
 
 - 核心链路（wiki + websearch）零依赖，开箱即用。
-- 接数据源（Longbridge / tushare / FMP / 自有 API）：在 `workspace-config` 的 `data_sources:` 段登记，key 走环境变量或 `config/*.env`。
+- 接脚本数据源（tushare / FMP / 自有 API）：在 `workspace-config` 登记，key 走环境变量或 `config/*.env`。Longbridge Skill 需要独立安装和授权，由 Agent 按需调用，不读取本项目的 env。
 - 想固化常用研究要点：编辑 `workspace/workspace-config.md` 的 `research:` 段，本 skill 会优先用用户要点。

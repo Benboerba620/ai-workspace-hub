@@ -63,16 +63,23 @@ def load_env_file(env_path: Path) -> None:
             os.environ[key] = value
 
 
+def usable_env(name: str) -> str:
+    value = os.environ.get(name, "").strip()
+    if not value or value.lower().startswith("your_"):
+        return ""
+    return value
+
+
 def load_env(env_path: Path) -> dict[str, str]:
     if env_path.is_file():
         load_env_file(env_path)
     else:
         log(f"Warning: {env_path} not found")
     return {
-        "FMP_API_KEY": os.environ.get("FMP_API_KEY", "").strip(),
-        "TUSHARE_TOKEN": os.environ.get("TUSHARE_TOKEN", "").strip(),
-        "FINNHUB_API_KEY": os.environ.get("FINNHUB_API_KEY", "").strip(),
-        "EOD_API_KEY": os.environ.get("EOD_API_KEY", "").strip(),
+        "FMP_API_KEY": usable_env("FMP_API_KEY"),
+        "TUSHARE_TOKEN": usable_env("TUSHARE_TOKEN"),
+        "FINNHUB_API_KEY": usable_env("FINNHUB_API_KEY"),
+        "EOD_API_KEY": usable_env("EOD_API_KEY"),
         "ENABLE_YFINANCE": os.environ.get("ENABLE_YFINANCE", "").strip(),
     }
 
@@ -154,7 +161,13 @@ def parse_float(value: Any) -> float | None:
     if isinstance(value, (int, float)):
         return float(value)
 
-    text = str(value).strip().replace("%", "").replace(",", "")
+    text = (
+        str(value)
+        .strip()
+        .replace("%", "")
+        .replace(",", "")
+        .replace("$", "")
+    )
     if not text:
         return None
     try:
@@ -282,57 +295,49 @@ def fetch_tushare_quotes(
 
 # --- Fallback data sources ---
 # Used when FMP doesn't return a ticker (rate-limited, symbol not covered, etc.).
-# Order per ticker: Stooq -> Finnhub (if key) -> EOD (if key) -> yfinance (if enabled).
+# Order per ticker: Nasdaq (US, no key) -> Finnhub -> EOD -> yfinance.
 
-STOOQ_MARKET_SUFFIX = {"US": "us", "JP": "jp", "DE": "de", "UK": "uk"}
 EOD_MARKET_SUFFIX = {"HK": "HK", "KR": "KO", "FI": "HE"}
 
 
-def fetch_stooq_quote(ticker: str, market: str) -> dict[str, Any] | None:
-    suffix = STOOQ_MARKET_SUFFIX.get(market.strip().upper())
-    if not suffix:
+def fetch_nasdaq_quote(ticker: str, market: str) -> dict[str, Any] | None:
+    if market.strip().upper() != "US":
         return None
-    symbol = ticker.split(".")[0].lower()
-    url = (
-        f"https://stooq.com/q/l/?s={symbol}.{suffix}"
-        "&f=sd2t2ohlcvp&h&e=csv"
-    )
+    symbol = ticker.split(".")[0].upper()
+    url = f"https://api.nasdaq.com/api/quote/{symbol}/info?assetclass=stocks"
     try:
-        response = requests.get(url, timeout=DEFAULT_TIMEOUT)
-        response.raise_for_status()
-        lines = response.text.strip().splitlines()
-        if len(lines) < 2:
-            return None
-        headers = [h.strip().lower() for h in lines[0].split(",")]
-        values = [v.strip() for v in lines[1].split(",")]
-        if len(headers) != len(values):
-            return None
-        row = dict(zip(headers, values))
-        if row.get("close", "").upper() in ("", "N/D"):
-            return None
-        close = parse_float(row.get("close"))
-        prev_close = parse_float(row.get("prev"))
-        change = (close - prev_close) if close is not None and prev_close is not None else None
-        change_pct = (
-            change / prev_close * 100
-            if change is not None and prev_close
-            else None
+        response = requests.get(
+            url,
+            timeout=DEFAULT_TIMEOUT,
+            headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"},
         )
+        response.raise_for_status()
+        payload = response.json()
+        data = payload.get("data") if isinstance(payload, dict) else None
+        primary = data.get("primaryData") if isinstance(data, dict) else None
+        if not isinstance(primary, dict):
+            return None
+        close = parse_float(primary.get("lastSalePrice"))
+        change = parse_float(primary.get("netChange"))
+        change_pct = parse_float(primary.get("percentageChange"))
+        if close is None:
+            return None
+        previous_close = round(close - change, 6) if change is not None else None
         return {
             "symbol": ticker,
             "price": close,
             "change": change,
             "changesPercentage": change_pct,
-            "previousClose": prev_close,
-            "open": parse_float(row.get("open")),
-            "dayHigh": parse_float(row.get("high")),
-            "dayLow": parse_float(row.get("low")),
-            "volume": parse_float(row.get("volume")),
-            "tradeDate": row.get("date", ""),
-            "source": "stooq",
+            "previousClose": previous_close,
+            "open": None,
+            "dayHigh": None,
+            "dayLow": None,
+            "volume": parse_float(primary.get("volume")),
+            "tradeDate": primary.get("lastTradeTimestamp", ""),
+            "source": "nasdaq",
         }
     except Exception as exc:  # noqa: BLE001
-        log(f"Warning: stooq fallback failed for {ticker}: {exc}")
+        log(f"Warning: Nasdaq fallback failed for {ticker}: {exc}")
         return None
 
 
@@ -406,7 +411,7 @@ def fetch_yfinance_quote(ticker: str) -> dict[str, Any] | None:
             if not _YFINANCE_IMPORT_WARNING_EMITTED:
                 log(
                     "Warning: ENABLE_YFINANCE is set but yfinance is not installed; "
-                    "run `pip install yfinance` or disable ENABLE_YFINANCE"
+                    f"run `{sys.executable} -m pip install yfinance` or disable ENABLE_YFINANCE"
                 )
                 _YFINANCE_IMPORT_WARNING_EMITTED = True
         return None
@@ -446,7 +451,7 @@ def fetch_fallback_quote(item: dict[str, str], env: dict[str, str]) -> dict[str,
     market = item.get("market", "")
     market_upper = market.strip().upper()
 
-    quote = fetch_stooq_quote(ticker, market)
+    quote = fetch_nasdaq_quote(ticker, market)
     if quote:
         return quote
 

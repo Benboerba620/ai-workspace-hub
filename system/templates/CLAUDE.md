@@ -15,6 +15,8 @@
 
 先读 `workspace/workspace-config.md`。非简单任务按其中"三条简单规则"执行。
 
+路径约定：本文件和各 skill 中的 `wiki/` 是默认示例。若 `workspace-config.md` 的 `wiki_root` 不是 `./wiki`，所有 wiki 读写都以配置值为根目录，不要同时写入本地 `wiki/`。
+
 | 场景 | 先读 | 主要写入 |
 |---|---|---|
 | 开始工作 | `workspace/workspace-config.md` | 按任务决定 |
@@ -35,12 +37,12 @@
 |---|---|---|---|
 | wiki | 知识库（基座核心） | `system/integrations/personal-wiki.md` | 否 |
 | research | 研究闭环 | `system/skills/research.md` | 否（websearch） |
-| screen | 快速筛选 | `system/skills/screen.md` | 可选（Longbridge/tushare/FMP） |
+| screen | 快速筛选 | `system/skills/screen.md` | 可选（外部 Longbridge Skill / tushare / FMP） |
 | hypothesis | 假设追踪 | `system/integrations/hypothesis-tracker.md` | 否 |
 | podcast | 播客/博客摄入 | `system/skills/podcast.md` | 需要 LLM key |
-| daily-watch | 日报监控 | `system/skills/daily-watch.md` | 可选（Longbridge/tushare/FMP） |
+| daily-watch | 日报监控 | `system/skills/daily-watch.md` | 可选（tushare / FMP） |
 
-工具代码在 `tools/` 目录下。首次使用时 agent 检查依赖，缺什么自动 `pip install`。
+工具代码在 `tools/` 目录下。首次使用时 agent 检查依赖，缺什么用 `python3 -m pip install ...` 安装；如果环境只有 `python`，再替换成 `python -m pip ...`。
 
 ## active-context：断点续传
 
@@ -73,9 +75,9 @@ Claude 应该创建一篇 `wiki/sources/YYYY-MM-DD-first-note.md`，并在 `work
 
 | 数据源 | 市场 | env key | 费用 |
 |--------|------|---------|------|
-| Longbridge | HK + US | `LONGBRIDGE_APP_KEY` 等 | 免费 |
-| tushare | A 股 | `TUSHARE_TOKEN` | 免费额度 |
-| FMP | 全球 | `FMP_API_KEY` | 免费 250 次/天 |
+| tushare | A 股 | `TUSHARE_TOKEN` | 按官方套餐 |
+| FMP | 全球 | `FMP_API_KEY` | 按官方套餐 |
+| Longbridge Skill | 多市场 | 独立安装与授权 | 外部 Agent 扩展，不是日报脚本内置源 |
 
 获取方式：
 - Longbridge：https://open.longbridge.com/zh-CN/skill/

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### 修复
+
+- 新增标准库安装器，安装协议明确先取得源码；非空目标默认停止，`--merge` 只补缺失文件、不覆盖用户资料。
+- 修复 all-in-one 工作区在配置文件创建前无法识别根目录的问题，`check_setup.py --init` 可安全初始化缺失配置。
+- 更正 Longbridge 定位：它是独立 Agent Skill/CLI/MCP，不再宣称为 daily-watch Python 脚本的内置环境变量数据源。
+- `faster-whisper` 拆到可选的 `requirements-transcribe.txt`，避免基础播客安装拉取重型转录依赖。
+- LLM 环境变量优先于示例 YAML；摘要全部失败时返回非零状态，不再静默报告成功。
+- 新增安装、路径、文档链接和仓库契约测试，以及 Python 3.10/3.12 CI。
+
 ## 0.3.0 - 2026-06-22
 
 ### 新增

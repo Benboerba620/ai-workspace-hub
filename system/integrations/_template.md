@@ -48,7 +48,7 @@
 
 > `{用 {工具名} 做 X，结果写进 wiki / 生成日报}`
 
-首次使用时 agent 检查依赖，缺什么自动 `pip install`。
+首次使用时 agent 检查依赖，缺什么用 `python3 -m pip install ...` 安装；如果环境只有 `python`，再替换成 `python -m pip ...`。
 
 ## 边界
 

@@ -313,9 +313,9 @@ def render_themes(config: dict[str, Any], enabled: bool) -> str:
 
 
 def render_sources(modules: dict[str, bool]) -> str:
-    lines = ["- `fetch_market_data.py`：实时拉取监控池行情、异动和财报数据"]
+    lines = ["- `fetch_market_data.py`：拉取监控池当前或最近可用行情、异动和财报数据"]
     if modules["macro"]:
-        lines.append("- `fetch_macro_data.py`：实时拉取 VIX、指数、商品和 BTC 数据")
+        lines.append("- `fetch_macro_data.py`：配置 FMP 后拉取 VIX、指数、商品和 BTC 数据")
     else:
         lines.append("- `fetch_macro_data.py`：当前配置已关闭宏观模块，本次未调用")
     lines.append(

@@ -38,7 +38,7 @@
 
 - **空目录 / 只有 `.gitkeep`** 且长期没用 → 提示是否还需要。
 - **存在但 `workspace-config` 没登记** 的目录，或登记了却不存在 → 指出对不上。
-  - **例外**：`status: planned` 的模块，其 `reads_from` / `writes_to` 目录（如 `output/daily-watchlist/`、`wiki/raw/podcasts/`）尚未创建是**正常的**——那是装了模块才生成的输出槽，不算"缺失"，别报。
+  - **例外**：`status: planned` 的未来模块或 `status: optional-external` 的外部能力，没有本地输出目录是正常的，不算"缺失"。
 - **职责重复** 的目录（两个地方放同类东西）→ 建议合并。
 - 安装脚手架（`INSTALL-FOR-AI.md`、`system/templates/`、`SMOKE-TEST.md`、6/05 smoke 产物）**是否还在** → 若用户已上手，提示跑 `system/skills/post-install-cleanup.md`。
 

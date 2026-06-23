@@ -48,7 +48,11 @@ def preferred_path(directory: Path, candidates: tuple[str, ...]) -> Path:
 
 def find_workspace_root(start_dir: Path) -> Path:
     current = start_dir.resolve()
-    for candidate in (current, *current.parents):
+    candidates = (current, *current.parents)
+    for candidate in candidates:
+        if (candidate / "workspace" / "workspace-config.md").is_file():
+            return candidate
+    for candidate in candidates:
         config_dir = candidate / CONFIG_DIRNAME
         if find_existing_path(config_dir, CONFIG_FILE_CANDIDATES):
             return candidate

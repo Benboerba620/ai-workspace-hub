@@ -6,8 +6,10 @@
 
 ## 快速使用
 
+以下命令默认使用 `python3`，且需要 Python 3.10+。先运行 `python3 --version`；如果版本低于 3.10，请改用 `python3.10` / `python3.11` / `python3.12`，或安装新版 Python。如果你的环境只有 `python` 且版本 ≥3.10，把命令里的 `python3` 替换成 `python` 即可。
+
 ```bash
-python tools/podcast/scripts/fetch_podcasts.py \
+python3 tools/podcast/scripts/fetch_podcasts.py \
   --config config/pod2wiki.config.yaml \
   --env-file config/pod2wiki.env \
   --output-dir output/pod2wiki \
@@ -18,10 +20,10 @@ python tools/podcast/scripts/fetch_podcasts.py \
 ## 依赖
 
 ```bash
-pip install -r tools/podcast/requirements.txt
+python3 -m pip install -r tools/podcast/requirements.txt
 ```
 
-可选：`faster-whisper`（音频转录，需要 ffmpeg）
+可选音频转录：`python3 -m pip install -r tools/podcast/requirements-transcribe.txt`，并确保系统已有 ffmpeg。
 
 ## 配置
 

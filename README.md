@@ -1,194 +1,262 @@
+<div align="center">
+
 # AI Workspace Hub
 
-> 一套 all-in-one 的 AI 研究工作系统。一次 clone，六大能力开箱即用。
+**Turn Codex, Claude Code, Cursor, and Cline into a persistent research workspace.**
 
-一个研究员每天干的事，说穿了就六步：
+把 AI 编程助手变成一套能长期记忆、持续研究、自动沉淀的工作台。
 
-1. **收集材料**——播客、研报、纪要、博客，什么都往里塞
-2. **沉淀知识**——把零散材料整理成结构化的知识库
-3. **做研究**——带着问题翻知识库、查网上的、写出结论
-4. **筛选标的**——给个方向，快速扫一圈值得跟的标的
-5. **日常盯盘**——每天看异动、查原因、盯假设有没有被证伪
-6. **追踪假设**——把投资逻辑写下来，收集证据，定期复盘
+[![CI](https://github.com/Benboerba620/ai-workspace-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/Benboerba620/ai-workspace-hub/actions/workflows/ci.yml)
+[![GitHub stars](https://img.shields.io/github/stars/Benboerba620/ai-workspace-hub?style=social)](https://github.com/Benboerba620/ai-workspace-hub/stargazers)
+[![License](https://img.shields.io/github/license/Benboerba620/ai-workspace-hub)](LICENSE)
 
-这套系统就是把这六步变成 AI 能跑的闭环。每一步对应一个能力，全部内置、零配置能跑基座，配上免费 API 全部亮灯。
+[30 秒试跑](#30-秒试跑) · [一键交给 AI 安装](#一键交给-ai-安装) · [六大能力](#六大能力) · [工作原理](#为什么不是一个普通模板)
+
+⭐ 如果你也想让 AI 从“一次性聊天”进化成“长期工作系统”，欢迎点一下 Star。它会帮助更多研究员和 AI power user 发现这个项目。
+
+</div>
 
 ---
 
-## 🚀 一键安装
+AI Workspace Hub 是一套 **AI-native research workspace**：一次 clone，就拿到知识库、研究、筛选、盯盘、播客摄入、假设追踪六大能力。
 
-把下面这句话**直接发给你的 AI agent**（Codex / Claude Code / Cursor / Cline），它会自动读协议、问 3 个问题、建好整套系统：
+它不是又一个 prompt，也不是单一脚本工具。它更像一套给 AI agent 使用的“工作台协议”：文件夹存材料，入口文档告诉 agent 怎么做，skills 定义能力流程，tools 提供可选自动化，active-context 负责断点续传。
+
+你可以把它理解成：给 Codex / Claude Code / Cursor / Cline 准备的一套“研究员操作系统”。
+
+---
+
+## 这个项目解决什么问题？
+
+很多人用 AI 做研究时，会遇到同一个瓶颈：
+
+> 对话很聪明，但工作流没有记忆；今天做完，明天又从头解释。
+
+AI Workspace Hub 的目标是把“临时对话”变成“可持续研究系统”。
+
+一个研究员每天做的事，本质上是六步：
+
+1. **收集材料**：播客、研报、纪要、博客、PDF、网页；
+2. **沉淀知识**：把零散材料整理进 personal wiki；
+3. **做研究**：带着问题查本地知识库和外部资料；
+4. **筛选标的**：围绕主题快速形成候选列表；
+5. **日常盯盘**：追踪价格异动、新闻和假设变化；
+6. **追踪假设**：记录投资逻辑、证据、反证和复盘。
+
+这个项目把这六步变成 AI agent 能读、能执行、能接续的文件协议。
+
+---
+
+## 效果示例
+
+把一个想法、PDF、播客或网页丢进工作区，然后直接用自然语言要求 AI 处理。
+
+```text
+用户：把 inbox/first-note.md 整理进 personal wiki，并记录这次处理过程。
+
+Agent：
+1. 读取 AGENTS.md / CLAUDE.md，确认当前工作区规则；
+2. 按 wiki/_schema.md 把材料整理为结构化笔记；
+3. 写入 wiki/sources/YYYY-MM-DD-first-note.md；
+4. 在 workspace/meta/active-context.md 记录本次进度，方便下次继续。
+```
+
+更复杂一点：
+
+```text
+用户：围绕 AI 数据中心电力链，整理已有 wiki，补充外部资料，
+      输出一篇研究报告，并把关键假设建档追踪。
+
+Agent：
+- 先查本地 wiki，不从空白对话开始；
+- 把事实、推测、待验证问题分开；
+- 输出到 output/research/；
+- 把核心假设写入 hypothesis/；
+- 后续 daily-watch 可以持续追踪证据变化。
+```
+
+核心变化不是“AI 回答更聪明”，而是：它知道材料在哪里、流程怎么走、结果写到哪里、下次从哪里接上。
+
+---
+
+## 适合谁？
+
+适合：
+
+- 投资研究员 / 个人投资者：做公司研究、产业链跟踪、假设复盘；
+- 内容创作者：把播客、文章、访谈整理成长期知识库；
+- AI power user：想让 Codex / Claude Code / Cursor 不只是写代码，而是接管研究工作流；
+- Markdown / Obsidian 用户：想让 personal wiki 变成 agent 可操作的系统；
+- 想做“长期项目”而不是“一次性对话”的人。
+
+不适合：想要 GUI 应用、自动交易系统，或者不愿意用 Markdown / 文件夹管理知识的人。
+
+---
+
+## 30 秒试跑
+
+你可以先不安装任何 Python 依赖，直接验证最小链路。
+
+```bash
+git clone https://github.com/Benboerba620/ai-workspace-hub.git my-ai-workspace
+cd my-ai-workspace
+```
+
+然后用 Codex / Claude Code / Cursor 打开这个目录，对 agent 说：
+
+```text
+把 inbox/first-note.md 整理进 personal wiki。
+```
+
+预期结果：
+
+- agent 读取 `AGENTS.md` 或 `CLAUDE.md`；
+- 读取 `wiki/_schema.md`；
+- 把样例材料整理成 `wiki/sources/YYYY-MM-DD-first-note.md`；
+- 在 `workspace/meta/active-context.md` 记录这次试跑。
+
+这条 note → wiki 链路只读写 Markdown，**不需要 API key，不需要联网，不需要安装依赖**。
+
+---
+
+## 一键交给 AI 安装
+
+如果你想把它安装成自己的研究工作区，把下面这句话直接发给你的 AI agent：
 
 ```text
 帮我按这个协议安装 AI Workspace Hub：
 https://github.com/Benboerba620/ai-workspace-hub/blob/main/INSTALL-FOR-AI.md
 ```
 
-> **全程零依赖、不联网、不动你的旧资料。** Agent 装完会告诉你哪些免费 API key 可以配，配了对应能力就亮灯。
+agent 会按协议问 3 个问题，然后创建一套完整工作区：工作区放在哪里、主要用途是什么、是否已有 wiki。
 
-<details>
-<summary>或者手动 clone 先试跑</summary>
+安装器默认安全：不覆盖已有文件、不默认安装 Python 依赖、不自动 commit / push；非空目录默认停止，只有你确认合并才补缺失文件。
 
-```bash
-git clone https://github.com/Benboerba620/ai-workspace-hub.git my-workspace
-cd my-workspace
-```
-
-用 Codex / Claude Code 打开，直接说：
-
-> 把 `inbox/first-note.md` 整理进 personal wiki。
-
-这条 note → wiki 链路纯 markdown 读写，**零依赖、不联网、任何 agent 都能跑**。这就是那个"先跑起来"的最小起点。
-
-</details>
+详细协议见 [INSTALL-FOR-AI.md](INSTALL-FOR-AI.md)。
 
 ---
 
-## 六步 × 六大能力
+## 六大能力
 
-```
-  ┌─────────┐    ┌─────────┐    ┌─────────┐
-  │ ① 收集  │───▶│ ② 沉淀  │───▶│ ③ 研究  │
-  │ podcast │    │  wiki   │    │research │
-  └─────────┘    └────┬────┘    └─────────┘
-                      │
-              ┌───────┼───────┐
-              ▼       ▼       ▼
-        ┌─────────┐ ┌─────────┐ ┌─────────┐
-        │ ④ 筛选  │ │ ⑤ 盯盘  │ │ ⑥ 假设  │
-        │ screen  │ │daily-w. │ │hypothe. │
-        └─────────┘ └─────────┘ └────┬────┘
-                                     │
-                              复盘回写 wiki
-                            ──── 闭环 ────
-```
+| 能力 | 你可以怎么说 | 写入哪里 | API key |
+|------|--------------|----------|---------|
+| **wiki** | “把这篇文章整理进知识库” | `wiki/` | 不需要 |
+| **research** | “帮我研究一下某公司 / 某行业” | `output/research/` | 不需要，websearch 可增强 |
+| **screen** | “帮我筛选 AI 产业链股票” | `output/screen/` | 可选 |
+| **daily-watch** | “生成今天的盯盘日报” | `daily-watchlist-reports/` | 可选 |
+| **hypothesis** | “把这个投资假设建档并追踪” | `hypothesis/` | 不需要 |
+| **podcast** | “扫一下这几个播客并写进 wiki” | `wiki/sources/` + `output/pod2wiki/` | 需要 LLM key |
 
-| 步骤 | 能力 | 做什么 | 需要 API? |
-|:----:|------|--------|:---------:|
-| ① | **podcast** | YouTube / RSS / 博客 → 双语摘要 → wiki | 需 LLM key |
-| ② | **wiki** | 材料摄入 → 按 schema 分类存储 | 否 |
-| ③ | **research** | wiki + websearch → 结构化报告 → 回写知识库 | 否 |
-| ④ | **screen** | 给主题 → 找候选 → 拉数据 → Top 5 分析 | 可选 |
-| ⑤ | **daily-watch** | 拉行情 → 检测异动 → 搜新闻 → 生成日报 | 可选 |
-| ⑥ | **hypothesis** | 建假设 → 收集证据 → 复盘 → 回写知识库 | 否 |
+零 key 可用：wiki、research、hypothesis、screen 的 websearch 模式，以及 daily-watch 的报告骨架和部分无 key 降级源。
 
-> **零 key 能跑**：wiki + research + hypothesis + screen（websearch 模式）不需要任何 API key。
->
-> **配上免费 key 全部亮灯**：[Longbridge](https://open.longbridge.com/zh-CN/skill/)（港美股）+ [tushare](https://tushare.pro/register)（A 股）+ [DeepSeek](https://platform.deepseek.com/)（LLM）。
+按需增强：
+
+- 播客摘要：DeepSeek / Kimi / GLM / Qwen 等兼容 LLM API；
+- A 股行情：tushare；
+- 全球行情 / 财报 / 宏观：FMP；
+- 多市场查询和筛选：可另装 [Longbridge Skill](https://open.longbridge.com/zh-CN/skill/)。
 
 ---
 
-## 闭环怎么转
+## 为什么不是一个普通模板？
 
-```mermaid
-flowchart LR
-    subgraph LOOP[六步闭环]
-      A[① 收集<br/>podcast / inbox] --> B[② 沉淀<br/>wiki]
-      B --> C[③ 研究<br/>research]
-      B --> D[④ 筛选<br/>screen]
-      B --> E[⑤ 盯盘<br/>daily-watch]
-      C & D & E --> F[⑥ 假设<br/>hypothesis]
-      F -.->|复盘回写| B
-    end
+普通模板只给你目录。AI Workspace Hub 给的是一套 **agent-readable workflow protocol**。
 
-    YOU([你]) -.->|反馈 · 品味 · 方向| LOOP
-```
+核心不是“文件夹长什么样”，而是：agent 进入目录后知道先读什么；做研究时知道先查本地 wiki；输出时知道事实、推测、待验证要分开；暂停时知道把进度写到 active-context；明天继续时知道从哪里接上。
 
-研究、筛选、盯盘的产出喂进假设，假设复盘后回写知识库——闭环就在这接上了。**但闭环里最关键的一环是你**：你对 AI 产出的评价、追问、方向调整，才是系统进化的驱动力。
+> 系统不在某个模型里，而在这套文件协议里。谁读懂这套协议，谁就接上你的工作流。
 
 ---
 
-## 系统就两样东西
-
-说穿了，这套系统就两样东西：**一份路由文档 + 一套文件夹结构**。
-
-文件夹是骨架，规定每样东西往哪儿放；路由文档是大脑——它告诉 AI：看到"摄入""研究""盯盘"这些信号，分别去读哪个文件、按什么规则干。路由按 AI 分：Codex 读 `AGENTS.md`、Claude 读 `CLAUDE.md`，两份内容同源，指向同一套配置。
-
-> 系统不在 agent 里，在文件协议里——谁来读这套文件夹，谁就接上了。
+## 目录结构
 
 ```text
 ai-workspace-hub/
-├── AGENTS.md            # 路由文档：Codex 读这份
-├── CLAUDE.md            # 路由文档：Claude 读这份（与 AGENTS.md 同源）
-├── workspace/
-│   ├── workspace-config.md   # 项目配置 + 数据源登记（每次必读）
-│   └── meta/
-│       ├── active-context.md # 工作记忆：当前在做什么，明天从哪接
-│       └── friction-log.md   # 摩擦日志：哪里卡住了，用来改流程
-│
-├── inbox/                    # 临时丢进来的原始材料
-├── wiki/                     # 结构化知识库（来源 / 公司 / 概念 / 结论）
-├── output/                   # 研究报告、筛选结果等输出
-├── daily-watchlist-reports/  # 每日监控日报
-├── hypothesis/               # 投资假设 + 证据 + 复盘
-├── monitoring/               # 股票池、关注对象
+├── AGENTS.md                 # Codex 入口路由
+├── CLAUDE.md                 # Claude Code 入口路由
+├── INSTALL-FOR-AI.md         # 交给 AI agent 的安装协议
+├── SMOKE-TEST.md             # 冒烟测试
+├── ARCHITECTURE.md           # 架构说明
+├── workspace/                # 项目配置、断点续传、摩擦日志
+├── inbox/                    # 临时输入材料
+├── wiki/                     # personal wiki
+├── output/                   # 研究、筛选、播客等输出
+├── monitoring/               # 股票池 / 关注列表
+├── hypothesis/               # 投资假设、证据、复盘
+├── daily-watchlist-reports/  # 日报输出
 ├── portfolio/                # 交易记录
-│
-├── config/                   # 用户配置：API key 等（不入 git）
-├── tools/
-│   ├── podcast/              # 播客 / 博客摄入脚本
-│   └── daily-watch/          # 日报监控 + 行情拉取脚本
-├── system/
-│   ├── skills/               # 能力说明书：每个能力怎么用
-│   ├── integrations/         # 内部接线：工具和知识库怎么连
-│   └── templates/            # 安装时复制的模板文件
-└── requirements.txt          # Python 依赖（首次用工具时装）
+├── config/                   # 用户配置，不入 git
+├── tools/                    # podcast / daily-watch 工具
+└── system/                   # skills / integrations / scripts / templates
 ```
 
 ---
 
-## 数据源
+## 数据源与边界
 
-| 数据源 | 市场 | 费用 | 获取方式 |
-|--------|------|:----:|---------|
-| **Longbridge** | 🇭🇰 HK  🇺🇸 US | 免费 | [open.longbridge.com](https://open.longbridge.com/zh-CN/skill/) |
-| **tushare** | 🇨🇳 A 股 | 免费额度 | [tushare.pro](https://tushare.pro/register) |
-| **FMP** | 🌍 全球 | 免费 250 次/天 | [financialmodelingprep.com](https://financialmodelingprep.com/) |
+| 名称 | 类型 | 用途 | 是否内置 |
+|------|------|------|----------|
+| Nasdaq | 无 key 降级源 | 美股基础行情 | 是 |
+| tushare | API 数据源 | A 股行情 / 财务 | 是，需 token |
+| FMP | API 数据源 | 全球行情 / 财报 / 宏观 | 是，需 key |
+| Longbridge Skill | 外部 Agent 扩展 | 多市场查询、筛选、研究 | 否，独立安装授权 |
+| websearch | Agent 能力 | 补充新闻、资料、公司信息 | 取决于 agent |
 
-> 没配 → 自动降级到 websearch，数字标 `[待验证]`，不编造。
+重要边界：本项目不做自动交易，不承诺数据源永远免费，不把 AI 输出包装成投资建议。价格、财报、新闻、监管等动态信息需要当场验证；没有 key 时，无法验证的数字必须标 `[待验证]`。
 
 ---
 
 ## 第一周怎么用
 
-| 天数 | 动作 | 对应工作流 |
-|:----:|------|:----------:|
-| Day 1 | clone，跑通 note → wiki | ①② |
-| Day 2 | 放入 3-5 条材料，整理进知识库 | ①② |
-| Day 3 | "帮我研究一下 {某公司}" | ③ |
-| Day 4 | 配 Longbridge / tushare | 亮灯数据源 |
-| Day 5 | "帮我筛选 AI 产业链的股票" | ④ |
-| Day 6 | 配 LLM key，扫一次播客 | ① |
-| Day 7 | 删一条没用的规则 | 防止系统变胖 |
+| 天数 | 动作 | 目标 |
+|:----:|------|------|
+| Day 1 | 跑通 `inbox/first-note.md → wiki` | 确认 agent 读得懂工作区 |
+| Day 2 | 放入 3-5 条真实材料 | 建立第一批知识库 |
+| Day 3 | 让 agent 研究一个公司 / 行业 | 生成第一篇结构化报告 |
+| Day 4 | 配 tushare / FMP，或另装 Longbridge Skill | 增强行情能力 |
+| Day 5 | 做一次主题筛选 | 形成候选池 |
+| Day 6 | 配 LLM key，扫一次播客 / 博客 | 建立外部信息流 |
+| Day 7 | 运行结构体检，删掉没用规则 | 防止系统变胖 |
 
 ---
 
-## 断点续传
+## 常用命令
 
-"今天停、明天接"，agent 自动执行：
+```bash
+python3 -m unittest discover -s tests -v
+python3 tools/daily-watch/scripts/check_setup.py --init
+python3 tools/podcast/scripts/fetch_podcasts.py --help
+```
 
-- **今天到此**：你说"暂停 / 明天继续"，agent 往 `active-context.md` 追一行，记主题、状态、续接锚点。
-- **明天接上**：你说"继续"，agent 读 `active-context.md`，顺着最新条目接上。
-
----
-
-## 别让它乱长
-
-加功能前问三句：
-
-1. 一次性的？→ 留在对话，不落盘。
-2. 项目特有的？→ 写项目配置或 skill。
-3. 跨项目长期有效的？→ 才写进 `AGENTS.md` / `CLAUDE.md`。
-
-> context 即智能——配置越胖、模型越笨。定期清理，让模型自己检查、自己清，你当监工就行。
+Python 工具需要 Python 3.10+。如果你的 `python3` 指向 3.9，请改用 `python3.10` / `python3.11` / `python3.12`，或安装新版 Python。
 
 ---
 
-## 不包含什么
+## Roadmap
 
-- 不包含 GUI、不绑定模型或数据源、不强制编辑器、不做自动交易。
-- Codex 和 Claude Code 都能用——系统在文件协议里，不在 agent 里。
+- 更清晰的 examples；
+- 更多真实研究工作流样例；
+- 更强的 screen 预设；
+- 更完善的 daily-watch 降级策略；
+- 更好的 Obsidian / personal wiki 兼容说明；
+- 更多 agent 入口适配。
 
-> 系列文章：[从零构建 AI 协作系统（一）：从最小可运行的 MVP 开始](https://mp.weixin.qq.com/s/YOUR_LINK)
+---
 
-*声明：本文提到的工具均为个人使用，非推广。投资有风险，AI 工具不构成投资建议。*
+## Contributing
+
+欢迎提 issue / PR，尤其是新 agent 适配、研究报告模板、数据源接入、真实使用摩擦点、README / 教程 / 安装流程改进。
+
+---
+
+## Star History
+
+如果这个项目对你有帮助，欢迎点一下 ⭐ Star。它会帮助更多需要“长期 AI 工作流”的人发现这个项目，也会让我知道哪些方向值得继续做。
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Benboerba620/ai-workspace-hub&type=Date)](https://www.star-history.com/#Benboerba620/ai-workspace-hub&Date)
+
+---
+
+## Disclaimer
+
+AI Workspace Hub 是个人研究与知识管理工具，不构成投资建议。所有市场数据、公司信息、财务数字、新闻和监管信息都应以原始来源为准。

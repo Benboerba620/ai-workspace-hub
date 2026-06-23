@@ -26,9 +26,9 @@
 对候选 ticker 列表，调数据源拉基础数据：
 
 **数据源优先级**：
-1. [Longbridge](https://open.longbridge.com/zh-CN/skill/) CLI（HK + US，免费）：`longbridge quote {TICKER}`
+1. 已独立安装并授权的 [Longbridge Skill/CLI](https://open.longbridge.com/zh-CN/skill/)：`longbridge quote {TICKER} --format json`
 2. [tushare](https://tushare.pro/register)（A 股 .SH/.SZ）：通过 `tools/daily-watch/scripts/fetch_market_data.py`
-3. [FMP](https://financialmodelingprep.com/)（全球，付费可选）：通过 `tools/daily-watch/scripts/fetch_market_data.py`
+3. [FMP](https://financialmodelingprep.com/)（全球，可选）：通过 `tools/daily-watch/scripts/fetch_market_data.py`
 
 **拉取字段**：当前价、市值、P/E、P/B、股息率、近 1 年营收增速、近 3 月涨跌幅。
 
@@ -56,7 +56,7 @@
 ```markdown
 # {主题} 筛选结果
 
-> 日期：YYYY-MM-DD | 模板：{价值股/AI产业链/自定义} | 数据源：{Longbridge/tushare/FMP/websearch}
+> 日期：YYYY-MM-DD | 模板：{价值股/AI产业链/自定义} | 数据源：{Longbridge Skill/tushare/FMP/websearch}
 
 ## 筛选条件
 
@@ -110,7 +110,7 @@
 ## 数据标注
 
 所有数字必须标注来源：
-- `[Longbridge]` / `[tushare]` / `[FMP]`：API 拉取
+- `[Longbridge Skill]`：独立 Agent 扩展；`[tushare]` / `[FMP]`：脚本 API 拉取
 - `[网页]`：websearch 公开信息
 - `[待验证]`：无 API、数据来自定性描述
 

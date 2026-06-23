@@ -52,7 +52,37 @@ my-ai-workspace/
 
 ## 安装步骤
 
-### Step 1：创建目录
+### Step 0：取得安装源
+
+安装需要联网读取本仓库。先判断当前目录是否已经是 AI Workspace Hub 源码：
+
+- 若当前目录存在本文件和 `system/scripts/install_workspace.py`，将当前目录记为 `{SOURCE_ROOT}`。
+- 否则，把仓库临时克隆到系统临时目录，再将该目录记为 `{SOURCE_ROOT}`：
+
+```bash
+git clone --depth 1 https://github.com/Benboerba620/ai-workspace-hub.git "{临时目录}/ai-workspace-hub-source"
+```
+
+如果环境没有 Git，下载 GitHub 源码 ZIP 并解压到临时目录。不要把临时源码目录当成用户工作区。
+
+### 推荐：运行安全安装器
+
+安装器只使用 Python 标准库，不安装依赖。目标目录为空时直接安装；目标目录非空时默认停止，只有用户确认合并后才加 `--merge`，并且所有已有文件都原样保留。
+
+命令默认使用 `python3`，且需要 Python 3.10+。先运行 `python3 --version`；如果版本低于 3.10，改用 `python3.10` / `python3.11` / `python3.12`，或引导用户安装新版 Python。如果用户环境只有 `python` 且版本 ≥3.10，把 `python3` 替换成 `python`；不要因为命令名不同就判定安装失败。
+
+```bash
+python3 "{SOURCE_ROOT}/system/scripts/install_workspace.py" \
+  --source "{SOURCE_ROOT}" \
+  --target "{用户工作区}" \
+  --name "{项目名}" \
+  --primary-use "{主要用途}" \
+  --wiki-root "{wiki路径}"
+```
+
+安装器成功后跳到 Step 3 检查结果。没有 Python 时，Agent 按下面的 Step 1-2 使用文件工具完成同样操作。
+
+### Step 1：手动创建目录（安装器不可用时）
 
 ```text
 workspace/meta/
@@ -63,7 +93,9 @@ wiki/concepts/
 wiki/explorations/
 inbox/
 output/
+output/research/
 output/screen/
+output/pod2wiki/
 monitoring/
 hypothesis/
 daily-watchlist-reports/
@@ -81,7 +113,7 @@ system/scripts/
 system/templates/
 ```
 
-### Step 2：写入核心文件
+### Step 2：手动写入核心文件（安装器不可用时）
 
 复制模板和工具代码：
 
@@ -112,12 +144,15 @@ system/templates/
 **Integrations**（内部接线说明）：
 - `system/integrations/personal-wiki.md` -> `system/integrations/personal-wiki.md`
 - `system/integrations/hypothesis-tracker.md` -> `system/integrations/hypothesis-tracker.md`
+- `system/integrations/pod2wiki.md` -> `system/integrations/pod2wiki.md`
+- `system/integrations/daily-watchlist.md` -> `system/integrations/daily-watchlist.md`
 - `system/integrations/_template.md` -> `system/integrations/_template.md`
 
 **工具代码**：
 - `tools/podcast/` 整个目录（scripts/ examples/ .env.example requirements.txt pyproject.toml）
 - `tools/daily-watch/` 整个目录（scripts/ config-examples/ templates/ requirements.txt pyproject.toml）
 - `system/scripts/pdf_to_md.py` -> `system/scripts/pdf_to_md.py`
+- `system/scripts/install_workspace.py` -> `system/scripts/install_workspace.py`
 
 **依赖文件**：
 - `requirements.txt` -> `requirements.txt`
@@ -125,6 +160,7 @@ system/templates/
 
 **试跑材料**：
 - `inbox/first-note.md` -> `inbox/first-note.md`
+- `inbox/sample-ai-workspace.pdf` -> `inbox/sample-ai-workspace.pdf`
 
 按用户用途替换模板里的占位符。
 
@@ -190,10 +226,11 @@ system/templates/
 
 | 功能 | 需要填的 key | 没填时 | 获取方式 |
 |------|-------------|--------|---------|
-| 日报/筛选（港美股） | `LONGBRIDGE_APP_KEY` 等 | 降级到 websearch | [Longbridge](https://open.longbridge.com/zh-CN/skill/) |
-| 日报/筛选（A 股） | `TUSHARE_TOKEN` | 跳过 A 股 | [tushare](https://tushare.pro/register) |
+| 日报（A 股） | `TUSHARE_TOKEN` | 跳过 A 股 | [tushare](https://tushare.pro/register) |
 | 播客摘要 | `LLM_API_KEY`（DeepSeek 等） | `--no-llm` 模式 | [DeepSeek](https://platform.deepseek.com/) |
-| 日报（付费可选） | `FMP_API_KEY` | 用 Longbridge 替代 | [FMP](https://financialmodelingprep.com/) |
+| 日报（全球市场） | `FMP_API_KEY` | 美股尝试 Nasdaq 等降级源 | [FMP](https://financialmodelingprep.com/) |
+
+Longbridge 不是上述脚本的环境变量数据源。它是独立 Agent Skill/CLI/MCP；用户需要时，按[官方安装说明](https://open.longbridge.com/zh-CN/skill/)另行安装和授权，可用于 screen / research 的行情查询。
 
 ### Step 6：完成后告诉用户
 
@@ -220,6 +257,7 @@ system/templates/
 ## 安装原则
 
 - 不要默认安装 Python 依赖（首次使用对应工具时再装）。
+- 不要声称安装过程不联网；取得源码需要联网，安装完成后的 Markdown 基座才可以离线运行。
 - 不要默认创建 Git commit。
 - 不要默认 push 到 GitHub。
 - 不要把用户的旧资料复制进新项目。

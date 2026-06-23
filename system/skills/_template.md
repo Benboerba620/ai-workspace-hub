@@ -13,10 +13,10 @@
 
 agent 第一次执行时先确认依赖，缺什么自动装：
 
-1. 检查运行时：`{python --version / node --version / 其他}`。
+1. 检查运行时：`{python3 --version / node --version / 其他}`；Python 工具默认需要 3.10+，如果 `python3` 版本过低，改用 `python3.10` / `python3.11` / `python3.12`；如果环境只有 `python` 且版本合格，用 `python --version`。
 2. 安装依赖：
    ```bash
-   pip install -r tools/{能力名}/requirements.txt
+   python3 -m pip install -r tools/{能力名}/requirements.txt
    ```
 
 > 纯 markdown 读写的能力（如 research）不需要装依赖，可删掉本节。

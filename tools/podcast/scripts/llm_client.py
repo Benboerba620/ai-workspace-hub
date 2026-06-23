@@ -25,7 +25,7 @@ PROVIDERS: dict[str, dict[str, str]] = {
         "base": "DEEPSEEK_BASE_URL",
         "model": "DEEPSEEK_MODEL",
         "base_default": "https://api.deepseek.com/v1",
-        "model_default": "deepseek-chat",
+        "model_default": "deepseek-v4-flash",
     },
     "kimi": {
         "key": "KIMI_API_KEY",
@@ -101,7 +101,7 @@ def load_dotenv(path: Path | None = None) -> None:
 def resolve_provider(provider: str | None = None, model: str | None = None) -> dict[str, str]:
     """Resolve provider config from env vars."""
     load_dotenv()
-    name = provider or env_value("LLM_PROVIDER") or "deepseek"
+    name = env_value("LLM_PROVIDER") or provider or "deepseek"
     if name not in PROVIDERS:
         raise LLMError(f"Unknown provider: {name}. Valid providers: {', '.join(PROVIDERS)}")
     cfg = PROVIDERS[name]
@@ -114,7 +114,7 @@ def resolve_provider(provider: str | None = None, model: str | None = None) -> d
         "provider": name,
         "api_key": api_key,
         "base_url": env_value("LLM_BASE_URL") or env_value(cfg["base"]) or cfg["base_default"],
-        "model": model or env_value("LLM_MODEL") or env_value(cfg["model"]) or cfg["model_default"],
+        "model": env_value("LLM_MODEL") or model or env_value(cfg["model"]) or cfg["model_default"],
     }
 
 

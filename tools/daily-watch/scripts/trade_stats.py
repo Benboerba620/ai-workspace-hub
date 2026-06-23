@@ -2,11 +2,11 @@
 统计 portfolio/trades.csv 中的交易概况。
 
 Usage:
-  python scripts/trade_stats.py
-  python scripts/trade_stats.py --hypothesis H1
-  python scripts/trade_stats.py --ticker AAPL
-  python scripts/trade_stats.py --month 2026-04
-  python scripts/trade_stats.py --json
+  python3 scripts/trade_stats.py
+  python3 scripts/trade_stats.py --hypothesis H1
+  python3 scripts/trade_stats.py --ticker AAPL
+  python3 scripts/trade_stats.py --month 2026-04
+  python3 scripts/trade_stats.py --json
 """
 
 from __future__ import annotations

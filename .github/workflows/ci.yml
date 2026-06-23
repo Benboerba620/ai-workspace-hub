@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -r requirements.txt ruff
+      - run: python -m unittest discover -s tests -v
+      - run: ruff check system tools tests
+      - run: python -m compileall -q system tools tests
+      - run: python tools/podcast/scripts/fetch_podcasts.py --help
+      - run: python tools/daily-watch/scripts/check_setup.py --init

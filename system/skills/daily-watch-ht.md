@@ -36,7 +36,7 @@ tools/daily-watch/templates/hypothesis-tracker-hypothesis-template.md
 ## 查看状态（ht-status）
 
 ```bash
-python tools/daily-watch/scripts/sync_hypothesis.py
+python3 tools/daily-watch/scripts/sync_hypothesis.py
 ```
 
 输出所有假设的当前状态：置信度、状态（active/paused/killed）、关联 ticker。
@@ -55,7 +55,7 @@ python tools/daily-watch/scripts/sync_hypothesis.py
 
 ```bash
 # 查看交易统计
-python tools/daily-watch/scripts/trade_stats.py
+python3 tools/daily-watch/scripts/trade_stats.py
 ```
 
 ## 假设生命周期

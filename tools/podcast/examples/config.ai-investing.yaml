@@ -19,7 +19,7 @@ whisper:
 
 llm:
   provider: deepseek
-  model: deepseek-chat
+  model: deepseek-v4-flash
   max_tokens: 4096
   translation_max_tokens: 4096
   report_max_tokens: 6000
