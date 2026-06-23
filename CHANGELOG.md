@@ -84,3 +84,5 @@
 - Added first-ingest smoke test.
 - Added PDF ingest smoke path with optional Python + pypdf path.
 - Added simple workspace rules in `workspace/workspace-config.md`.
+
+<!-- 文件说明：版本变化记录。 -->
