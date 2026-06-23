@@ -163,3 +163,5 @@ podcast ──► wiki ──► daily-watch ──► output/ ──► hypothe
 ```
 
 基座保证 `inbox → wiki → output + research`。其余能力按配置渐进亮灯。
+
+<!-- 文件说明：系统架构、能力分层和目录关系说明。 -->
