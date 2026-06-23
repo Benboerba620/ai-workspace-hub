@@ -1,12 +1,13 @@
-# Personal Wiki
+# wiki
 
-这是 Hub 的默认知识库核心。最小结构兼容 karpathy-claude-wiki 思路，但当前只保留可直接试跑的最小目录。
+长期知识库目录。
+
+这是 AI Workspace Hub 的核心。原始材料会先进入 raw 或 inbox，整理后的来源、概念、实体和综合判断会沉淀到这里，让 agent 下次研究时可以先查本地知识库，而不是从空白对话重新开始。
 
 ## 目录
 
-- `raw/`：原始材料
-- `sources/`：结构化来源页面
-- `entities/`：实体档案
-- `concepts/`：概念和主题
-- `explorations/`：综合判断
-
+- raw/：原始材料和未完全清洗的文本。
+- sources/：结构化来源页面，例如文章、访谈、PDF、播客摘要。
+- entities/：公司、人物、机构、产品等实体档案。
+- concepts/：概念、主题、产业链环节和方法论。
+- explorations/：综合研究判断、阶段性结论和复盘。
