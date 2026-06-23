@@ -263,3 +263,5 @@ Longbridge 不是上述脚本的环境变量数据源。它是独立 Agent Skill
 - 不要把用户的旧资料复制进新项目。
 - 不要把一次性偏好写进 `AGENTS.md` 或 `CLAUDE.md`。
 - 遇到摩擦时，优先记录到 `workspace/meta/friction-log.md`。
+
+<!-- 文件说明：交给 AI agent 执行的安装协议。 -->
