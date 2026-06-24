@@ -21,6 +21,12 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+*.swp
+*~
 
 # 可选能力生成的中间产物（按需保留时可删此行）
 inbox/sample-ai-workspace.md

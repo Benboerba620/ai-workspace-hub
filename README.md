@@ -262,6 +262,44 @@ python3 tools/podcast/scripts/fetch_podcasts.py --help
 
 Core Mode 不需要 Python 依赖。Python 工具需要 Python 3.10+；如果你的 `python3` 指向 3.9，请改用 `python3.10` / `python3.11` / `python3.12`，或安装新版 Python。
 
+**Windows 用户注意**：Windows 上通常用 `python` 而不是 `python3`。如果 `python3` 报错，请尝试：
+
+```bash
+python --version          # 确认版本 ≥ 3.10
+python system/scripts/check_workspace.py
+python -m pip install -r requirements.txt
+```
+
+如果系统同时安装了 Python 2 和 3，可以用 `py -3` 指定版本：
+
+```bash
+py -3 system/scripts/check_workspace.py
+```
+
+---
+
+## 新手常见问题
+
+**Q：我不会写代码，能用这个项目吗？**
+
+可以。Core Mode 只需要你会把文本文件放进 `inbox/`，然后用自然语言告诉 AI agent 做什么。不需要写任何代码。
+
+**Q：一定要用 Codex / Claude Code 吗？**
+
+不一定。任何能读写文件、理解 Markdown 的 AI agent 都可以。Codex 和 Claude Code 效果最好，因为它们原生支持文件操作和代码执行。Cursor 和 Cline 也可以。
+
+**Q：我的 wiki 越来越大，怎么办？**
+
+wiki 就是文件夹里的 Markdown 文件。你可以用 Obsidian 打开整个 `wiki/` 目录做可视化管理，也可以让 AI agent 帮你整理和归档。
+
+**Q：API key 会不会泄露？**
+
+`config/` 目录已被 `.gitignore` 排除，不会被 git 提交。只要你不手动把 `.env` 文件发给别人，key 就是安全的。
+
+**Q：我可以把这个项目和 Obsidian 一起用吗？**
+
+可以。把项目目录（或其中的 `wiki/` 目录）添加为 Obsidian vault 即可。所有笔记都是标准 Markdown，完全兼容。
+
 ---
 
 ## Roadmap
@@ -272,6 +310,12 @@ Core Mode 不需要 Python 依赖。Python 工具需要 Python 3.10+；如果你
 - 更完善的 daily-watch 降级策略；
 - 更好的 Obsidian / personal wiki 兼容说明；
 - 更多 agent 入口适配。
+
+---
+
+## 故障排查
+
+遇到问题？查看 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)。
 
 ---
 

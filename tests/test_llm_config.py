@@ -1,14 +1,9 @@
 from __future__ import annotations
 
-import sys
 import unittest
-from pathlib import Path
 from unittest.mock import patch
 
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-PODCAST_SCRIPTS = REPO_ROOT / "tools" / "podcast" / "scripts"
-sys.path.insert(0, str(PODCAST_SCRIPTS))
+import _test_paths  # noqa: F401
 
 from llm_client import resolve_provider  # noqa: E402
 

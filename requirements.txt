@@ -1,5 +1,6 @@
 # AI Workspace Hub - 合并依赖
 # 安装：pip install -r requirements.txt
+# 可复现安装用 requirements.lock（版本锁定）。
 
 # 核心（daily-watch + screen + research 数据拉取）
 requests>=2.28.0

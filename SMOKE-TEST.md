@@ -21,6 +21,36 @@ python3 system/scripts/check_workspace.py
 3. `workspace/meta/active-context.md` 追加或更新一条试跑完成记录。
 4. 不需要联网，不需要任何依赖。
 
+生成的 wiki 页面大致如下：
+
+```markdown
+---
+title: 我对 AI 工具的使用心得
+source_type: note
+date: 2026-06-24
+status: evergreen
+---
+
+# 我对 AI 工具的使用心得
+
+## 核心结论
+AI 编程助手正在改变开发者的工作方式，核心价值在于"AI + 文件系统"的组合。
+
+## 关键证据
+- 重复性代码交给 AI，人专注架构和设计
+- 文件系统沉淀知识比对话记忆高效
+- AI 读到已有笔记后回答质量大幅提升
+
+## 待验证
+- [ ] wiki 系统在多人协作场景下的效果
+- [ ] 长期积累的 wiki 维护难度
+
+## 下一步
+- 尝试更多材料的摄入（播客、PDF、研报）
+```
+
+（这只是示意，实际格式取决于 agent 对 `wiki/_schema.md` 的理解。）
+
 ## Enhanced Mode：播客工具（需 Python + 可选 LLM key）
 
 以下命令默认使用 `python3`，且需要 Python 3.10+。先运行 `python3 --version`；如果版本低于 3.10，请改用 `python3.10` / `python3.11` / `python3.12`，或安装新版 Python。如果你的环境只有 `python` 且版本 ≥3.10，把命令里的 `python3` 替换成 `python` 即可。

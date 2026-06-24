@@ -107,7 +107,9 @@ def vix_status(vix_value: float | None) -> str:
     return "Panic"
 
 
-def build_quote_payload(quote: dict[str, Any] | None, *, label: str | None = None) -> dict[str, Any]:
+def build_quote_payload(
+    quote: dict[str, Any] | None, *, label: str | None = None,
+) -> dict[str, Any]:
     payload = {
         "price": None,
         "change_pct": None,
@@ -235,10 +237,9 @@ def main() -> None:
     result["meta"]["received_symbols"] = len(quote_map) + (1 if vix_quote else 0)
     result["meta"]["missing_symbols"] = sorted(set(result["meta"]["missing_symbols"]))
 
-    print(
-        f"Macro data fetched: {result['meta']['received_symbols']}/{result['meta']['requested_symbols']} symbols",
-        file=sys.stderr,
-    )
+    received = result["meta"]["received_symbols"]
+    requested = result["meta"]["requested_symbols"]
+    print(f"Macro data fetched: {received}/{requested} symbols", file=sys.stderr)
     json.dump(result, sys.stdout, indent=2, ensure_ascii=False)
 
 

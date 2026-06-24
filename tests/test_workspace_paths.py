@@ -1,15 +1,11 @@
 from __future__ import annotations
 
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-DAILY_SCRIPTS = REPO_ROOT / "tools" / "daily-watch" / "scripts"
-sys.path.insert(0, str(DAILY_SCRIPTS))
+from _test_paths import REPO_ROOT  # noqa: F401 (also sets up sys.path)
 
 from check_setup import initialize_config  # noqa: E402
 from fetch_market_data import fetch_nasdaq_quote, load_env  # noqa: E402

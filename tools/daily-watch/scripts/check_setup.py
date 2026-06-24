@@ -194,10 +194,11 @@ def main() -> int:
                 )
                 check("TUSHARE_TOKEN", True, "可用")
             except ImportError:
-                warn(
-                    "TUSHARE_TOKEN",
-                    f"已配置，但未安装 tushare（{PIP_INSTALL} -r tools/daily-watch/requirements-tushare.txt）",
+                msg = (
+                    f"已配置，但未安装 tushare"
+                    f"（{PIP_INSTALL} -r tools/daily-watch/requirements-tushare.txt）"
                 )
+                warn("TUSHARE_TOKEN", msg)
             except Exception as exc:  # noqa: BLE001
                 warn("TUSHARE_TOKEN", f"检查跳过：{exc}")
         else:
