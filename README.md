@@ -11,7 +11,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/Benboerba620/ai-workspace-hub?style=social)](https://github.com/Benboerba620/ai-workspace-hub/stargazers)
 [![License](https://img.shields.io/github/license/Benboerba620/ai-workspace-hub)](LICENSE)
 
-[30 秒试跑](#-30-秒试跑) · [六大能力](#-六大能力) · [一键 AI 安装](#-一键交给-ai-安装) · [第一周怎么用](#-第一周怎么用) · [故障排查](TROUBLESHOOTING.md)
+[30 秒上手](#-30-秒上手) · [六大能力](#-六大能力) · [第一周怎么用](#-第一周怎么用) · [故障排查](TROUBLESHOOTING.md)
 
 </div>
 
@@ -19,18 +19,20 @@
 
 > 对话很聪明，但工作流没有记忆；今天做完，明天又从头解释。
 
-AI Workspace Hub 解决这个问题。一次 clone，六大能力开箱即用——**核心工作流不需要 API key**。
+AI Workspace Hub 解决这个问题。六大能力开箱即用——**核心工作流不需要 API key**。
 
 ---
 
-## ⚡ 30 秒试跑
+## ⚡ 30 秒上手
 
-```bash
-git clone https://github.com/Benboerba620/ai-workspace-hub.git my-ai-workspace
-cd my-ai-workspace
+把下面这句话发给你的 AI agent（Codex / Claude Code / Cursor / Cline）：
+
+```text
+帮我按这个协议安装 AI Workspace Hub：
+https://github.com/Benboerba620/ai-workspace-hub/blob/main/INSTALL-FOR-AI.md
 ```
 
-用 Codex / Claude Code / Cursor 打开目录，对 agent 说：
+Agent 会问你 3 个问题，然后自动创建完整工作区。装好后，对它说：
 
 ```text
 把 inbox/first-note.md 整理进 personal wiki。
@@ -38,16 +40,25 @@ cd my-ai-workspace
 
 预期：agent 读 `AGENTS.md` → 按 `wiki/_schema.md` 整理 → 写入 `wiki/sources/` → 在 `active-context.md` 记录进度。
 
-**不需要 API key，不需要联网，不需要安装依赖。**
+**不需要 API key，不需要联网，不需要写任何代码。**
 
 <details>
-<summary>验证安装状态</summary>
+<summary>更习惯手动 clone？</summary>
+
+```bash
+git clone https://github.com/Benboerba620/ai-workspace-hub.git my-ai-workspace
+cd my-ai-workspace
+```
+
+用 AI agent 打开这个目录，直接试跑 `inbox/first-note.md → wiki`。
+
+验证安装状态：
 
 ```bash
 python3 system/scripts/check_workspace.py
 ```
 
-Core Mode 显示 `READY` 即可开始使用。Enhanced Mode 的 API key 警告只代表可选自动化暂未开启，不是安装失败。
+Core Mode 显示 `READY` 即可开始使用。
 
 </details>
 
@@ -103,19 +114,6 @@ Core Mode 显示 `READY` 即可开始使用。Enhanced Mode 的 API key 警告�
 | **Enhanced** | 按需填写 | 播客摘要、行情日报、A 股 / 全球市场数据、自动监控 | 启用自动化流程时 |
 
 推荐路径：**Core 先跑通** → `check_workspace.py` 看状态 → 按需填 key 到 `config/*.env`。
-
----
-
-## 🤖 一键交给 AI 安装
-
-把这句话发给你的 AI agent：
-
-```text
-帮我按这个协议安装 AI Workspace Hub：
-https://github.com/Benboerba620/ai-workspace-hub/blob/main/INSTALL-FOR-AI.md
-```
-
-Agent 会问 3 个问题（放哪里、做什么、有没有 wiki），然后创建完整工作区。安装器不覆盖已有文件、不默认装依赖、不要求先配 key。详见 [INSTALL-FOR-AI.md](INSTALL-FOR-AI.md)。
 
 ---
 
