@@ -1,15 +1,35 @@
 # Changelog
 
-## Unreleased
+## 0.3.1 - 2026-07-02
 
 ### 修复
 
+- **手动 clone 不再继承维护者的工作状态**：`workspace/meta/active-context.md` 和 `friction-log.md` 重置为干净模板，仓库契约测试新增这两对模板一致性检查，防止个人工作日志再次混进发布内容。
+  之所以这样改：README 的"手动 clone 直接用"路径会把维护者的断点记录带给新用户，走安装协议的用户不受影响，但两条路径应该拿到同样干净的工作区。
+- **smoke-test 演示产物移入 `examples/smoke-test/`**：原先散在 `wiki/` 和 `output/` 里的 2026-06-05 试跑产物（含未在文档声明的 `output/first-ingest/` 等三个子目录）统一收进 `examples/`，配 README 说明"这是示例、可整目录删除"。用户的 `wiki/` 和 `output/` 现在从空白开始。
+- `TROUBLESHOOTING.md` 播客排障段指错配置文件：`config/llm.env` 更正为实际存在的 `config/pod2wiki.env`。
 - 新增标准库安装器，安装协议明确先取得源码；非空目标默认停止，`--merge` 只补缺失文件、不覆盖用户资料。
 - 修复 all-in-one 工作区在配置文件创建前无法识别根目录的问题，`check_setup.py --init` 可安全初始化缺失配置。
 - 更正 Longbridge 定位：它是独立 Agent Skill/CLI/MCP，不再宣称为 daily-watch Python 脚本的内置环境变量数据源。
 - `faster-whisper` 拆到可选的 `requirements-transcribe.txt`，避免基础播客安装拉取重型转录依赖。
 - LLM 环境变量优先于示例 YAML；摘要全部失败时返回非零状态，不再静默报告成功。
+
+### 改进
+
+- **CI 新增 Windows job**（windows-latest × Python 3.12）：README 明确支持 Windows 用户，编码、路径分隔符、`python`/`python3` 别名类问题现在能在 CI 被抓住。
+- CI 的 pytest 步骤去掉 `|| true`，测试失败不再被吞掉。
 - 新增安装、路径、文档链接和仓库契约测试，以及 Python 3.10/3.12 CI。
+
+### 文档
+
+- 数据源表（README / AGENTS / CLAUDE）补上代码里实际支持的 daily-watch 降级源：Finnhub / EOD / yfinance（`FINNHUB_API_KEY` / `EOD_API_KEY` / `ENABLE_YFINANCE`）。
+- README「30 秒上手」和 SMOKE-TEST 的第一条命令内联标注 Windows 写法（`python` 代替 `python3`），不用翻到故障排查才发现。
+- `AGENTS.md` 补上与 `CLAUDE.md` 的双向同步声明（此前只有 CLAUDE.md 单向声明）。
+- 日报监控路由行补充 `system/integrations/daily-watchlist.md` 接线说明的入口。
+
+### 移除
+
+- 删除冗余的 `tools/daily-watch/.env.example`（与 `config-examples/daily-watchlist.env.example` 内容重复，安装器和文档都只用后者）。
 
 ## 0.3.0 - 2026-06-22
 
@@ -17,7 +37,7 @@
 
 - **All-in-One 集成**：pod2wiki（播客/博客摄入）和 daily-watchlist（日报监控）代码合并进 `tools/podcast/` 和 `tools/daily-watch/`，一次 clone 拿到全部六大能力。原始独立 repo 继续存在。
 - **screen 快速筛选**（基座能力）：给定主题 → websearch 候选 → 拉数据 → 过滤 → 表格 + Top 5 分析。内置两个预设模板（价值股 / AI 产业链）。无 API 时降级为纯 websearch。
-- **Longbridge 数据源**：新增 Longbridge 为默认免费数据源（HK + US 行情），与 tushare（A 股）并列为零成本起步选项。FMP 降为付费可选。
+- **Longbridge 数据源**：新增 Longbridge 为默认免费数据源（HK + US 行情），与 tushare（A 股）并列为零成本起步选项。FMP 降为付费可选。（勘误：0.3.1 已更正——Longbridge 是独立 Agent Skill/CLI/MCP 外部扩展，不是日报脚本的内置数据源；FMP 仍为内置可选源。）
 - **统一 config/ 目录**：所有工具的用户配置文件统一放在 `config/`（不入 git）。
 
 ### 改进
