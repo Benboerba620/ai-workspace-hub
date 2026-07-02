@@ -60,7 +60,7 @@
 
 **原因**：provider 名称和 base_url 不匹配，或 key 填错了位置。
 
-**解决**：检查 `config/llm.env` 中的 `LLM_PROVIDER` 和 `LLM_BASE_URL` 是否对应同一家服务商。常见错误：填了 DeepSeek 的 key 但 provider 写成 openai。
+**解决**：检查 `config/pod2wiki.env` 中的 `LLM_PROVIDER` 和 `LLM_BASE_URL` 是否对应同一家服务商。常见错误：填了 DeepSeek 的 key 但 provider 写成 openai。
 
 ### 没有 LLM key 能用播客吗
 

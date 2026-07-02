@@ -5,7 +5,7 @@
 先运行总检查：
 
 ```bash
-python3 system/scripts/check_workspace.py
+python3 system/scripts/check_workspace.py    # Windows: python system/scripts/check_workspace.py
 ```
 
 预期：`Core Mode result: READY`。Enhanced Mode 里的 Python 版本、依赖包或 API key 警告不代表安装失败，只代表可选自动化暂未开启。

@@ -2,6 +2,8 @@
 
 这个 repo 是一个 all-in-one AI 研究工作系统，包含六大能力。Codex 进入本目录后，先读本文件，再读 `workspace/workspace-config.md`。
 
+本文件与 `CLAUDE.md` 保持**同一套工作协议**。两者内容应当同源，改一个就同步另一个。
+
 ## 工作方式
 
 - 默认使用中文。
@@ -23,7 +25,7 @@
 | 研究主题 | `system/skills/research.md` + `wiki/` + websearch | `output/research/` → 确认后回写 `wiki/explorations/` |
 | 快速筛选 | `system/skills/screen.md` | `output/screen/` |
 | 播客摄入 | `system/skills/podcast.md` | `wiki/sources/` + `wiki/raw/podcasts/` + `output/pod2wiki/` |
-| 日报监控 | `system/skills/daily-watch.md` | `daily-watchlist-reports/` + `hypothesis/` |
+| 日报监控 | `system/skills/daily-watch.md`（接线细节见 `system/integrations/daily-watchlist.md`） | `daily-watchlist-reports/` + `hypothesis/` |
 | 管理股票池 | `system/skills/daily-watch-import.md` | `config/daily-watchlist-watchlist.md` |
 | 假设操作 | `system/skills/daily-watch-ht.md` | `hypothesis/` + `portfolio/` |
 | 生成输出 | `workspace/meta/active-context.md` + 相关 wiki 文件 | `output/` |
@@ -75,6 +77,7 @@ Codex 应该创建一篇 `wiki/sources/YYYY-MM-DD-first-note.md`，并在 `works
 |--------|------|---------|------|
 | tushare | A 股 | `TUSHARE_TOKEN` | 按官方套餐 |
 | FMP | 全球 | `FMP_API_KEY` | 按官方套餐 |
+| Finnhub / EOD / yfinance | 美股（daily-watch 降级源） | `FINNHUB_API_KEY` / `EOD_API_KEY` / `ENABLE_YFINANCE` | 免费档可用 |
 | Longbridge Skill | 多市场 | 独立安装与授权 | 外部 Agent 扩展，不是日报脚本内置源 |
 
 获取方式：

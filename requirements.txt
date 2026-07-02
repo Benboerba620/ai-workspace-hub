@@ -5,7 +5,6 @@
 # 核心（daily-watch + screen + research 数据拉取）
 requests>=2.28.0
 python-dotenv>=1.0.0
-# 文件说明：基础 Python 依赖和可选能力依赖入口。
 pyyaml>=6.0
 
 # 播客摄入（podcast）
@@ -14,3 +13,4 @@ youtube-transcript-api>=0.6.2
 # 可选：faster-whisper>=1.0.0  （音频转录，需要 ffmpeg）
 
 # PDF 摄入见 requirements-pdf.txt（可选）
+# 文件说明：基础 Python 依赖和可选能力依赖入口。

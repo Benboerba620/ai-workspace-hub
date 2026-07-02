@@ -55,7 +55,7 @@ cd my-ai-workspace
 验证安装状态：
 
 ```bash
-python3 system/scripts/check_workspace.py
+python3 system/scripts/check_workspace.py    # Windows: python system/scripts/check_workspace.py
 ```
 
 Core Mode 显示 `READY` 即可开始使用。
@@ -171,6 +171,7 @@ ai-workspace-hub/
 | 名称 | 类型 | 用途 | 是否内置 |
 |------|------|------|----------|
 | Nasdaq | 无 key 降级源 | 美股基础行情 | 是 |
+| Finnhub / EOD / yfinance | 降级源 | 美股行情备选（Finnhub / EOD 需各自免费 key，yfinance 用 `ENABLE_YFINANCE=1` 开启） | 是 |
 | tushare | API 数据源 | A 股行情 / 财务 | 是，需 token |
 | FMP | API 数据源 | 全球行情 / 财报 / 宏观 | 是，需 key |
 | Longbridge Skill | 外部 Agent 扩展 | 多市场查询、筛选、研究 | 否，独立安装授权 |
