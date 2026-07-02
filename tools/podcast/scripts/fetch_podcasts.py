@@ -25,6 +25,11 @@ from llm_client import load_dotenv as load_llm_dotenv
 from podcast_batch_summarize import detect_reversal_flags
 from proxy_config import PROXY, requests_proxy
 
+# Windows 控制台可能默认 cp1252/GBK，统一 UTF-8 输出避免中文触发 UnicodeEncodeError
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output"

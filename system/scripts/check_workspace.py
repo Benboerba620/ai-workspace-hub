@@ -13,6 +13,11 @@ import os
 import sys
 from pathlib import Path
 
+# Windows 控制台可能默认 cp1252/GBK，统一 UTF-8 输出避免中文触发 UnicodeEncodeError
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 
 CORE_FILES = (
     "AGENTS.md",

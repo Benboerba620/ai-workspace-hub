@@ -8,6 +8,7 @@
   之所以这样改：README 的"手动 clone 直接用"路径会把维护者的断点记录带给新用户，走安装协议的用户不受影响，但两条路径应该拿到同样干净的工作区。
 - **smoke-test 演示产物移入 `examples/smoke-test/`**：原先散在 `wiki/` 和 `output/` 里的 2026-06-05 试跑产物（含未在文档声明的 `output/first-ingest/` 等三个子目录）统一收进 `examples/`，配 README 说明"这是示例、可整目录删除"。用户的 `wiki/` 和 `output/` 现在从空白开始。
 - `TROUBLESHOOTING.md` 播客排障段指错配置文件：`config/llm.env` 更正为实际存在的 `config/pod2wiki.env`。
+- **Windows 西文 locale 下中文输出崩溃**：8 个入口脚本（`check_workspace.py`、`check_setup.py`、`fetch_podcasts.py` 等）在 cp1252 控制台打印中文会触发 `UnicodeEncodeError`；现在启动时统一把 stdout/stderr 重配为 UTF-8。新加的 Windows CI job 第一跑就抓到了这个问题。
 - 新增标准库安装器，安装协议明确先取得源码；非空目标默认停止，`--merge` 只补缺失文件、不覆盖用户资料。
 - 修复 all-in-one 工作区在配置文件创建前无法识别根目录的问题，`check_setup.py --init` 可安全初始化缺失配置。
 - 更正 Longbridge 定位：它是独立 Agent Skill/CLI/MCP，不再宣称为 daily-watch Python 脚本的内置环境变量数据源。

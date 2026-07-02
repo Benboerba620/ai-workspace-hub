@@ -23,6 +23,11 @@ from workspace_paths import (
     resolve_watchlist_path,
 )
 
+# Windows 控制台可能默认 cp1252/GBK，统一 UTF-8 输出避免中文触发 UnicodeEncodeError
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 FMP_BASE_URL = "https://financialmodelingprep.com/api/v3"
 DEFAULT_TIMEOUT = 20
 DEFAULT_THRESHOLDS = {
