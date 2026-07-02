@@ -14,6 +14,8 @@ class RepositoryContractTests(unittest.TestCase):
             ("system/templates/AGENTS.md", "AGENTS.md"),
             ("system/templates/CLAUDE.md", "CLAUDE.md"),
             ("system/templates/workspace-config.md", "workspace/workspace-config.md"),
+            ("system/templates/active-context.md", "workspace/meta/active-context.md"),
+            ("system/templates/friction-log.md", "workspace/meta/friction-log.md"),
         )
         for template, public in pairs:
             self.assertEqual(
