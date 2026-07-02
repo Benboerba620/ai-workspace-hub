@@ -200,9 +200,10 @@ def main() -> int:
     except (FileExistsError, FileNotFoundError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
-    print(f"Installed AI Workspace Hub to {args.target.resolve()}")
+    target = args.target.resolve()
+    print(f"Installed AI Workspace Hub to {target}")
     print(f"Created files: {created}; preserved existing files: {skipped}")
-    print("Next: run tools/daily-watch/scripts/check_setup.py")
+    print(f'Next: python3 "{target / "system/scripts/check_workspace.py"}" --root "{target}"')
     return 0
 
 

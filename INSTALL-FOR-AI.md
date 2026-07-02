@@ -2,7 +2,10 @@
 
 把下面这句话发给 Codex、Claude Code、Cursor、Cline 或任何能读写文件的 AI agent：
 
-> 帮我按这个协议安装 AI Workspace Hub：https://github.com/Benboerba620/ai-workspace-hub/blob/main/INSTALL-FOR-AI.md
+> 帮我按这个协议安装 AI Workspace Hub：https://raw.githubusercontent.com/Benboerba620/ai-workspace-hub/main/INSTALL-FOR-AI.md
+> 如果抓不到协议全文，先 `git clone https://github.com/Benboerba620/ai-workspace-hub.git`，再读源码里的 `INSTALL-FOR-AI.md` 逐字执行。
+
+（给 agent 的提醒：网页抓取常返回摘要。执行安装前确认你拿到的是协议**全文**——全文包含「安装步骤 Step 0-8」；只拿到摘要就走 git clone 通路。）
 
 ---
 
@@ -67,6 +70,8 @@ my-ai-workspace/
 git clone --depth 1 https://github.com/Benboerba620/ai-workspace-hub.git "{临时目录}/ai-workspace-hub-source"
 ```
 
+临时目录按平台取：Windows 用 `%TEMP%`，macOS / Linux 用 `/tmp`（或 `mktemp -d`）。
+
 如果环境没有 Git，下载 GitHub 源码 ZIP 并解压到临时目录。不要把临时源码目录当成用户工作区。
 
 ### 推荐：运行安全安装器
@@ -83,6 +88,8 @@ python3 "{SOURCE_ROOT}/system/scripts/install_workspace.py" \
   --primary-use "{主要用途}" \
   --wiki-root "{wiki路径}"
 ```
+
+参数说明：用户没有现成 wiki 时，`--wiki-root` 直接省略（默认值 `./wiki`，即在工作区内新建）；只有用户给出**已存在**的 wiki 路径时才传该参数。
 
 安装器成功后跳到 Step 3 继续。没有 Python 时，Agent 按下面的 Step 1-2 使用文件工具完成同样操作。
 

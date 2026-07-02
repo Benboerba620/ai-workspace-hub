@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+以下修复来自一次完整的冷启动安装模拟测试（陌生环境、只凭 README 分享句从 GitHub 安装）：
+
+### 修复
+
+- **安装分享句改用 raw 链接 + git clone 双通路**：原 blob 页面链接是约 340KB 的 HTML，网页抓取只能拿到摘要，agent 可能凭残缺协议安装；raw 链接是 12KB 纯 markdown，与源文件逐字一致。协议开头同时提醒 agent 自检"拿到的是全文还是摘要"。
+- `install_workspace.py` 完成提示指错下一步：原来指向 `check_setup.py`（Enhanced Mode 配置），会把新用户引向 API key；更正为协议 Step 5 的 `check_workspace.py --root`（Core Mode 检查）。
+- `INSTALL-FOR-AI.md` 补两处 agent 只能靠猜的空白：用户没有现成 wiki 时 `--wiki-root` 直接省略（默认 `./wiki`）；临时克隆目录按平台取 `%TEMP%` / `/tmp`。
+- `first-ingest.md` 步骤对齐 `wiki/_schema.md` 的「MVP 最低合格标准」（补 raw 归档、至少一个分类页、output 试跑报告），不同 agent 的产出不再因两份文档标准不一致而波动。
+
+### 文档
+
+- README「30 秒上手」新增「还没有 AI agent？先花 2 分钟装一个」：Claude Code / Codex CLI / Cursor 三条最短安装路径，收礼的朋友从零也能起步。
+
+### 改进
+
+- 仓库开启 GitHub template：点 "Use this template" 即可创建自己的（可私有）工作区副本，个人研究数据不必公开 fork。
+
 ## 0.3.1 - 2026-07-02
 
 ### 修复

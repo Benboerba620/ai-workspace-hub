@@ -29,7 +29,8 @@ AI Workspace Hub 解决这个问题。六大能力开箱即用——**核心工�
 
 ```text
 帮我按这个协议安装 AI Workspace Hub：
-https://github.com/Benboerba620/ai-workspace-hub/blob/main/INSTALL-FOR-AI.md
+https://raw.githubusercontent.com/Benboerba620/ai-workspace-hub/main/INSTALL-FOR-AI.md
+抓不到协议全文就先 git clone 本仓库，再读其中的 INSTALL-FOR-AI.md 逐字执行。
 ```
 
 Agent 会问你 3 个问题，然后自动创建完整工作区。装好后，对它说：
@@ -41,6 +42,19 @@ Agent 会问你 3 个问题，然后自动创建完整工作区。装好后，�
 预期：agent 读 `AGENTS.md` → 按 `wiki/_schema.md` 整理 → 写入 `wiki/sources/` → 在 `active-context.md` 记录进度。
 
 **不需要 API key，不需要联网，不需要写任何代码。**
+
+<details>
+<summary>还没有 AI agent？先花 2 分钟装一个</summary>
+
+任选其一，都有免费或试用档：
+
+- **Claude Code**（推荐）：先装 [Node.js](https://nodejs.org/)，然后终端运行 `npm install -g @anthropic-ai/claude-code`，在任意目录输入 `claude` 登录 Claude 账号。
+- **Codex CLI**：`npm install -g @openai/codex`，输入 `codex` 登录 ChatGPT 账号。
+- **Cursor**：去 [cursor.com](https://cursor.com) 下载安装，打开一个文件夹后用内置对话。
+
+装好后回到上面，把那句话发给它就行。
+
+</details>
 
 <details>
 <summary>更习惯手动 clone？</summary>
