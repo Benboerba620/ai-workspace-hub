@@ -21,6 +21,8 @@
 
 AI Workspace Hub 解决这个问题。六大能力开箱即用——**核心工作流不需要 API key**。
 
+> 📖 想先了解设计思路？看作者的公众号长文：[《从0构建 AI 协作系统（一）：从最小可运行的 MVP 开始》](https://mp.weixin.qq.com/s?__biz=MzcwNTA3NjkzNQ==&mid=2247484256&idx=1&sn=8b7af107a56947b1d14b944445f19d38)
+
 ---
 
 ## ⚡ 30 秒上手

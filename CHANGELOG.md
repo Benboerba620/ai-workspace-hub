@@ -14,6 +14,7 @@
 ### 文档
 
 - README「30 秒上手」新增「还没有 AI agent？先花 2 分钟装一个」：Claude Code / Codex CLI / Cursor 三条最短安装路径，收礼的朋友从零也能起步。
+- README 开头与仓库 homepage 挂上设计思路长文《从0构建 AI 协作系统（一）：从最小可运行的 MVP 开始》（作者公众号）。
 
 ### 改进
 
