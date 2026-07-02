@@ -15,6 +15,7 @@
 
 - README「30 秒上手」新增「还没有 AI agent？先花 2 分钟装一个」：Claude Code / Codex CLI / Cursor 三条最短安装路径，收礼的朋友从零也能起步。
 - README 开头与仓库 homepage 挂上设计思路长文《从0构建 AI 协作系统（一）：从最小可运行的 MVP 开始》（作者公众号）。
+- **README 顶部新增 33 秒演示动图**（`docs/demo.gif`）：一句话安装 → 3 个问题 → Core Mode READY → 第一次摄入 → 配 API key（Enhanced Mode）→ 断点续传收尾。按安装协议真实流程脚本化生成（生成脚本 `docs/gen_demo_gif.py` 一并入库，流程变更时改台词重跑即可），并在图下注明"非实录"。
 
 ### 改进
 
