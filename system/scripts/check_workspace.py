@@ -25,11 +25,16 @@ CORE_FILES = (
     "workspace/workspace-config.md",
     "workspace/meta/active-context.md",
     "wiki/_schema.md",
-    "inbox/first-note.md",
     "system/integrations/personal-wiki.md",
     "system/skills/first-ingest.md",
     "system/skills/research.md",
     "system/skills/screen.md",
+)
+
+# Optional sample material: useful for the first smoke run, but routinely
+# archived by post-install-cleanup. Missing is informational, never a failure.
+OPTIONAL_FILES = (
+    "inbox/first-note.md",
 )
 
 CORE_DIRECTORIES = (
@@ -90,7 +95,7 @@ def parse_env_file(path: Path) -> dict[str, str]:
     values: dict[str, str] = {}
     if not path.is_file():
         return values
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
+    for raw_line in path.read_text(encoding="utf-8-sig").splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -148,11 +153,20 @@ def check(root: Path) -> int:
         core_ok = core_ok and exists
         line = status_line(True, relative) if exists else fail_line(relative, "missing")
         print(line)
+    first_note_available = (root / OPTIONAL_FILES[0]).is_file()
+    for relative in OPTIONAL_FILES:
+        if (root / relative).is_file():
+            print(status_line(True, relative, "sample material for the first smoke run"))
+        else:
+            print(f"  [INFO] {relative} - optional sample not present (fine after cleanup)")
 
     print()
     if core_ok:
         print("Core Mode result: READY")
-        print("Next: ask your agent to turn inbox/first-note.md into a wiki note.")
+        if first_note_available:
+            print("Next: ask your agent to turn inbox/first-note.md into a wiki note.")
+        else:
+            print("Next: drop any note into inbox/ and ask your agent to turn it into a wiki note.")
     else:
         print("Core Mode result: NOT READY")
         print("Fix missing files/directories before using this as a workspace.")

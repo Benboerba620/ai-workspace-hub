@@ -42,13 +42,6 @@ YFINANCE_IMPORT_WARNING_LOCK = Lock()
 _YFINANCE_IMPORT_WARNING_EMITTED = False
 
 
-def configure_stdio() -> None:
-    for stream_name in ("stdout", "stderr"):
-        stream = getattr(sys, stream_name, None)
-        if stream and hasattr(stream, "reconfigure"):
-            stream.reconfigure(encoding="utf-8")
-
-
 def log(message: str) -> None:
     print(message, file=sys.stderr, flush=True)
 
@@ -237,7 +230,9 @@ def load_tushare_client(token: str) -> Any | None:
 
 def fetch_tushare_quote(client: Any, ticker: str) -> dict[str, Any] | None:
     end_date = date.today()
-    start_date = end_date - timedelta(days=10)
+    # 14-day window (aligned with fetch_tushare_profile's daily_basic window)
+    # so long market holidays such as Spring Festival still contain a session.
+    start_date = end_date - timedelta(days=14)
     start_text = start_date.strftime("%Y%m%d")
     end_text = end_date.strftime("%Y%m%d")
     try:
@@ -304,11 +299,35 @@ def fetch_tushare_quotes(
 
 EOD_MARKET_SUFFIX = {"HK": "HK", "KR": "KO", "FI": "HE"}
 
+# Market suffixes that may safely be stripped from a ticker before querying a
+# fallback source. Share-class suffixes (BRK.B, BF.B, ...) are NOT in this set:
+# stripping them would query a different symbol entirely (e.g. BF.B -> BF,
+# which is another listed company) and could attach the wrong quote.
+KNOWN_MARKET_SUFFIXES = {"SH", "SZ", "SS", "HK", "T", "KS", "KQ", "KO", "HE", "TW"}
+
+# Yahoo Finance uses different suffixes for some exchanges.
+YFINANCE_SUFFIX_MAP = {".SH": ".SS"}
+
+
+def strip_market_suffix(ticker: str) -> str:
+    """Strip a known market suffix (601857.SH -> 601857); keep anything else."""
+    base, sep, suffix = ticker.rpartition(".")
+    if sep and base and suffix.upper() in KNOWN_MARKET_SUFFIXES:
+        return base
+    return ticker
+
+
+def to_yfinance_symbol(ticker: str) -> str:
+    for suffix, replacement in YFINANCE_SUFFIX_MAP.items():
+        if ticker.upper().endswith(suffix):
+            return ticker[: -len(suffix)] + replacement
+    return ticker
+
 
 def fetch_nasdaq_quote(ticker: str, market: str) -> dict[str, Any] | None:
     if market.strip().upper() != "US":
         return None
-    symbol = ticker.split(".")[0].upper()
+    symbol = strip_market_suffix(ticker).upper()
     url = f"https://api.nasdaq.com/api/quote/{symbol}/info?assetclass=stocks"
     try:
         response = requests.get(
@@ -377,7 +396,7 @@ def fetch_eod_quote(ticker: str, market: str, api_key: str) -> dict[str, Any] | 
     suffix = EOD_MARKET_SUFFIX.get(market.strip().upper())
     if not suffix:
         return None
-    symbol = ticker.split(".")[0]
+    symbol = strip_market_suffix(ticker)
     url = (
         f"https://eodhd.com/api/real-time/{symbol}.{suffix}"
         f"?api_token={api_key}&fmt=json"
@@ -421,7 +440,7 @@ def fetch_yfinance_quote(ticker: str) -> dict[str, Any] | None:
                 _YFINANCE_IMPORT_WARNING_EMITTED = True
         return None
     try:
-        hist = yf.Ticker(ticker).history(period="5d", auto_adjust=False)
+        hist = yf.Ticker(to_yfinance_symbol(ticker)).history(period="5d", auto_adjust=False)
         if hist is None or hist.empty:
             return None
         latest = hist.iloc[-1]
@@ -913,7 +932,6 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
-    configure_stdio()
     parser = build_parser()
     args = parser.parse_args()
 

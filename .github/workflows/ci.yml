@@ -19,11 +19,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install -r requirements.txt ruff pytest pytest-cov
-      - run: python -m unittest discover -s tests -v
-      - run: python -m pytest tests/ -v --cov=tools --cov-report=term-missing
+      - run: python -m pip install -r requirements.txt ruff==0.15.18 pytest
+      - run: python -m pytest tests -v
       - run: ruff check system tools tests
       - run: python -m compileall -q system tools tests
       - run: python system/scripts/check_workspace.py
       - run: python tools/podcast/scripts/fetch_podcasts.py --help
+      - run: python tools/daily-watch/scripts/generate_daily_report.py --help
       - run: python tools/daily-watch/scripts/check_setup.py --init

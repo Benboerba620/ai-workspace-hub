@@ -60,7 +60,7 @@
 
 **原因**：provider 名称和 base_url 不匹配，或 key 填错了位置。
 
-**解决**：检查 `config/pod2wiki.env` 中的 `LLM_PROVIDER` 和 `LLM_BASE_URL` 是否对应同一家服务商。常见错误：填了 DeepSeek 的 key 但 provider 写成 openai。
+**解决**：检查 `config/pod2wiki.env` 中的 `LLM_PROVIDER` 和 `LLM_BASE_URL` 是否对应同一家服务商（运行时用 `--env-file config/pod2wiki.env` 传入）。常见错误：填了 DeepSeek 的 key 但 provider 写成 openai。
 
 ### 没有 LLM key 能用播客吗
 
@@ -104,7 +104,7 @@
 
 **原因**：项目所有文件使用 UTF-8 编码。Windows 某些编辑器默认用 GBK 或 UTF-16 打开。
 
-**解决**：确保编辑器设置为 UTF-8。如果已有文件出现 BOM 头（`\xef\xbb\xbf`），用支持 UTF-8 的编辑器重新保存。Git 配置建议：`git config --global core.autocrlf true`（Windows）。
+**解决**：确保编辑器设置为 UTF-8。如果已有文件出现 BOM 头（`\xef\xbb\xbf`），用支持 UTF-8 的编辑器重新保存。换行符不用手动配置：仓库自带 `.gitattributes` 已统一为 LF（`* text=auto eol=lf`），无需（也不要）改动 `core.autocrlf`。
 
 ### 如何重置工作区
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -28,18 +29,14 @@ for _stream in (sys.stdout, sys.stderr):
         _stream.reconfigure(encoding="utf-8", errors="replace")
 
 
-def configure_stdio() -> None:
-    for stream_name in ("stdout", "stderr"):
-        stream = getattr(sys, stream_name, None)
-        if stream and hasattr(stream, "reconfigure"):
-            stream.reconfigure(encoding="utf-8", errors="replace")
-
-
 def log(message: str) -> None:
     print(message, file=sys.stderr, flush=True)
 
 
 def load_env_file(env_path: Path) -> dict[str, str]:
+    if not env_path.is_file():
+        log(f"Warning: {env_path} not found; continuing without API keys")
+        return {}
     raw_text = env_path.read_text(encoding="utf-8-sig")
     parsed = dotenv_values(stream=StringIO(raw_text))
     values: dict[str, str] = {}
@@ -71,11 +68,19 @@ def run_json_script(workspace_root: Path, script_name: str) -> dict[str, Any]:
         capture_output=True,
         text=True,
         encoding="utf-8",
-        check=True,
+        check=False,
     )
     if completed.stderr.strip():
         log(completed.stderr.strip())
-    return json.loads(completed.stdout)
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"{script_name} exited with code {completed.returncode}; "
+            "see the log output above for the underlying error"
+        )
+    try:
+        return json.loads(completed.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"{script_name} did not produce valid JSON: {exc}") from exc
 
 
 def format_pct(value: Any) -> str:
@@ -358,6 +363,17 @@ def extract_title(content: str, fallback: str) -> str:
     return fallback
 
 
+# Ticker shapes accepted in the 关联标的 table (first column):
+# - US style, optional share class: F, NVDA, BRK.B, BF-B
+# - Numeric codes with a market suffix: 601857.SH, 0700.HK, 005930.KS
+# The cell must already be written in uppercase; mixed-case words such as
+# company names ("Apple") are intentionally rejected to avoid false positives.
+RELATED_TICKER_PATTERN = re.compile(
+    r"[A-Z][A-Z0-9]{0,4}(?:[.-][A-Z0-9]{1,2})?"
+    r"|\d{4,6}\.[A-Z]{1,2}"
+)
+
+
 def extract_related_tickers(content: str) -> set[str]:
     tickers: set[str] = set()
     section_match = re.search(
@@ -371,8 +387,10 @@ def extract_related_tickers(content: str) -> set[str]:
                 continue
             cells = [cell.strip() for cell in stripped.strip("|").split("|")]
             if cells and cells[0] and cells[0] != "公司" and set(cells[0]) != {"-"}:
-                candidate = cells[0].upper()
-                if re.fullmatch(r"[A-Z][A-Z0-9-]{1,9}", candidate):
+                candidate = cells[0]
+                if candidate != candidate.upper():
+                    continue
+                if RELATED_TICKER_PATTERN.fullmatch(candidate):
                     tickers.add(candidate)
     return tickers
 
@@ -394,7 +412,7 @@ def read_hypotheses(workspace_root: Path) -> list[dict[str, Any]]:
 
     items: list[dict[str, Any]] = []
     for file_path in sorted(hypothesis_dir.glob("H*.md")):
-        content = file_path.read_text(encoding="utf-8")
+        content = file_path.read_text(encoding="utf-8-sig")
         frontmatter = extract_frontmatter(content)
         fallback_title = file_path.stem
         items.append(
@@ -515,6 +533,9 @@ def matches_focus_area(hypothesis: dict[str, Any], area: dict[str, Any]) -> bool
     haystack = f"{hypothesis['title']}\n{hypothesis['content']}".lower()
     keywords = [str(item).lower() for item in area.get("keywords") or []]
     required_any = [str(item).lower() for item in area.get("required_any") or []]
+    excluded = [str(item).lower() for item in area.get("exclude") or []]
+    if any(keyword_matches_text(keyword, haystack) for keyword in excluded):
+        return False
     if required_any and not any(
         keyword_matches_text(keyword, haystack) for keyword in required_any
     ):
@@ -530,6 +551,19 @@ def format_certainty(certainty: Any) -> str:
     if certainty is None:
         return "N/A"
     return f"{certainty}%"
+
+
+def hypothesis_settings(config: dict[str, Any]) -> tuple[bool, bool]:
+    """Return (enabled, auto_writeback) from config.hypothesis_tracking.
+
+    Both default to True to preserve backwards-compatible behavior.
+    """
+    hypothesis_config = config.get("hypothesis_tracking") or {}
+    if not isinstance(hypothesis_config, dict):
+        hypothesis_config = {}
+    enabled = bool(hypothesis_config.get("enabled", True))
+    auto_writeback = bool(hypothesis_config.get("auto_writeback", True))
+    return enabled, auto_writeback
 
 
 def build_hypothesis_section(
@@ -574,7 +608,12 @@ def build_hypothesis_section(
     lines.append("### 操作建议")
     lines.append("")
     if signals:
-        lines.append("- 已将本地可确认信号自动回写到对应 `hypothesis/H*.md`。")
+        if hypothesis_config.get("auto_writeback", True):
+            lines.append("- 已将本地可确认信号自动回写到对应 `hypothesis/H*.md`。")
+        else:
+            lines.append(
+                "- `auto_writeback` 已关闭：以上信号仅在日报中展示，未回写假设文件。"
+            )
         lines.append("- 如需整体回看当前假设状态，运行 `/ht-status`。")
     else:
         lines.append(
@@ -614,7 +653,15 @@ def append_to_date_block(section_body: str, date_text: str, entry_text: str) -> 
         updated = block + "\n" + entry_text + "\n"
         return section_body[: match.start()] + updated + section_body[match.end() :]
 
-    addition = f"\n### {date_text}\n\n{entry_text}\n"
+    addition = f"\n\n### {date_text}\n\n{entry_text}\n"
+    # If the section ends with a horizontal rule ("---"), insert the new date
+    # block before it so entries stay inside the section instead of drifting
+    # past the visual separator.
+    trailing_rule = re.search(r"(?ms)\n-{3,}[ \t]*\n?\s*\Z", section_body)
+    if trailing_rule:
+        head = section_body[: trailing_rule.start()].rstrip()
+        tail = section_body[trailing_rule.start() :]
+        return head + addition + tail
     suffix = "\n" if not section_body.endswith("\n") else ""
     return section_body.rstrip() + addition + suffix
 
@@ -726,7 +773,10 @@ def build_report(
 
 
 def main() -> int:
-    configure_stdio()
+    parser = argparse.ArgumentParser(
+        description="Generate the daily watchlist report (market data, macro, hypothesis signals)."
+    )
+    parser.parse_args()
     script_dir = Path(__file__).resolve().parent
     workspace_root = find_workspace_root(script_dir)
     config_dir = resolve_config_dir(workspace_root)
@@ -743,8 +793,13 @@ def main() -> int:
     )
     movers = market_data.get("movers") or []
     earnings = market_data.get("earnings") or []
-    hypotheses = read_hypotheses(workspace_root)
-    signals = collect_hypothesis_signals(hypotheses, config, movers, earnings)
+    hypothesis_enabled, auto_writeback = hypothesis_settings(config)
+    hypotheses = read_hypotheses(workspace_root) if hypothesis_enabled else []
+    signals = (
+        collect_hypothesis_signals(hypotheses, config, movers, earnings)
+        if hypothesis_enabled
+        else []
+    )
     report_path = build_report(
         workspace_root,
         config,
@@ -754,9 +809,10 @@ def main() -> int:
         hypotheses,
         signals,
     )
-    apply_hypothesis_updates(
-        workspace_root, hypotheses, signals, report_path, date.today().isoformat()
-    )
+    if hypothesis_enabled and auto_writeback:
+        apply_hypothesis_updates(
+            workspace_root, hypotheses, signals, report_path, date.today().isoformat()
+        )
     print(json.dumps({"report_path": str(report_path)}, ensure_ascii=False))
     return 0
 

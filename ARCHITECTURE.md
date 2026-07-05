@@ -146,7 +146,7 @@ ai-workspace-hub/
 │   ├── skills/                     #   能力说明书
 │   ├── integrations/               #   内部接线说明
 │   ├── interfaces/                 #   已启用工具总览
-│   ├── scripts/                    #   基座脚本（pdf_to_md.py）
+│   ├── scripts/                    #   基座脚本（install_workspace.py / check_workspace.py / pdf_to_md.py）
 │   └── templates/                  #   安装时复制的模板文件
 │
 └── _archive/                       # 归档区

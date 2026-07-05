@@ -1,5 +1,6 @@
 pyyaml>=6.0
-requests>=2.31
+# [socks] pulls in PySocks so PODCAST_PROXY=socks5://... works with requests.
+requests[socks]>=2.31
 yt-dlp>=2025.1.0
 youtube-transcript-api>=0.6.2
 # Optional: faster-whisper enables auto MP3 transcription for podcast RSS feeds

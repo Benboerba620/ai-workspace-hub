@@ -35,6 +35,7 @@ HYPOTHESIS_CONFIG_CANDIDATES = (
 
 
 def find_existing_path(directory: Path, candidates: tuple[str, ...]) -> Path | None:
+    """Return the first candidate that exists in directory, or None."""
     for candidate in candidates:
         path = directory / candidate
         if path.is_file():
@@ -43,7 +44,15 @@ def find_existing_path(directory: Path, candidates: tuple[str, ...]) -> Path | N
 
 
 def preferred_path(directory: Path, candidates: tuple[str, ...]) -> Path:
+    """Return the preferred (first) candidate path without checking existence."""
     return directory / candidates[0]
+
+
+# Contract shared by all resolve_* helpers below:
+# they return the first EXISTING candidate if one is found, otherwise the
+# preferred (first) candidate path, WHICH MAY NOT EXIST. Callers that read the
+# returned path must therefore check .is_file() / .exists() themselves (or be
+# prepared to handle FileNotFoundError) before opening it.
 
 
 def find_workspace_root(start_dir: Path) -> Path:
@@ -67,24 +76,28 @@ def resolve_config_dir(workspace_root: Path) -> Path:
 
 
 def resolve_config_path(config_dir: Path) -> Path:
+    """Resolve the main config file; may return a non-existent preferred path."""
     return find_existing_path(config_dir, CONFIG_FILE_CANDIDATES) or preferred_path(
         config_dir, CONFIG_FILE_CANDIDATES
     )
 
 
 def resolve_watchlist_path(config_dir: Path) -> Path:
+    """Resolve the watchlist file; may return a non-existent preferred path."""
     return find_existing_path(config_dir, WATCHLIST_FILE_CANDIDATES) or preferred_path(
         config_dir, WATCHLIST_FILE_CANDIDATES
     )
 
 
 def resolve_env_path(config_dir: Path) -> Path:
+    """Resolve the env file; may return a non-existent preferred path."""
     return find_existing_path(config_dir, ENV_FILE_CANDIDATES) or preferred_path(
         config_dir, ENV_FILE_CANDIDATES
     )
 
 
 def resolve_template_path(workspace_root: Path) -> Path:
+    """Resolve the report template; may return a non-existent preferred path."""
     search_dirs = [
         workspace_root / "templates",
         Path(__file__).resolve().parent.parent / "templates",
@@ -117,6 +130,7 @@ def resolve_holdings_path(workspace_root: Path) -> Path:
 
 
 def resolve_hypothesis_config_path(config_dir: Path) -> Path:
+    """Resolve hypothesis-tracker config; may return a non-existent preferred path."""
     return find_existing_path(
         config_dir, HYPOTHESIS_CONFIG_CANDIDATES
     ) or preferred_path(config_dir, HYPOTHESIS_CONFIG_CANDIDATES)

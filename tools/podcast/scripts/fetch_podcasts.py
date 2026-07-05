@@ -90,7 +90,25 @@ def strip_markdown_light(text: str) -> str:
 def parse_date(value: str | None) -> datetime | None:
     if not value:
         return None
-    parsed = email.utils.parsedate_to_datetime(value)
+    try:
+        parsed = email.utils.parsedate_to_datetime(value)
+    except (TypeError, ValueError):
+        return None
+    if parsed is None:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def parse_iso_date(value: str | None) -> datetime | None:
+    """Parse an Atom/ISO-8601 timestamp; return None instead of raising."""
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
     return parsed
@@ -326,11 +344,14 @@ def _whisper_settings(config: dict[str, Any]) -> dict[str, Any]:
     raw = config.get("whisper") or {}
     if not isinstance(raw, dict):
         raw = {}
+    language = raw.get("language")
     return {
         "enabled": bool(raw.get("enabled", True)),
         "model": str(raw.get("model") or "tiny"),
         "clip_seconds": raw.get("clip_seconds", 600),
         "auto_threshold": int(raw.get("auto_threshold") or 1500),
+        # None lets faster-whisper auto-detect the audio language.
+        "language": str(language) if language else None,
     }
 
 
@@ -356,7 +377,8 @@ def _download_audio(url: str, dest: Path) -> Path:
 
 
 def _clip_audio(src: Path, seconds: int) -> Path:
-    clip = src.with_suffix(f".clip{seconds}.mp3")
+    # Keep the source container: "-c copy" cannot remux e.g. .m4a into .mp3.
+    clip = src.with_name(f"{src.stem}.clip{seconds}{src.suffix or '.mp3'}")
     if clip.is_file() and clip.stat().st_size > 0:
         eprint(f"[whisper] reuse cached clip {clip}")
         return clip
@@ -410,7 +432,7 @@ def maybe_transcribe(item: dict[str, Any], whisper_cfg: dict[str, Any], transcri
     eprint(f"[whisper] transcribing {target.name} with {model_name} model...")
     started = time.time()
     try:
-        transcript = transcribe_audio(target, model_name=model_name)
+        transcript = transcribe_audio(target, model_name=model_name, language=whisper_cfg.get("language"))
     except Exception as exc:
         eprint(f"[whisper] transcription failed: {exc}; falling back to RSS description")
         return
@@ -425,7 +447,99 @@ def maybe_transcribe(item: dict[str, Any], whisper_cfg: dict[str, Any], transcri
     item["transcript_audio_path"] = str(target)
 
 
-def rss_items(feed: dict[str, Any], days: int, whisper_cfg: dict[str, Any] | None = None, transcripts_dir: Path | None = None, max_items: int | None = None) -> list[dict[str, Any]]:
+ATOM_NS = {"atom": "http://www.w3.org/2005/Atom"}
+
+
+def _rss_entries(root: ET.Element, feed_label: str) -> list[dict[str, Any]]:
+    """Normalize RSS 2.0 <channel><item> elements; skip broken items instead of failing the feed."""
+    ns = {
+        "itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",
+        "content": "http://purl.org/rss/1.0/modules/content/",
+    }
+    entries: list[dict[str, Any]] = []
+    for item in root.findall("./channel/item"):
+        try:
+            title = item.findtext("title") or "Untitled"
+            published = parse_date(item.findtext("pubDate"))
+            link = item.findtext("link") or ""
+            guid = item.findtext("guid") or link or title
+            description = (
+                item.findtext("content:encoded", namespaces=ns)
+                or item.findtext("description")
+                or item.findtext("itunes:summary", namespaces=ns)
+                or ""
+            )
+            enclosure = item.find("enclosure")
+            audio_url = enclosure.attrib.get("url") if enclosure is not None else ""
+            entries.append(
+                {
+                    "title": title,
+                    "published": published,
+                    "link": link,
+                    "guid": guid,
+                    "description": description,
+                    "audio_url": audio_url,
+                }
+            )
+        except Exception as exc:
+            eprint(f"- item skipped in {feed_label}: {item.findtext('title') or 'Untitled'} ({exc})")
+    return entries
+
+
+def _atom_entries(root: ET.Element, feed_label: str) -> list[dict[str, Any]]:
+    """Normalize Atom <feed><entry> elements; skip broken entries instead of failing the feed."""
+    entries: list[dict[str, Any]] = []
+    for entry in root.findall("atom:entry", ATOM_NS):
+        try:
+            title = entry.findtext("atom:title", namespaces=ATOM_NS) or "Untitled"
+            published = parse_iso_date(
+                entry.findtext("atom:published", namespaces=ATOM_NS)
+                or entry.findtext("atom:updated", namespaces=ATOM_NS)
+            )
+            link = ""
+            audio_url = ""
+            first_href = ""
+            for link_el in entry.findall("atom:link", ATOM_NS):
+                href = link_el.attrib.get("href") or ""
+                rel = link_el.attrib.get("rel") or "alternate"
+                if href and not first_href:
+                    first_href = href
+                if rel == "alternate" and not link:
+                    link = href
+                elif rel == "enclosure" and not audio_url:
+                    audio_url = href
+            link = link or first_href
+            guid = entry.findtext("atom:id", namespaces=ATOM_NS) or link or title
+            description = ""
+            for tag in ("atom:content", "atom:summary"):
+                element = entry.find(tag, ATOM_NS)
+                if element is not None:
+                    description = "".join(element.itertext()).strip()
+                    if description:
+                        break
+            entries.append(
+                {
+                    "title": title,
+                    "published": published,
+                    "link": link,
+                    "guid": guid,
+                    "description": description,
+                    "audio_url": audio_url,
+                }
+            )
+        except Exception as exc:
+            eprint(f"- item skipped in {feed_label}: {entry.findtext('atom:title', namespaces=ATOM_NS) or 'Untitled'} ({exc})")
+    return entries
+
+
+def rss_items(
+    feed: dict[str, Any],
+    days: int,
+    whisper_cfg: dict[str, Any] | None = None,
+    transcripts_dir: Path | None = None,
+    max_items: int | None = None,
+    history: dict[str, str] | None = None,
+) -> list[dict[str, Any]]:
     url = feed.get("url") or feed.get("rss")
     if not url:
         return []
@@ -433,44 +547,43 @@ def rss_items(feed: dict[str, Any], days: int, whisper_cfg: dict[str, Any] | Non
     response = requests.get(url, timeout=30, headers={"User-Agent": UA}, proxies=requests_proxy())
     response.raise_for_status()
     root = ET.fromstring(response.content)
-    ns = {
-        "itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",
-        "content": "http://purl.org/rss/1.0/modules/content/",
-    }
-    channel_title = root.findtext("./channel/title") or feed.get("name") or "Unknown"
-    out = []
-    for item in root.findall("./channel/item"):
+    feed_label = feed.get("name") or str(url)
+    if root.tag.split("}")[-1] == "feed":
+        channel_title = root.findtext("atom:title", namespaces=ATOM_NS) or feed.get("name") or "Unknown"
+        entries = _atom_entries(root, feed_label)
+    else:
+        channel_title = root.findtext("./channel/title") or feed.get("name") or "Unknown"
+        entries = _rss_entries(root, feed_label)
+    out: list[dict[str, Any]] = []
+    for entry in entries:
         if max_items is not None and len(out) >= max_items:
             break
-        title = item.findtext("title") or "Untitled"
-        published_raw = item.findtext("pubDate")
-        published = parse_date(published_raw)
-        if published and published < cutoff:
-            continue
-        link = item.findtext("link") or ""
-        guid = item.findtext("guid") or link or title
-        description = (
-            item.findtext("content:encoded", namespaces=ns)
-            or item.findtext("description")
-            or item.findtext("itunes:summary", namespaces=ns)
-            or ""
-        )
-        enclosure = item.find("enclosure")
-        audio_url = enclosure.attrib.get("url") if enclosure is not None else ""
-        record = {
-            "id": guid,
-            "title": strip_html(title),
-            "channel": feed.get("name") or channel_title,
-            "author": feed.get("author") or "",
-            "date": (published or datetime.now(timezone.utc)).date().isoformat(),
-            "url": link or audio_url or url,
-            "audio_url": audio_url,
-            "source_kind": "rss",
-            "raw_text": strip_html(description),
-        }
-        if whisper_cfg and transcripts_dir is not None:
-            maybe_transcribe(record, whisper_cfg, transcripts_dir)
-        out.append(record)
+        try:
+            published = entry.get("published")
+            if published and published < cutoff:
+                continue
+            guid = entry.get("guid")
+            # Dedupe against history BEFORE any download/transcription cost.
+            if history is not None and guid in history:
+                continue
+            link = entry.get("link") or ""
+            audio_url = entry.get("audio_url") or ""
+            record = {
+                "id": guid,
+                "title": strip_html(entry.get("title") or "Untitled"),
+                "channel": feed.get("name") or channel_title,
+                "author": feed.get("author") or "",
+                "date": (published or datetime.now(timezone.utc)).date().isoformat(),
+                "url": link or audio_url or url,
+                "audio_url": audio_url,
+                "source_kind": "rss",
+                "raw_text": strip_html(entry.get("description") or ""),
+            }
+            if whisper_cfg and transcripts_dir is not None:
+                maybe_transcribe(record, whisper_cfg, transcripts_dir)
+            out.append(record)
+        except Exception as exc:
+            eprint(f"- item skipped in {feed_label}: {entry.get('title') or 'Untitled'} ({exc})")
     return out
 
 
@@ -497,9 +610,15 @@ def collect_rss(config: dict[str, Any], days: int, history: dict[str, str], whis
     feeds.extend(config.get("blog_feeds") or [])
     for feed in feeds:
         try:
-            for item in rss_items(feed, days, whisper_cfg=whisper_cfg, transcripts_dir=transcripts_dir, max_items=max_items_per_feed):
-                key = item["id"]
-                if key not in history:
+            for item in rss_items(
+                feed,
+                days,
+                whisper_cfg=whisper_cfg,
+                transcripts_dir=transcripts_dir,
+                max_items=max_items_per_feed,
+                history=history,
+            ):
+                if item["id"] not in history:
                     items.append(item)
         except Exception as exc:
             eprint(f"- feed skipped: {feed.get('name') or feed.get('url')} ({exc})")
@@ -560,14 +679,18 @@ def collect_youtube(
                     eprint(f"  hint: {YOUTUBE_RATE_LIMIT_HINT}")
 
     if youtube_mode in {"urls", "all"}:
-        url_values = list(config.get("youtube_urls") or []) + explicit_urls
-        for value in url_values:
+        url_values = [(value, False) for value in config.get("youtube_urls") or []]
+        url_values.extend((value, True) for value in explicit_urls)
+        for value, is_explicit in url_values:
             if isinstance(value, dict):
                 raw_url = value.get("url") or value.get("youtube") or ""
             else:
                 raw_url = str(value)
             meta = ytdlp_video_metadata(raw_url)
             if meta:
+                if is_explicit:
+                    # User named this URL on the CLI: process it even if seen before or old.
+                    meta["explicit"] = True
                 videos.append(meta)
 
     items: list[dict[str, Any]] = []
@@ -577,10 +700,11 @@ def collect_youtube(
         if not video_id or video_id in seen_video_ids:
             continue
         seen_video_ids.add(video_id)
-        if not is_recent_youtube(video.get("upload_date"), days):
+        explicit = bool(video.get("explicit"))
+        if not explicit and not is_recent_youtube(video.get("upload_date"), days):
             continue
         history_key = f"youtube:{video_id}"
-        if history_key in history:
+        if not explicit and history_key in history:
             continue
         text, transcript_status = fetch_youtube_transcript(video_id, transcript_backend, transcript_languages, transcript_sleep)
         if not text:
@@ -1190,52 +1314,55 @@ def main() -> int:
         wiki_source_dir = None
         wiki_root = OUTPUT
 
-    for item in items:
-        if not item.get("raw_text"):
-            continue
-        try:
-            structured = summarize_item(item, config, args.locale, no_llm=args.no_llm)
-        except (LLMError, json.JSONDecodeError) as exc:
-            eprint(f"- LLM skipped: {item.get('title')} ({exc})")
-            processing_errors.append(f"{item.get('title')}: {exc}")
-            continue
-        raw_path = write_raw(item, wiki_root)
-        raw_ref = str(raw_path.relative_to(wiki_root)).replace("\\", "/")
-        local_raw_copy = write_raw(item, OUTPUT)
-        local_source = write_source(item, structured, local_source_dir, raw_ref, args.domain, args.locale)
-        item_translation_pages: list[str] = []
-        raw_pages.append(str(local_raw_copy))
-        if wiki_source_dir:
-            raw_pages.append(str(raw_path))
-        source_pages.append(str(local_source))
-        if wiki_source_dir:
-            wiki_source = write_source(item, structured, wiki_source_dir, raw_ref, args.domain, args.locale)
-            source_pages.append(str(wiki_source))
-        if args.translate_full and not args.no_llm:
+    try:
+        for item in items:
+            if not item.get("raw_text"):
+                continue
             try:
-                translated_text = translate_full_text(item, config, args.translation_locale)
-                local_translation = write_translation(item, translated_text, OUTPUT, args.translation_locale)
-                translation_pages.append(str(local_translation))
-                item_translation_pages.append(str(local_translation))
-                if wiki_source_dir:
-                    wiki_translation = write_translation(item, translated_text, wiki_root, args.translation_locale)
-                    translation_pages.append(str(wiki_translation))
-                    item_translation_pages.append(str(wiki_translation))
-            except LLMError as exc:
-                eprint(f"- translation skipped: {item.get('title')} ({exc})")
-        warnings.extend(structured.get("verification_warnings") or [])
-        processed.append(
-            {
-                "item": item,
-                "structured": structured,
-                "source_pages": [str(local_source)],
-                "translation_pages": item_translation_pages,
-            }
-        )
-        if item.get("source_kind") != "file":
-            history[item["id"]] = datetime.now(timezone.utc).isoformat()
-
-    save_history(history_path, history)
+                structured = summarize_item(item, config, args.locale, no_llm=args.no_llm)
+            except (LLMError, json.JSONDecodeError) as exc:
+                eprint(f"- LLM skipped: {item.get('title')} ({exc})")
+                processing_errors.append(f"{item.get('title')}: {exc}")
+                continue
+            raw_path = write_raw(item, wiki_root)
+            raw_ref = str(raw_path.relative_to(wiki_root)).replace("\\", "/")
+            local_raw_copy = write_raw(item, OUTPUT)
+            local_source = write_source(item, structured, local_source_dir, raw_ref, args.domain, args.locale)
+            item_translation_pages: list[str] = []
+            raw_pages.append(str(local_raw_copy))
+            if wiki_source_dir:
+                raw_pages.append(str(raw_path))
+            source_pages.append(str(local_source))
+            if wiki_source_dir:
+                wiki_source = write_source(item, structured, wiki_source_dir, raw_ref, args.domain, args.locale)
+                source_pages.append(str(wiki_source))
+            if args.translate_full and not args.no_llm:
+                try:
+                    translated_text = translate_full_text(item, config, args.translation_locale)
+                    local_translation = write_translation(item, translated_text, OUTPUT, args.translation_locale)
+                    translation_pages.append(str(local_translation))
+                    item_translation_pages.append(str(local_translation))
+                    if wiki_source_dir:
+                        wiki_translation = write_translation(item, translated_text, wiki_root, args.translation_locale)
+                        translation_pages.append(str(wiki_translation))
+                        item_translation_pages.append(str(wiki_translation))
+                except LLMError as exc:
+                    eprint(f"- translation skipped: {item.get('title')} ({exc})")
+            warnings.extend(structured.get("verification_warnings") or [])
+            processed.append(
+                {
+                    "item": item,
+                    "structured": structured,
+                    "source_pages": [str(local_source)],
+                    "translation_pages": item_translation_pages,
+                }
+            )
+            if item.get("source_kind") != "file":
+                history[item["id"]] = datetime.now(timezone.utc).isoformat()
+                # Persist per item so a mid-run crash never re-bills completed LLM/Whisper work.
+                save_history(history_path, history)
+    finally:
+        save_history(history_path, history)
     insight_log_path = None
     if args.write_insight_log and processed:
         try:

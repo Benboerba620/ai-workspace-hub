@@ -2,6 +2,7 @@
 # Generated from requirements.txt — re-pin after updating.
 # Install with: pip install -r requirements.lock
 requests==2.32.3
+PySocks==1.7.1
 python-dotenv==1.1.0
 pyyaml==6.0.2
 yt-dlp==2025.6.9

@@ -5,7 +5,7 @@
 
 ## 触发词
 
-用户说"我装好了" / "精简系统" / "清理安装内容" / "我熟悉了，瘦身吧"；或安装流程末尾（`INSTALL-FOR-AI.md` Step 6）主动提议。
+用户说"我装好了" / "精简系统" / "清理安装内容" / "我熟悉了，瘦身吧"；或安装流程末尾（`INSTALL-FOR-AI.md` Step 8）主动提议。
 
 ## 前置确认（先问，别直接动手）
 
@@ -23,6 +23,8 @@
 | 安装模板（已复制进工作区） | `system/templates/` |
 | 试跑样例输入 | `inbox/first-note.md`、`inbox/sample-ai-workspace.pdf`、`inbox/sample-ai-workspace.md` |
 | 试跑 smoke 产物 | `wiki/raw/2026-06-05-*`、`wiki/sources/2026-06-05-*`、`wiki/explorations/2026-06-05-*`、`output/first-ingest/`、`output/pdf-ingest/`、`output/wiki-read-priority/` |
+
+> 注意来源差异：用 `install_workspace.py` 装出的工作区**没有** `INSTALL-FOR-AI.md`、`SMOKE-TEST.md` 和 smoke 产物（它们只存在于直接 clone 的仓库副本里）。表里列的路径**不存在就跳过**，不算异常。
 
 **判断项（问用户，不要默认删）**：
 - `wiki/concepts/ai-workspace-file-protocol.md`、`wiki/concepts/pdf-to-md-ingest.md` 是讲系统理念的概念页，可能有长期参考价值——问用户保留还是归档。**若选择保留**：这两页里链向 `wiki/sources/2026-06-05-*` / `wiki/explorations/2026-06-05-*` 等 smoke 产物的链接会随归档悬空，必须一并把链接改指 `_archive/...` 或删掉死链，别留断链。

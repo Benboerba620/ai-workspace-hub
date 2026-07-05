@@ -3,13 +3,24 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import requests
 
 from proxy_config import requests_proxy
+
+
+def force_utf8_stdio() -> None:
+    """Avoid UnicodeEncodeError on Windows when stdout/stderr are redirected."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
 
 
 def slugify(text: str, max_len: int = 80) -> str:
@@ -43,7 +54,8 @@ def probe_duration(path: Path) -> float | None:
     return None
 
 
-def transcribe_audio(path: Path, model_name: str = "medium", language: str = "en") -> str:
+def transcribe_audio(path: Path, model_name: str = "medium", language: str | None = None) -> str:
+    """Transcribe audio. language=None lets faster-whisper auto-detect."""
     try:
         from faster_whisper import WhisperModel  # type: ignore
     except ImportError as exc:
@@ -56,14 +68,18 @@ def transcribe_audio(path: Path, model_name: str = "medium", language: str = "en
 def write_transcript(path: Path, title: str, channel: str, date: str, source_url: str, audio_url: str, body: str, model: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     duration = probe_duration(Path(audio_url)) if Path(audio_url).is_file() else None
+
+    def q(value: str) -> str:
+        return json.dumps(value or "", ensure_ascii=False)
+
     text = f"""---
-title: {title}
+title: {q(title)}
 type: raw-transcript
-channel: {channel}
+channel: {q(channel)}
 created: {date}
-source: {source_url}
-audio: {audio_url}
-model: {model}
+source: {q(source_url)}
+audio: {q(audio_url)}
+model: {q(model)}
 duration_sec: {duration or ''}
 ---
 
@@ -76,6 +92,7 @@ duration_sec: {duration or ''}
 
 
 def main() -> int:
+    force_utf8_stdio()
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", required=True, help="MP3 URL")
     parser.add_argument("--title", required=True)
@@ -83,7 +100,7 @@ def main() -> int:
     parser.add_argument("--date", required=True)
     parser.add_argument("--source-url", default="")
     parser.add_argument("--model", default="medium")
-    parser.add_argument("--language", default="en")
+    parser.add_argument("--language", default=None, help="Audio language code (e.g. en, zh). Default: auto-detect.")
     parser.add_argument("--out-dir", default="output/transcripts")
     args = parser.parse_args()
 

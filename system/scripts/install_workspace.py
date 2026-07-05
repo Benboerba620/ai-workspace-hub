@@ -89,11 +89,26 @@ def copy_file(source: Path, destination: Path, merge: bool) -> str:
     return "created"
 
 
+EXCLUDED_DIR_NAMES = {"__pycache__", ".ruff_cache", ".pytest_cache", ".mypy_cache"}
+EXCLUDED_FILE_NAMES = {".DS_Store"}
+
+
+def is_excluded(item: Path) -> bool:
+    if any(part in EXCLUDED_DIR_NAMES for part in item.parts):
+        return True
+    if item.suffix in {".pyc", ".pyo"} or item.name in EXCLUDED_FILE_NAMES:
+        return True
+    # Never copy local secrets (.env, .env.local, ...); .env.example stays.
+    if item.name.startswith(".env") and item.name != ".env.example":
+        return True
+    return False
+
+
 def copy_directory(source: Path, destination: Path, merge: bool) -> tuple[int, int]:
     created = 0
     skipped = 0
     for item in source.rglob("*"):
-        if "__pycache__" in item.parts or item.suffix in {".pyc", ".pyo"}:
+        if is_excluded(item):
             continue
         relative = item.relative_to(source)
         target = destination / relative
@@ -135,7 +150,9 @@ def install(
     if not (source_root / "INSTALL-FOR-AI.md").is_file():
         raise FileNotFoundError(f"Invalid AI Workspace Hub source: {source_root}")
 
-    if target_root.exists() and any(target_root.iterdir()) and not merge:
+    if target_root.exists() and not target_root.is_dir():
+        raise ValueError(f"Target exists but is not a directory: {target_root}")
+    if target_root.is_dir() and any(target_root.iterdir()) and not merge:
         raise FileExistsError(
             f"Target is not empty: {target_root}. Use --merge to keep existing files."
         )
@@ -203,7 +220,8 @@ def main() -> int:
     target = args.target.resolve()
     print(f"Installed AI Workspace Hub to {target}")
     print(f"Created files: {created}; preserved existing files: {skipped}")
-    print(f'Next: python3 "{target / "system/scripts/check_workspace.py"}" --root "{target}"')
+    print(f'Next: python3 "{target / "system/scripts/check_workspace.py"}" --root "{target}" (verifies Core Mode)')
+    print("Enhanced Mode (optional): run tools/daily-watch/scripts/check_setup.py later.")
     return 0
 
 

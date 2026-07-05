@@ -53,6 +53,14 @@ class InstallWorkspaceTests(unittest.TestCase):
             config = (target / "workspace/workspace-config.md").read_text(encoding="utf-8")
             self.assertIn("name: `SANDBOX`", config)
             self.assertIn("primary_use: `investing`", config)
+            leaked = [
+                path.relative_to(target).as_posix()
+                for path in target.rglob("*")
+                if path.name in {"__pycache__", ".ruff_cache", ".pytest_cache", ".mypy_cache", ".DS_Store"}
+                or path.suffix in {".pyc", ".pyo"}
+                or (path.name.startswith(".env") and path.name != ".env.example")
+            ]
+            self.assertEqual(leaked, [], "installer must not copy caches or local .env files")
             with redirect_stdout(io.StringIO()):
                 self.assertEqual(CHECKER.check(target), 0)
 

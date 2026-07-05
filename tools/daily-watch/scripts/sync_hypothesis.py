@@ -22,15 +22,21 @@ for _stream in (sys.stdout, sys.stderr):
     if hasattr(_stream, "reconfigure"):
         _stream.reconfigure(encoding="utf-8", errors="replace")
 
-if sys.stdout and hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+def warn(message: str) -> None:
+    print(f"Warning: {message}", file=sys.stderr)
 
 
-def extract_frontmatter(content: str) -> dict[str, object]:
+def extract_frontmatter(content: str, source: str = "") -> dict[str, object]:
     match = re.match(r"^---\s*\n(.*?)\n---\s*\n?", content, re.DOTALL)
     if not match:
         return {}
-    payload = yaml.safe_load(match.group(1)) or {}
+    try:
+        payload = yaml.safe_load(match.group(1)) or {}
+    except yaml.YAMLError as exc:
+        label = f" in {source}" if source else ""
+        warn(f"invalid frontmatter YAML{label}: {exc}")
+        return {}
     return payload if isinstance(payload, dict) else {}
 
 
@@ -42,11 +48,15 @@ def extract_title(content: str, fallback: str) -> str:
 def read_hypothesis_files(hypothesis_dir: Path) -> dict[str, dict[str, object]]:
     data: dict[str, dict[str, object]] = {}
     for file_path in sorted(hypothesis_dir.glob("H*.md")):
-        content = file_path.read_text(encoding="utf-8")
-        frontmatter = extract_frontmatter(content)
         match = re.match(r"(H\d+)", file_path.stem)
         if not match:
             continue
+        try:
+            content = file_path.read_text(encoding="utf-8-sig")
+        except (OSError, UnicodeDecodeError) as exc:
+            warn(f"skipping unreadable hypothesis file {file_path.name}: {exc}")
+            continue
+        frontmatter = extract_frontmatter(content, source=file_path.name)
         hypothesis_id = match.group(1)
         data[hypothesis_id] = {
             "certainty": frontmatter.get("certainty"),
@@ -57,10 +67,24 @@ def read_hypothesis_files(hypothesis_dir: Path) -> dict[str, dict[str, object]]:
     return data
 
 
+def parse_certainty(certainty: object) -> int | None:
+    """Tolerant certainty parsing: 80, 80.0, "80", "80%" -> 80; junk -> None."""
+    if certainty is None or isinstance(certainty, bool):
+        return None
+    if isinstance(certainty, (int, float)):
+        return int(certainty)
+    text = str(certainty).strip().rstrip("%").strip()
+    try:
+        return int(float(text))
+    except ValueError:
+        warn(f"unrecognized certainty value: {certainty!r}")
+        return None
+
+
 def format_certainty_bar(certainty: object) -> str:
-    if certainty is None:
+    certainty_value = parse_certainty(certainty)
+    if certainty_value is None:
         return "—"
-    certainty_value = int(certainty)
     if certainty_value >= 80:
         return f"🟢 {certainty_value}%"
     if certainty_value >= 50:

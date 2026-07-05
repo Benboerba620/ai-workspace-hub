@@ -267,6 +267,8 @@ VIX / SPY / QQQ / GLD / WTI / BTC 的当前价和涨跌幅表格
 
 **Fallback 顺序**（单只股票 FMP 未返回时）：Nasdaq → Finnhub → EOD → yfinance。每个源按 env key 是否配置自动决定是否尝试。
 
+**yfinance 后缀映射**：Yahoo 对上交所使用 `.SS` 后缀，脚本会自动把 watchlist 里的 `601857.SH` 映射为 `601857.SS` 再查询；`.SZ` / `.HK` 与 Yahoo 一致，无需转换。watchlist 中仍然统一写 tushare 风格的 `.SH`。
+
 Longbridge Skill/CLI 是独立 Agent 扩展，不是本脚本的内置数据源。需要时按[官方说明](https://open.longbridge.com/zh-CN/skill/)另行安装和授权。
 
 ## 环境变量
@@ -324,7 +326,7 @@ python tools/daily-watch/scripts/check_setup.py --init
 
 1. **Ticker 格式**：A 股必须带后缀（`601857.SH` 不是 `601857`），港股必须带 `.HK`（`0700.HK` 不是 `700`），后缀必须大写
 2. **数据源**：A 股 / 港股需要 tushare token；纯美股无 key 时 Nasdaq 源能覆盖大部分
-3. **非交易时间**：脚本取最近 5-10 个交易日的数据，周末和假日也能拿到最近一个交易日的数据
+3. **非交易时间**：脚本取最近 5-14 个自然日内的数据，周末和长假也能拿到最近一个交易日的数据
 4. **FMP 限流**：免费 plan 有 250 次/天的限制，股票池太大时会被截断
 
 ### 找不到配置文件
@@ -333,10 +335,10 @@ python tools/daily-watch/scripts/check_setup.py --init
 Error: Could not locate workspace root
 ```
 
-脚本从自身位置向上查找包含 `config/daily-watchlist.yaml` 或 `workspace/workspace-config.md` 的目录作为 workspace 根。确保：
+脚本**从脚本文件自身所在位置**（`tools/daily-watch/scripts/`）逐级向上查找包含 `workspace/workspace-config.md` 或 `config/daily-watchlist.yaml` 的目录作为 workspace 根——与你在哪个目录下运行命令（cwd）无关。出现此错误说明脚本所在目录的所有上级目录里都没有这两个标记，请确保：
 
-1. 已运行 `check_setup.py --init` 生成 `config/` 目录
-2. 从 workspace 根目录（或其子目录）运行脚本
+1. 已运行 `check_setup.py --init` 在 workspace 根生成 `config/` 目录
+2. 脚本文件仍位于 workspace 内（`tools/daily-watch/scripts/`），没有被单独拷贝到 workspace 之外
 
 ### 报告中数据全是 N/A
 

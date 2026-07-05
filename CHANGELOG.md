@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+### 修复（2026-07-05 全量体检批次）
+
+三路并行代码审查（podcast / daily-watch / 安装链路）后的批量修复，共 40+ 项：
+
+**daily-watch**
+
+- 零 key 承诺兜底：`generate_daily_report.py` 缺 env 文件时警告后继续（原直接 `FileNotFoundError` 崩溃）。
+- `hypothesis_tracking.enabled` / `auto_writeback` 配置真正生效：关闭后不再回写 `hypothesis/H*.md`（原开关形同虚设）。
+- 关联标的识别支持 `601857.SH` / `0700.HK` / `BRK.B` / 单字母美股（原正则对 A 股、港股、类别股全部静默失效）。
+- Nasdaq/EOD 降级源只剥已知市场后缀，`BF.B` 不再被剥成 `BF` 查错公司；yfinance 增加 `.SH` → `.SS` 映射（原对上交所永远失败）。
+- `run_json_script` 失败时透出子进程 stderr（原真实错误被吞）；`generate_daily_report.py` 补 argparse，`--help` 不再误跑真报告。
+- `check_setup.py --init` 补创建 `hypothesis/` 和 `portfolio/journal/`，FAIL 项附修复提示；根目录探测失败时回退 cwd 并警告。
+- `sync_hypothesis.py` 容错手改的 frontmatter（`certainty: 80%`、坏 YAML 单文件跳过不崩全表）。
+- `focus_areas.exclude` 真正实现；示例 yaml 标注仅 skill 层使用的字段；假设文件读取兼容 BOM；tushare 窗口 10 → 14 天覆盖长假；证据时间线插入段尾 `---` 之前。
+
+**podcast**
+
+- LLM provider/model 优先级改为「显式入参 > 环境变量 > 默认值」，并防止通用 `LLM_*` 变量串到显式指定的其他 provider（反转 0.3.1 的「环境变量优先」：config/CLI 显式指定不该被 .env 默认块静默压过）。
+- Whisper 转录语言默认自动检测（原硬编码英文，中文播客产出错误转录并污染 wiki）；config 支持 `whisper.language`。
+- history 去重前移到下载/转录之前，且逐条落盘——中途崩溃不再重付 LLM/Whisper 成本；显式 `--youtube-url` 绕过去重。
+- 代理改为显式配置：`PODCAST_PROXY` 未设置即直连，`auto` 才扫描本地端口（原盲扫 12345-12350 误伤开发服务）；requirements 补 `requests[socks]`（原配了 SOCKS 代理必挂 Missing dependencies）。
+- 单条坏 `pubDate` 不再毁掉整个 feed（逐条容错）；新增 Atom feed 支持（原静默 0 条）。
+- `.m4a` 剪辑沿用源容器（原静默退化为整集转录）；LLM 返回非对象 JSON 走跳过路径不再崩整轮；转录 frontmatter 转义特殊字符；`podcast_rss_transcribe.py` / `podcast_feed_registry.py` 补 UTF-8 输出兜底（0.3.1 已覆盖其余入口）。
+
+**安装 / 测试**
+
+- 安装器不再把 `.ruff_cache` / `__pycache__` / `.DS_Store` / 本地 `.env`（含 API key）复制进新工作区；`--target` 指向文件时给友好报错。
+- `check_workspace.py` 兼容带 BOM 的 env 文件；`inbox/first-note.md` 降级为可选项，post-install-cleanup 归档后不再误报 NOT READY。
+- 文档修正：删除与 `.gitattributes` 冲突的 autocrlf 建议；post-install-cleanup 步骤编号与 installer 路径说明；daily-watch 数据源表列对齐。
+- CI 统一 pytest 收集（unittest 会漏掉 pytest 风格用例）、钉 ruff 版本、补 `generate_daily_report.py --help` 冒烟；新增 41 个针对上述修复的单测（全套 55 个通过）。
+
 以下修复来自一次完整的冷启动安装模拟测试（陌生环境、只凭 README 分享句从 GitHub 安装）：
 
 ### 修复

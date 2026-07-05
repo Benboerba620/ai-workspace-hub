@@ -35,6 +35,8 @@ python3 -m pip install -r tools/podcast/requirements.txt
 | Key | 用途 | 必要性 |
 |-----|------|--------|
 | LLM API Key（DeepSeek 默认） | 摘要生成 | 必需 |
-| PODCAST_PROXY | SOCKS5 代理（访问 YouTube） | 可选 |
+| PODCAST_PROXY | 代理（作用于 YouTube、RSS 抓取和播客音频下载，不影响 LLM 请求） | 可选 |
 
-无 LLM key 时可用 `--no-llm` 模式（仅列出发现的内容，不生成摘要）。
+`PODCAST_PROXY` 取值语义：不设置 / 空 / `none` = 不走代理（默认）；`auto` = 自动扫描本机 12345-12350 端口寻找 SOCKS5 代理；其他值 = 直接作为代理 URL 使用（如 `socks5://127.0.0.1:1080`）。SOCKS 代理依赖 PySocks，已包含在 `requirements.txt` 的 `requests[socks]` 中。
+
+无 LLM key 时可用 `--no-llm` 模式：不调用 LLM，改用本地抽取式逻辑（首段摘要 + 关键词 + 假设关键词匹配）生成低置信度（`confidence: low`）的 source page，并可输出 fallback 版 insight log。

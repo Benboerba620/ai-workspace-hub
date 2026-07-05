@@ -16,6 +16,7 @@ whisper:
   model: tiny                # tiny | base | small | medium | large-v3
   clip_seconds: 600          # transcribe first N seconds; null = whole episode
   auto_threshold: 1500       # auto-transcribe if RSS description shorter than this
+  # language: zh             # force audio language (e.g. zh, en); omit = auto-detect
 
 llm:
   provider: deepseek

@@ -1,8 +1,7 @@
 """Convert a text PDF to Markdown using pypdf.
 
-This is the optional Python path for users who want a more realistic PDF -> MD
-workflow than the Node smoke parser. It handles text PDFs. Scanned PDFs still
-need OCR or a document parser such as MinerU.
+Optional Python path for PDF -> MD ingest. It handles text PDFs. Scanned PDFs
+still need OCR or a document parser such as MinerU.
 """
 
 from __future__ import annotations

@@ -10,6 +10,7 @@ config/*.env
 config/*.yaml
 config/*.md
 !config/.gitkeep
+!config/README.md
 
 # 回收站 / 临时
 _trash/
@@ -26,6 +27,7 @@ dist/
 build/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
 .coverage
 *.swp
 *~

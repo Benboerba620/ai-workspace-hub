@@ -4,9 +4,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import xml.etree.ElementTree as ET
 
 import requests
+
+
+def force_utf8_stdio() -> None:
+    """Avoid UnicodeEncodeError on Windows when stdout/stderr are redirected."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
 
 
 UA = "pod2wiki/0.1 (+https://github.com/Benboerba620/pod2wiki)"
@@ -127,6 +137,7 @@ def verify_all() -> list[dict]:
 
 
 def main() -> None:
+    force_utf8_stdio()
     parser = argparse.ArgumentParser()
     parser.add_argument("--category", choices=["ai", "energy"])
     parser.add_argument("--verify", action="store_true")

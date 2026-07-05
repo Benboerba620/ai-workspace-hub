@@ -99,22 +99,37 @@ def load_dotenv(path: Path | None = None) -> None:
 
 
 def resolve_provider(provider: str | None = None, model: str | None = None) -> dict[str, str]:
-    """Resolve provider config from env vars."""
+    """Resolve provider config.
+
+    Precedence: explicit arguments > environment variables > defaults.
+    The generic LLM_* variables only apply when they do not contradict an
+    explicitly requested provider (e.g. LLM_MODEL from a DeepSeek .env block
+    must not leak into an explicit provider="kimi" call).
+    """
     load_dotenv()
-    name = env_value("LLM_PROVIDER") or provider or "deepseek"
+    env_provider = env_value("LLM_PROVIDER")
+    name = provider or env_provider or "deepseek"
     if name not in PROVIDERS:
         raise LLMError(f"Unknown provider: {name}. Valid providers: {', '.join(PROVIDERS)}")
     cfg = PROVIDERS[name]
-    api_key = env_value("LLM_API_KEY") or env_value(cfg["key"])
+    generic_ok = env_provider is None or env_provider == name
+    api_key = (env_value("LLM_API_KEY") if generic_ok else None) or env_value(cfg["key"])
     if not api_key:
         raise LLMError(
             "Missing API key. Set LLM_API_KEY or the provider-specific key from .env.example."
         )
+    base_url = (env_value("LLM_BASE_URL") if generic_ok else None) or env_value(cfg["base"]) or cfg["base_default"]
+    resolved_model = (
+        model
+        or (env_value("LLM_MODEL") if generic_ok else None)
+        or env_value(cfg["model"])
+        or cfg["model_default"]
+    )
     return {
         "provider": name,
         "api_key": api_key,
-        "base_url": env_value("LLM_BASE_URL") or env_value(cfg["base"]) or cfg["base_default"],
-        "model": env_value("LLM_MODEL") or model or env_value(cfg["model"]) or cfg["model_default"],
+        "base_url": base_url,
+        "model": resolved_model,
     }
 
 
@@ -157,18 +172,28 @@ def chat(
         raise LLMError(f"Unexpected LLM response: {json.dumps(data)[:500]}") from exc
 
 
+def _ensure_json_object(data: Any) -> dict[str, Any]:
+    if not isinstance(data, dict):
+        raise LLMError(f"Expected a JSON object from the model, got {type(data).__name__}")
+    return data
+
+
 def extract_json(text: str) -> dict[str, Any]:
-    """Parse strict or code-fenced JSON returned by a model."""
+    """Parse strict or code-fenced JSON returned by a model.
+
+    Raises LLMError when the parsed value is not a JSON object, so callers
+    can reuse their existing LLM-failure skip path.
+    """
     cleaned = text.strip()
     if cleaned.startswith("```"):
         cleaned = cleaned.strip("`")
         if cleaned.lower().startswith("json"):
             cleaned = cleaned[4:].strip()
     try:
-        return json.loads(cleaned)
+        return _ensure_json_object(json.loads(cleaned))
     except json.JSONDecodeError:
         start = cleaned.find("{")
         end = cleaned.rfind("}")
         if start >= 0 and end > start:
-            return json.loads(cleaned[start : end + 1])
+            return _ensure_json_object(json.loads(cleaned[start : end + 1]))
         raise

@@ -31,10 +31,6 @@ for _stream in (sys.stdout, sys.stderr):
     if hasattr(_stream, "reconfigure"):
         _stream.reconfigure(encoding="utf-8", errors="replace")
 
-if sys.stdout and hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-if sys.stderr and hasattr(sys.stderr, "reconfigure"):
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 OK = "[OK]"
 FAIL = "[FAIL]"
@@ -99,6 +95,14 @@ def initialize_config(root: Path) -> list[Path]:
         if not destination.exists():
             shutil.copy2(source, destination)
             created.append(destination)
+    # Working directories the checks below expect; create them up front so a
+    # fresh workspace passes right after --init. (Directories are not added to
+    # the returned list, which only tracks copied config files.)
+    for directory in (
+        resolve_hypothesis_dir(root),
+        resolve_journal_dir(root),
+    ):
+        directory.mkdir(parents=True, exist_ok=True)
     return created
 
 
@@ -144,7 +148,12 @@ def main() -> int:
         from workspace_paths import find_workspace_root
         root = find_workspace_root(script_dir)
     except FileNotFoundError:
-        root = script_dir.parent.parent
+        root = Path.cwd()
+        print(
+            f"  {WARN} 未找到 workspace 根目录标记"
+            "（workspace/workspace-config.md 或 config/ 配置文件），"
+            f"退回使用当前目录：{root}"
+        )
     if args.init:
         created = initialize_config(root)
         if created:
@@ -154,7 +163,11 @@ def main() -> int:
     config_dir = root / "config"
     env_file = resolve_env_path(config_dir)
 
-    all_pass &= check("config/ 目录", config_dir.exists())
+    all_pass &= check(
+        "config/ 目录",
+        config_dir.exists(),
+        "" if config_dir.exists() else "运行 check_setup.py --init 创建",
+    )
 
     if not env_file.exists():
         all_pass &= check(
@@ -237,10 +250,20 @@ def main() -> int:
     )
 
     hypothesis_dir = resolve_hypothesis_dir(root)
-    all_pass &= check("hypothesis/", hypothesis_dir.exists())
+    all_pass &= check(
+        "hypothesis/",
+        hypothesis_dir.exists(),
+        "" if hypothesis_dir.exists() else "运行 check_setup.py --init 创建，或手动 mkdir hypothesis",
+    )
 
     journal_dir = resolve_journal_dir(root)
-    all_pass &= check("portfolio/journal/", journal_dir.exists())
+    all_pass &= check(
+        "portfolio/journal/",
+        journal_dir.exists(),
+        ""
+        if journal_dir.exists()
+        else "运行 check_setup.py --init 创建，或手动 mkdir -p portfolio/journal",
+    )
 
     trades_path = resolve_trades_path(root)
     if not trades_path.exists():

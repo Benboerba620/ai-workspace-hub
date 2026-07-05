@@ -16,7 +16,7 @@
 
 | 文件 | 软上限（行） |
 |---|---|
-| `AGENTS.md` / `CLAUDE.md` | ~60 |
+| `AGENTS.md` / `CLAUDE.md` | ~100 |
 | `workspace/workspace-config.md` | ~100 |
 | `workspace/meta/active-context.md` | 50 |
 | `wiki/_schema.md` | ~200 |
