@@ -2,9 +2,9 @@
 """Generate a scripted terminal-style demo GIF for ai-workspace-hub README.
 
 Renders frames with Pillow: fake terminal window, typing effect for user
-input, line-by-line agent output. Content mirrors the real install flow
-in INSTALL-FOR-AI.md (3 questions -> installer -> READY -> first ingest
--> Enhanced Mode API keys). Not a screen recording; the README says so.
+input, line-by-line agent output. Content mirrors the real install and
+first-research flow (3 questions -> installer -> READY -> research profile
+-> theme hypothesis -> daily watch). Not a screen recording; the README says so.
 
 Usage: python docs/gen_demo_gif.py [output.gif]   (requires Pillow;
 falls back to Microsoft YaHei, so render on Windows or adjust FONT paths)
@@ -125,30 +125,29 @@ put("$ python check_workspace.py", YELLOW, ms=800)
 put("  Core Mode result: READY", GREEN, True, ms=500)
 put("  （不需要 API key，现在就能用）", DIM, ms=2000)
 
-# ---- Scene 4: first ingest -------------------------------------------
+# ---- Scene 4: first stock research -----------------------------------
 put()
-type_line("你 > ", "把 inbox/first-note.md 整理进 personal wiki。", speed=40)
-put("● 按 wiki/_schema.md 整理…", CYAN, ms=900)
-put("  √ wiki/sources/2026-07-02-first-note.md", GREEN, ms=450)
-put("  √ wiki/concepts/AI工作流.md", GREEN, ms=450)
-put("  √ active-context.md 已记录进度", GREEN, ms=1600)
+type_line("你 > ", "研究英飞凌，同时帮我建立第一版研究偏好。", speed=35)
+put("     我关注 AI 服务器 800V 电源架构升级。", DIM, ms=900)
+put("● 首次研究引导：直接研究，不让你先填模板。", CYAN, ms=900)
+put("  √ output/research/2026-07-11-infineon.md", GREEN, ms=450)
+put("  √ workspace/research-profile.md → v0.1", GREEN, ms=450)
+put("  √ 已分开：事实 / 推测 / 反方证据 / 待验证", GREEN, ms=1400)
 
-# ---- Scene 5: Enhanced Mode (API keys) --------------------------------
+# ---- Scene 5: hypothesis and daily watch -----------------------------
 put()
-type_line("你 > ", "再帮我开通行情日报和播客摘要。", speed=40)
-put("● 这两项属于 Enhanced Mode，需要填 2 个 key（都有免费档）：", CYAN, ms=900)
-put("  · config/daily-watchlist.env —— TUSHARE_TOKEN（A 股行情）", FG, ms=500)
-put("  · config/pod2wiki.env —— LLM_API_KEY（播客摘要）", FG, ms=500)
-put("  （key 直接粘贴给我；config/ 不进 git，不会被提交）", DIM, ms=1500)
-type_line("你 > ", "TUSHARE_TOKEN=3f8a****c2e1", speed=45)
-put("  √ 已写入 config/daily-watchlist.env", GREEN, ms=800)
+type_line("你 > ", "加入观察池，建立假设，再生成今天的日报。", speed=35)
+put("● 假设是行业主题，公司只是映射和验证载体。", CYAN, ms=900)
+put("  √ H001：AI 服务器电源架构向高压升级", GREEN, ms=450)
+put("  √ IFX.DE：核心受益映射 + 技术卡点", GREEN, ms=450)
+put("  √ daily-watchlist-reports/2026-07-11.md", GREEN, ms=450)
+put("  √ 公司异动回写证据；纯主题命中等待核验", GREEN, ms=1500)
 put()
-put("$ python check_setup.py", YELLOW, ms=800)
-put("  Enhanced Mode: daily-watch READY", GREEN, True, ms=2000)
+put("  行情 key 可选；零 key 也能先跑研究与报告骨架。", DIM, ms=2000)
 
 # ---- Scene 6: closing ------------------------------------------------
 put()
-put("● 完成。明天开场说「继续」，我会从断点接上。", MAUVE, True, ms=3500)
+put("● 完成。下次研究会复用偏好，日报继续验证假设。", MAUVE, True, ms=3500)
 
 out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "demo.gif")

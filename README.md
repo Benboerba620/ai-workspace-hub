@@ -13,9 +13,9 @@
 
 [30 秒上手](#-30-秒上手) · [六大能力](#-六大能力) · [第一周怎么用](#-第一周怎么用) · [故障排查](TROUBLESHOOTING.md)
 
-![完整流程演示：一句话安装 → Core Mode READY → 第一次摄入 → 配 API key → 断点续传](docs/demo.gif)
+![完整流程演示：一句话安装 → Core Mode READY → 首次股票研究 → 研究偏好 → 主题假设 → 日报跟踪](docs/demo.gif)
 
-<sub>演示动图按 <a href="INSTALL-FOR-AI.md">INSTALL-FOR-AI.md</a> 的真实流程脚本化生成（<a href="docs/gen_demo_gif.py">生成脚本</a>），非实录。</sub>
+<sub>演示动图按安装协议与 <a href="START-HERE.md">首次股票研究流程</a>脚本化生成（<a href="docs/gen_demo_gif.py">生成脚本</a>），非实录。</sub>
 
 </div>
 
