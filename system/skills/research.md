@@ -37,12 +37,15 @@
 
 ```markdown
 ---
+id: RYYYYMMDD-01
 title: {研究主题}
 date: YYYY-MM-DD
 type: research
 status: draft
 mode: 收敛 / 发散
 tags: []
+linked_hypotheses: []
+linked_entities: []
 ---
 
 # {研究主题}
@@ -89,6 +92,8 @@ Wiki check: 查了 wiki/ 的 {x} 篇，{命中/未命中/有矛盾}。
 > 💡 这次研究 + 讨论的结论要沉淀进 wiki 吗？
 
 用户确认后，按 `wiki/_schema.md` 分流（**只有长期有用的判断才回写，不要把整篇 output 塞进 wiki**）：
+
+确认请求先追加到 `workspace/review-queue.md`。用户确认后执行回写并把该队列项改成 `done`；不要依赖对话记住一个尚未执行的“以后再写”。
 
 | 内容 | 写入 |
 |---|---|

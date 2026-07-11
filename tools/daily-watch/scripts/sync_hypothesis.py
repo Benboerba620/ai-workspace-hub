@@ -57,7 +57,7 @@ def read_hypothesis_files(hypothesis_dir: Path) -> dict[str, dict[str, object]]:
             warn(f"skipping unreadable hypothesis file {file_path.name}: {exc}")
             continue
         frontmatter = extract_frontmatter(content, source=file_path.name)
-        hypothesis_id = match.group(1)
+        hypothesis_id = str(frontmatter.get("id") or match.group(1))
         data[hypothesis_id] = {
             "certainty": frontmatter.get("certainty"),
             "status": frontmatter.get("status"),

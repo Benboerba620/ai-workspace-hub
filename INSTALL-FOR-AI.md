@@ -26,12 +26,14 @@ my-ai-workspace/
 ├── workspace/workspace-config.md
 ├── workspace/meta/active-context.md
 ├── workspace/meta/friction-log.md
+├── workspace/review-queue.md
 ├── wiki/_schema.md
 ├── wiki/raw/ / sources/ / entities/ / concepts/ / explorations/
 ├── inbox/
 ├── output/ / output/screen/
 ├── monitoring/
 ├── hypothesis/
+├── evidence/
 ├── daily-watchlist-reports/
 ├── portfolio/journal/
 ├── config/
@@ -109,6 +111,7 @@ output/screen/
 output/pod2wiki/
 monitoring/
 hypothesis/
+evidence/
 daily-watchlist-reports/
 portfolio/journal/
 config/
@@ -134,14 +137,22 @@ system/templates/
 - `system/templates/workspace-config.md` -> `workspace/workspace-config.md`
 - `system/templates/active-context.md` -> `workspace/meta/active-context.md`
 - `system/templates/friction-log.md` -> `workspace/meta/friction-log.md`
+- `system/templates/research-profile.md` -> `workspace/research-profile.md`
+- `system/templates/review-queue.md` -> `workspace/review-queue.md`
 - `system/templates/interfaces-README.md` -> `system/interfaces/README.md`
 
 **知识库**：
 - `wiki/_schema.md` -> `wiki/_schema.md`
+- `evidence/README.md` -> `evidence/README.md`
 
 **Skills**（能力说明书）：
 - `system/skills/first-ingest.md` -> `system/skills/first-ingest.md`
+- `system/skills/first-research.md` -> `system/skills/first-research.md`
 - `system/skills/research.md` -> `system/skills/research.md`
+- `system/skills/research-closeout.md` -> `system/skills/research-closeout.md`
+- `system/skills/hypothesis-review.md` -> `system/skills/hypothesis-review.md`
+- `system/skills/workspace-status.md` -> `system/skills/workspace-status.md`
+- `system/skills/upgrade-workspace.md` -> `system/skills/upgrade-workspace.md`
 - `system/skills/screen.md` -> `system/skills/screen.md`
 - `system/skills/podcast.md` -> `system/skills/podcast.md`
 - `system/skills/daily-watch.md` -> `system/skills/daily-watch.md`
@@ -157,6 +168,7 @@ system/templates/
 - `system/integrations/hypothesis-tracker.md` -> `system/integrations/hypothesis-tracker.md`
 - `system/integrations/pod2wiki.md` -> `system/integrations/pod2wiki.md`
 - `system/integrations/daily-watchlist.md` -> `system/integrations/daily-watchlist.md`
+- `system/integrations/object-model.md` -> `system/integrations/object-model.md`
 - `system/integrations/_template.md` -> `system/integrations/_template.md`
 
 **工具代码**：
@@ -165,6 +177,9 @@ system/templates/
 - `system/scripts/pdf_to_md.py` -> `system/scripts/pdf_to_md.py`
 - `system/scripts/install_workspace.py` -> `system/scripts/install_workspace.py`
 - `system/scripts/check_workspace.py` -> `system/scripts/check_workspace.py`
+- `system/scripts/workspace_status.py` -> `system/scripts/workspace_status.py`
+- `system/scripts/review_queue.py` -> `system/scripts/review_queue.py`
+- `system/scripts/upgrade_workspace.py` -> `system/scripts/upgrade_workspace.py`
 
 **依赖文件**：
 - `requirements.txt` -> `requirements.txt`
@@ -202,8 +217,8 @@ system/templates/
 ## daily-watch
 - status: enabled
 - project_path: ./tools/daily-watch
-- reads_from: config/daily-watchlist-watchlist.md, monitoring, wiki/entities, wiki/concepts
-- writes_to: daily-watchlist-reports, hypothesis
+- reads_from: config/daily-watchlist-watchlist.md, wiki/entities, wiki/concepts
+- writes_to: daily-watchlist-reports, evidence, hypothesis（证据引用）
 
 ## screen
 - status: enabled

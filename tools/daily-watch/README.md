@@ -78,6 +78,7 @@ daily-watchlist-reports/      # 生成的日报
   └── 2026-06/
       └── 2026-06-24.md
 hypothesis/                   # 假设文件（H1.md, H2.md, ...）
+evidence/                     # 独立证据账本（按月分目录）
 portfolio/                    # 交易和持仓
   ├── trades.csv
   ├── holdings.csv
@@ -138,7 +139,7 @@ hypothesis_tracking:
   enabled: true
   directory: hypothesis        # 假设文件存放目录
   max_matches: 8               # 日报中最多展示的信号数
-  auto_writeback: true         # 自动回写信号到假设文件的证据时间线
+  auto_writeback: true         # 自动登记证据，并在假设时间线追加引用
   suggest_new_hypothesis_threshold: 2  # 重复主题超过此数建议建立新假设
 
 # 重点关注领域（最多 3 个）
@@ -153,7 +154,7 @@ focus_areas:
 
 - `thresholds`：用于自动识别异动股。大盘股（Market Cap = Large）用 `large_cap_move`，其余用 `small_cap_move`。
 - `focus_areas.required_any`：假设必须命中其中至少一个关键词才会被归入该主题。不设则只看 `keywords`。
-- `hypothesis_tracking.auto_writeback`：开启后，脚本会自动把当日触发的信号（异动、财报）追加到对应 `hypothesis/H*.md` 文件的"证据时间线"章节。
+- `hypothesis_tracking.auto_writeback`：开启后，脚本把当日触发的异动/财报信号写入 `evidence/`，再把证据 ID 引用追加到对应假设。不会自动改变假设确定性或状态。
 
 ## 股票池格式
 
@@ -228,19 +229,20 @@ VIX / SPY / QQQ / GLD / WTI / BTC 的当前价和涨跌幅表格
 
 报告由脚本生成数据骨架。新闻检索和原因分析部分是占位符，设计上由 Claude Code 通过 WebSearch 补充。
 
-### 假设联动回写
+### 证据登记与假设联动
 
-开启 `auto_writeback` 后，如果当日有股票异动或财报事件命中了某条假设的关联标的，脚本会自动在对应 `hypothesis/H*.md` 的"证据时间线"章节下追加一条带日期戳的记录，格式如：
+开启 `auto_writeback` 后，如果当日有股票异动或财报事件命中了某条假设的关联标的，脚本会先创建 `evidence/YYYY-MM/E-*.md`，再在对应 `hypothesis/H*.md` 的“证据时间线”追加引用，格式如：
 
 ```
 ### 2026-06-24
 
-- 🟡 **[DW-2026-06-24-mover-nvda] Daily Watchlist** - NVDA 今日涨跌幅 +4.52%，分类 Technology
+- 🟡 **[DW-2026-06-24-mover-nvda-h1] E-2026-06-24-mover-nvda-h1** - NVDA 今日涨跌幅 +4.52%，分类 Technology
+  - 证据：evidence/2026-06/E-2026-06-24-mover-nvda-h1.md
   - 来源：daily-watchlist-reports/2026-06/2026-06-24.md
-  - 影响：日报自动回写，待结合新闻后再决定是否调整确定性。
+  - 影响：待复盘；本条引用不改变 frontmatter 中的确定性或状态。
 ```
 
-同一天同一信号不会重复写入（用 marker 去重）。
+同一天同一信号不会重复写入（用 `dedup_key` 和 marker 去重）。
 
 ## 零 Key 运行
 

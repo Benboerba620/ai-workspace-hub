@@ -19,6 +19,7 @@ from workspace_paths import (
     resolve_config_dir,
     resolve_config_path,
     resolve_env_path,
+    resolve_evidence_dir,
     resolve_hypothesis_dir,
     resolve_template_path,
 )
@@ -415,15 +416,24 @@ def read_hypotheses(workspace_root: Path) -> list[dict[str, Any]]:
         content = file_path.read_text(encoding="utf-8-sig")
         frontmatter = extract_frontmatter(content)
         fallback_title = file_path.stem
+        filename_id_match = re.match(r"(H\d+)", file_path.stem)
+        hypothesis_id = str(
+            frontmatter.get("id")
+            or (filename_id_match.group(1) if filename_id_match else file_path.stem)
+        )
+        linked_entities = frontmatter.get("linked_entities") or []
+        if isinstance(linked_entities, str):
+            linked_entities = [linked_entities]
+        frontmatter_tickers = {
+            str(item).upper() for item in linked_entities if str(item).strip()
+        }
         items.append(
             {
-                "id": re.match(r"(H\d+)", file_path.stem).group(1)
-                if re.match(r"(H\d+)", file_path.stem)
-                else file_path.stem,
+                "id": hypothesis_id,
                 "title": extract_title(content, fallback_title),
                 "certainty": frontmatter.get("certainty"),
                 "status": frontmatter.get("status"),
-                "tickers": extract_related_tickers(content),
+                "tickers": frontmatter_tickers | extract_related_tickers(content),
                 "content": content,
                 "path": file_path,
             }
@@ -613,7 +623,9 @@ def build_hypothesis_section(
     if signals:
         writeback_signals = [signal for signal in signals if signal.get("auto_writeback")]
         if auto_writeback and writeback_signals:
-            lines.append("- 已将本地可确认信号自动回写到对应 `hypothesis/H*.md`。")
+            lines.append(
+                "- 已将本地可确认信号登记到 `evidence/`，并在对应假设中追加证据引用。"
+            )
         elif auto_writeback:
             lines.append("- 当前只有主题匹配，等待网页核验后再决定是否写入假设证据。")
         else:
@@ -631,18 +643,77 @@ def build_hypothesis_section(
 def build_signal_marker(date_text: str, signal: dict[str, Any]) -> str:
     signal_type = str(signal["signal_type"])
     ref = slugify(str(signal["ref"]))
-    return f"DW-{date_text}-{signal_type}-{ref}"
+    hypothesis_id = slugify(str(signal["hypothesis_id"]))
+    return f"DW-{date_text}-{signal_type}-{ref}-{hypothesis_id}"
+
+
+def build_evidence_id(date_text: str, signal: dict[str, Any]) -> str:
+    marker = build_signal_marker(date_text, signal)
+    return "E-" + marker.removeprefix("DW-")
+
+
+def write_signal_evidence(
+    workspace_root: Path,
+    date_text: str,
+    signal: dict[str, Any],
+    report_relpath: str,
+) -> tuple[Path, bool]:
+    evidence_id = build_evidence_id(date_text, signal)
+    evidence_dir = resolve_evidence_dir(workspace_root) / date_text[:7]
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    evidence_path = evidence_dir / f"{evidence_id}.md"
+    if evidence_path.exists():
+        return evidence_path, False
+
+    signal_type = str(signal["signal_type"])
+    ref = str(signal["ref"]).upper()
+    metric = "price_change" if signal_type == "mover" else "earnings"
+    frontmatter = {
+        "id": evidence_id,
+        "type": "evidence",
+        "observed_at": date_text,
+        "recorded_at": date_text,
+        "source_type": "daily-watch",
+        "source_path": report_relpath,
+        "source_url": None,
+        "direction": "pending",
+        "confidence": "pending",
+        "review_status": "pending",
+        "linked_hypotheses": [str(signal["hypothesis_id"])],
+        "linked_entities": [ref],
+        "metric": metric,
+        "dedup_key": build_signal_marker(date_text, signal),
+    }
+    yaml_text = yaml.safe_dump(
+        frontmatter, allow_unicode=True, sort_keys=False, default_flow_style=False
+    ).rstrip()
+    content = (
+        f"---\n{yaml_text}\n---\n\n"
+        f"# {evidence_id}\n\n"
+        f"## 观察\n\n{signal['summary']}\n\n"
+        "## 与假设的关系\n\n"
+        f"关联 `{signal['hypothesis_id']}`。这是自动采集的信号，方向和权重待复盘确认。\n\n"
+        "## 来源\n\n"
+        f"- `{report_relpath}`\n"
+    )
+    evidence_path.write_text(content, encoding="utf-8")
+    return evidence_path, True
 
 
 def render_signal_evidence(
-    date_text: str, signal: dict[str, Any], report_relpath: str
+    date_text: str,
+    signal: dict[str, Any],
+    report_relpath: str,
+    evidence_relpath: str,
 ) -> str:
     marker = build_signal_marker(date_text, signal)
+    evidence_id = build_evidence_id(date_text, signal)
     return "\n".join(
         [
-            f"- 🟡 **[{marker}] Daily Watchlist** - {signal['summary']}",
+            f"- 🟡 **[{marker}] {evidence_id}** - {signal['summary']}",
+            f"  - 证据：{evidence_relpath}",
             f"  - 来源：{report_relpath}",
-            "  - 影响：日报自动回写，待结合新闻后再决定是否调整确定性。",
+            "  - 影响：待复盘；本条引用不改变 frontmatter 中的确定性或状态。",
         ]
     )
 
@@ -671,13 +742,19 @@ def append_to_date_block(section_body: str, date_text: str, entry_text: str) -> 
 
 
 def append_signal_to_hypothesis(
-    content: str, date_text: str, signal: dict[str, Any], report_relpath: str
+    content: str,
+    date_text: str,
+    signal: dict[str, Any],
+    report_relpath: str,
+    evidence_relpath: str,
 ) -> tuple[str, bool]:
     marker = build_signal_marker(date_text, signal)
     if marker in content:
         return content, False
 
-    entry_text = render_signal_evidence(date_text, signal, report_relpath)
+    entry_text = render_signal_evidence(
+        date_text, signal, report_relpath, evidence_relpath
+    )
     section_pattern = re.compile(r"(?ms)^##\s*证据时间线\s*\n(.*?)(?=^##\s|\Z)")
     match = section_pattern.search(content)
     if not match:
@@ -710,10 +787,16 @@ def apply_hypothesis_updates(
         hypothesis = hypothesis_map.get(str(signal["hypothesis_id"]))
         if not hypothesis:
             continue
+        evidence_path, _ = write_signal_evidence(
+            workspace_root, date_text, signal, report_relpath
+        )
+        evidence_relpath = str(evidence_path.relative_to(workspace_root)).replace(
+            "\\", "/"
+        )
         path = Path(hypothesis["path"])
         original = path.read_text(encoding="utf-8")
         updated, changed = append_signal_to_hypothesis(
-            original, date_text, signal, report_relpath
+            original, date_text, signal, report_relpath, evidence_relpath
         )
         if changed and updated != original:
             path.write_text(updated, encoding="utf-8")

@@ -18,8 +18,8 @@
 - status: `enabled`
 - project_path: `./tools/daily-watch`
 - skill: `system/skills/daily-watch.md`
-- reads_from: `config/daily-watchlist-watchlist.md`, `monitoring/`, `wiki/entities/`, `wiki/concepts/`
-- writes_to: `daily-watchlist-reports/`, `hypothesis/`
+- reads_from: `config/daily-watchlist-watchlist.md`, `wiki/entities/`, `wiki/concepts/`
+- writes_to: `daily-watchlist-reports/`, `evidence/`, `hypothesis/`（引用）
 
 ## screen
 - status: `enabled`

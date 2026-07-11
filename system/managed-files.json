@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "hub_version": "0.5.0",
+  "schema_version": 2,
+  "hub_version": "0.6.0",
   "ownership": {
     "managed": [
       "system/**",
@@ -14,6 +14,7 @@
     "user_owned": [
       "config/**",
       "daily-watchlist-reports/**",
+      "evidence/**",
       "hypothesis/**",
       "inbox/**",
       "monitoring/**",
@@ -24,7 +25,8 @@
       "wiki/explorations/**",
       "wiki/raw/**",
       "wiki/sources/**",
-      "workspace/meta/**"
+      "workspace/meta/**",
+      "workspace/review-queue.md"
     ],
     "mixed": [
       ".gitignore",
@@ -39,5 +41,20 @@
     "managed": "Hub upgrades may replace these files after showing a diff.",
     "user_owned": "Hub upgrades must never overwrite these files.",
     "mixed": "Hub upgrades must preserve local changes and require an explicit merge."
+  },
+  "migrations": {
+    "additive_directories": [
+      "evidence"
+    ],
+    "additive_files": [
+      {
+        "source": "evidence/README.md",
+        "target": "evidence/README.md"
+      },
+      {
+        "source": "system/templates/review-queue.md",
+        "target": "workspace/review-queue.md"
+      }
+    ]
   }
 }

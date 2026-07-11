@@ -1,6 +1,6 @@
 # Daily Watch（日报监控）
 
-> 获取股票行情、检测异动、搜索新闻、生成每日结构化报告，并把证据回写到假设。
+> 获取股票行情、检测异动、搜索新闻、生成每日结构化报告，把新信号登记为独立证据并链接到假设。
 > 代码位于 `tools/daily-watch/`，原始项目 [daily-watchlist](https://github.com/Benboerba620/daily-watchlist)。
 
 ## 触发词
@@ -32,10 +32,10 @@ Agent 首次使用时检查上述条件，缺什么补什么。
    ```
 3. 脚本输出报告骨架到 `daily-watchlist-reports/YYYY-MM/YYYY-MM-DD.md`
 4. Agent 用 websearch 补充新闻：异动原因、财报反应、行业动态
-5. Agent 扫描 `hypothesis/H*.md`，把当日发现关联到相关假设
+5. Agent 扫描 `hypothesis/H*.md`。可确认的行情/财报信号先写入 `evidence/YYYY-MM/`，再把证据 ID 引用到相关假设；主题匹配仍只提示，不自动造证据
 6. 最终报告写入，更新 `workspace/meta/active-context.md`
 
-日报默认只处理上一份日报之后的新证据，避免重复堆积；这仍是现有 `daily-watch`，不是新的日报类型。日报不自动改变假设确定性或状态。命中证伪条件、关键催化剂、财报或连续多条同方向证据时，提示按 `system/skills/hypothesis-review.md` 启动复盘。
+日报默认只处理上一份日报之后的新证据，使用 `dedup_key` 避免重复堆积；这仍是现有 `daily-watch`，不是新的日报类型。日报不自动改变假设确定性或状态。命中证伪条件、关键催化剂、财报或连续多条同方向证据时，追加待确认复盘项，并提示按 `system/skills/hypothesis-review.md` 启动复盘。
 
 ## 数据源优先级
 
@@ -54,7 +54,8 @@ Longbridge Skill/CLI 是独立 Agent 扩展，不是 `tools/daily-watch/` 的内
 | 输出 | 路径 |
 |------|------|
 | 日报 | `daily-watchlist-reports/YYYY-MM/YYYY-MM-DD.md` |
-| 假设证据 | `hypothesis/H*.md`（回写） |
+| 独立证据 | `evidence/YYYY-MM/E-*.md` |
+| 假设证据 | `hypothesis/H*.md`（只追加证据引用） |
 | 长期结论 | `wiki/explorations/`（可选沉淀） |
 
 ## 股票池格式

@@ -1,6 +1,6 @@
 # 系统架构 · AI Workspace Hub
 
-> 截至 2026-06-22（v0.3.0 All-in-One）。给"想看懂这套系统怎么搭"的人看的参照图，不是每次必读文件。
+> 截至 2026-07-11（v0.6.0）。给"想看懂这套系统怎么搭"的人看的参照图，不是每次必读文件。
 > 一句话：**一个 all-in-one AI 研究工作系统——六大能力开箱即用，数据源按需配置，零 key 也能跑。**
 
 ---
@@ -41,18 +41,22 @@ flowchart TB
     end
 
     subgraph HYPO["假设追踪 · 基座自带"]
-        HT["hypothesis/<br/>假设 + 证据 + 复盘"]
+        HT["hypothesis/<br/>假设 + 复盘"]
+        EV["evidence/<br/>独立证据账本"]
     end
 
     subgraph MEM["反馈 + 记忆"]
         FL["friction-log"]
         AC["active-context"]
+        RQ["review-queue<br/>待用户确认"]
+        WS["workspace-status<br/>下一步汇总"]
     end
 
     C --> BASE
     POD ==>|"摘要"| KB
     DW ==>|"日报"| OUT
-    DW -.->|"证据回写"| HT
+    DW ==>|"登记新证据"| EV
+    EV -.->|"ID 引用"| HT
     HT -.->|"复盘结论"| KB
     SCR ==>|"筛选报告"| OUT
     DATA -.->|"行情数据"| DW
@@ -60,6 +64,11 @@ flowchart TB
     DATA -.->|"按需"| RES
     LB -.->|"按需调用"| SCR
     LB -.->|"按需调用"| RES
+    RES -.->|"待确认动作"| RQ
+    HT -.->|"待确认调整"| RQ
+    WS -.-> RQ
+    WS -.-> EV
+    WS -.-> HT
 ```
 
 ### 怎么读这张图
@@ -127,6 +136,8 @@ ai-workspace-hub/
 │
 ├── workspace/
 │   ├── workspace-config.md         # 项目配置
+│   ├── research-profile.md         # 从真实研究校准的方法偏好
+│   ├── review-queue.md             # 待用户确认的动作
 │   └── meta/
 │       ├── active-context.md       # 工作记忆
 │       └── friction-log.md         # 摩擦日志
@@ -137,8 +148,9 @@ ai-workspace-hub/
 │
 ├── inbox/                          # 输入
 ├── output/                         # 输出（research/ screen/ pod2wiki/ 等子目录）
-├── monitoring/                     # 监控对象
-├── hypothesis/                     # 假设追踪
+├── monitoring/                     # 用户阅读的监控看板
+├── hypothesis/                     # 假设追踪与复盘
+├── evidence/                       # 独立证据账本
 ├── daily-watchlist-reports/        # 日报输出
 ├── portfolio/                      # 交易记录
 │
@@ -157,9 +169,10 @@ ai-workspace-hub/
 ## 完整闭环
 
 ```text
-podcast ──► wiki ──► daily-watch ──► output/ ──► hypothesis ──► wiki/explorations
-               │                                                      ▲
-               └──────────── research / screen ────────────────────────┘
+research ──► hypothesis ──► watchlist ──► daily-watch ──► evidence
+    │             ▲                                      │
+    │             └──────── 用户确认后的复盘 ──────────────┘
+    └──► review-queue ──► wiki / hypothesis / watchlist / research-profile
 ```
 
 基座保证 `inbox → wiki → output + research`。其余能力按配置渐进亮灯。
@@ -169,13 +182,23 @@ podcast ──► wiki ──► daily-watch ──► output/ ──► hypothe
 ## 文件归属与升级边界
 
 Hub 用 `system/managed-files.json` 记录三类文件，安装时在
-`workspace/.hub-state.json` 记录来源版本和安装方式。这是未来做升级预览与迁移的基础，
-当前版本仍不会自动覆盖任何已有文件。
+`workspace/.hub-state.json` 记录来源版本和安装方式，并用于升级预览与迁移。
+`system/scripts/upgrade_workspace.py` 默认只预览差异；加 `--apply-managed` 才会更新 Hub 管理文件，并先备份旧版本。迁移清单可以创建缺失的新目录或空白模板，但绝不覆盖同名用户文件；混合文件只列为人工合并。
 
-| 类型 | 典型路径 | 未来升级规则 |
+| 类型 | 典型路径 | 升级规则 |
 |------|----------|--------------|
 | Hub 管理 | `system/`、`tools/`、依赖清单 | 展示差异后可以更新 |
-| 用户所有 | `wiki/`、`config/`、`output/`、`hypothesis/`、`portfolio/` 等 | 永不自动覆盖 |
+| 用户所有 | `wiki/`、`config/`、`output/`、`hypothesis/`、`evidence/`、`portfolio/` 等 | 永不自动覆盖 |
 | 混合文件 | Agent 入口、`wiki/_schema.md`、`workspace/workspace-config.md` | 保留本地修改，只提示合并 |
+
+## 状态层
+
+系统不引入数据库。Markdown 继续作为可读、可编辑的主存储，但使用统一 frontmatter 和稳定 ID 解决跨文件关联：
+
+- 研究 `RYYYYMMDD-NN`、假设 `Hn`、证据 `E-*`、待确认动作 `Q-*` 创建后不改 ID。
+- frontmatter 是当前状态唯一来源，正文只保存论证和历史日志。
+- `config/daily-watchlist-watchlist.md` 是唯一执行股票池；`monitoring/` 是展示层。
+- `workspace/review-queue.md` 保存不能自动生效的动作。
+- `system/scripts/workspace_status.py` 汇总进行中研究、开放假设、待复盘证据、到期复盘和待确认动作。
 
 <!-- 文件说明：系统架构、能力分层和目录关系说明。 -->

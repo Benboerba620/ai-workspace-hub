@@ -2,7 +2,7 @@
 
 这个 repo 是一个 all-in-one AI 研究工作系统，包含六大能力。Claude Code 进入本目录后，先读本文件，再读 `workspace/workspace-config.md`。
 
-本文件与 `AGENTS.md` 保持**同一套工作协议**。两者内容应当同源，改一个就同步另一个。
+本文件与 `AGENTS.md` 保持**同一套工作协议**。两者内容应当同源，改一个就同步另一个。研究对象、状态和 ID 统一遵循 `system/integrations/object-model.md`。
 
 ## 工作方式
 
@@ -21,15 +21,18 @@
 |---|---|---|
 | 开始工作 | `workspace/workspace-config.md` | 按任务决定 |
 | 继续上下文 | `workspace/meta/active-context.md` | `workspace/meta/active-context.md` |
+| 查看当前待办 | `system/skills/workspace-status.md` + `workspace/review-queue.md` | 只读汇总，不修改判断 |
+| 升级工作区 | `system/skills/upgrade-workspace.md` | 先预览，确认后只更新受管文件 |
 | 摄入材料 | `wiki/_schema.md` + `system/integrations/personal-wiki.md`；笔记走 `system/skills/first-ingest.md`，PDF 走 `system/skills/pdf-ingest.md` | `wiki/` |
 | 首次股票研究 | `system/skills/first-research.md` + `workspace/research-profile.md` | `output/research/` + 研究偏好 v0.1 |
 | 后续研究 | `workspace/research-profile.md` + `system/skills/research.md`；结束走 `system/skills/research-closeout.md` | `output/research/` → 知识与假设分流 |
 | 快速筛选 | `system/skills/screen.md` | `output/screen/` |
 | 播客摄入 | `system/skills/podcast.md` | `wiki/sources/` + `wiki/raw/podcasts/` + `output/pod2wiki/` |
-| 日报监控 | `system/skills/daily-watch.md`（接线细节见 `system/integrations/daily-watchlist.md`） | `daily-watchlist-reports/` + `hypothesis/` |
+| 日报监控 | `system/skills/daily-watch.md`（接线细节见 `system/integrations/daily-watchlist.md`） | `daily-watchlist-reports/` + `evidence/` + 假设引用 |
 | 管理股票池 | `system/skills/daily-watch-import.md` | `config/daily-watchlist-watchlist.md` |
 | 假设操作 | `system/skills/daily-watch-ht.md` | `hypothesis/` + `portfolio/` |
 | 假设复盘 | `system/skills/hypothesis-review.md` + 相关研究和日报 | `hypothesis/` → 确认后更新 `wiki/explorations/` |
+| 处理待确认项 | `workspace/review-queue.md` | 执行后更新队列状态 |
 | 生成输出 | `workspace/meta/active-context.md` + 相关 wiki 文件 | `output/` |
 | 遇到摩擦 | 相关文件 | `workspace/meta/friction-log.md` |
 
@@ -45,6 +48,13 @@
 | daily-watch | 日报监控 | `system/skills/daily-watch.md` | 可选（tushare / FMP） |
 
 工具代码在 `tools/` 目录下。首次使用时 agent 检查依赖，缺什么用 `python3 -m pip install ...` 安装；如果环境只有 `python`，再替换成 `python -m pip ...`。
+
+## 状态与确认
+
+- Markdown frontmatter 是研究、假设和证据“当前状态”的唯一来源；正文只保存分析与历史。
+- `config/daily-watchlist-watchlist.md` 是日报执行股票池的唯一来源；`monitoring/` 只是用户看板。
+- wiki 沉淀、假设状态调整、股票池新增、研究偏好固化等需要确认的动作，先追加到 `workspace/review-queue.md`，不能只留在对话里。
+- 用户说“看看现在该做什么”时，运行 `python system/scripts/workspace_status.py`（macOS/Linux 可用 `python3`）。
 
 ## active-context：断点续传
 

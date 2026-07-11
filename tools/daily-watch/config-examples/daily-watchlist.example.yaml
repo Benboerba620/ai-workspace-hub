@@ -24,7 +24,7 @@ hypothesis_tracking:
   enabled: true
   directory: hypothesis
   max_matches: 8
-  auto_writeback: true  # false 时信号仅在日报中展示，不回写 hypothesis/ 文件
+  auto_writeback: true  # false 时只展示；true 时登记 evidence/ 并追加假设引用
   suggest_new_hypothesis_threshold: 2  # 仅 agent/skill 层使用，Python 脚本不读取
 
 focus_areas:

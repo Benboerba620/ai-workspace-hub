@@ -18,6 +18,7 @@ from workspace_paths import (
     WATCHLIST_FILE_CANDIDATES,
     resolve_config_path,
     resolve_env_path,
+    resolve_evidence_dir,
     resolve_holdings_path,
     resolve_hypothesis_config_path,
     resolve_hypothesis_dir,
@@ -100,6 +101,7 @@ def initialize_config(root: Path) -> list[Path]:
     # the returned list, which only tracks copied config files.)
     for directory in (
         resolve_hypothesis_dir(root),
+        resolve_evidence_dir(root),
         resolve_journal_dir(root),
     ):
         directory.mkdir(parents=True, exist_ok=True)
@@ -254,6 +256,13 @@ def main() -> int:
         "hypothesis/",
         hypothesis_dir.exists(),
         "" if hypothesis_dir.exists() else "运行 check_setup.py --init 创建，或手动 mkdir hypothesis",
+    )
+
+    evidence_dir = resolve_evidence_dir(root)
+    all_pass &= check(
+        "evidence/",
+        evidence_dir.exists(),
+        "" if evidence_dir.exists() else "运行 check_setup.py --init 创建，或手动 mkdir evidence",
     )
 
     journal_dir = resolve_journal_dir(root)

@@ -85,7 +85,7 @@ class HypothesisSettingsTests(unittest.TestCase):
         enabled = build_hypothesis_section(
             hypotheses, signals, {"hypothesis_tracking": {"auto_writeback": True}}
         )
-        self.assertIn("已将本地可确认信号自动回写", enabled)
+        self.assertIn("登记到 `evidence/`", enabled)
 
     def test_theme_only_signal_does_not_claim_writeback(self) -> None:
         hypotheses = [

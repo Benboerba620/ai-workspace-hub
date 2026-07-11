@@ -10,7 +10,8 @@ config/daily-watchlist-watchlist.md（股票池）
 config/daily-watchlist.yaml（配置）
   → tools/daily-watch/scripts/generate_daily_report.py
   → daily-watchlist-reports/YYYY-MM/YYYY-MM-DD.md（日报）
-  → hypothesis/H*.md（证据回写）
+  → evidence/YYYY-MM/E-*.md（证据账本）
+  → hypothesis/H*.md（只追加证据引用）
 ```
 
 ## 文件契约
@@ -20,7 +21,8 @@ config/daily-watchlist.yaml（配置）
 | 读取股票池 | `config/daily-watchlist-watchlist.md` |
 | 读取知识库 | `wiki/entities/` / `wiki/concepts/` |
 | 写入日报 | `daily-watchlist-reports/YYYY-MM/YYYY-MM-DD.md` |
-| 回写证据 | `hypothesis/H*.md` |
+| 写入证据 | `evidence/YYYY-MM/E-*.md` |
+| 引用证据 | `hypothesis/H*.md` |
 | 可选沉淀 | `wiki/explorations/` |
 
 ## workspace-config 记录
@@ -29,6 +31,8 @@ config/daily-watchlist.yaml（配置）
 ### daily-watch
 - status: enabled
 - project_path: ./tools/daily-watch
-- reads_from: config/daily-watchlist-watchlist.md, monitoring/, wiki/entities/, wiki/concepts/
-- writes_to: daily-watchlist-reports/, hypothesis/
+- reads_from: config/daily-watchlist-watchlist.md, wiki/entities/, wiki/concepts/
+- writes_to: daily-watchlist-reports/, evidence/, hypothesis/（引用）
 ```
+
+`config/daily-watchlist-watchlist.md` 是唯一执行股票池。`monitoring/` 是用户看板，不作为脚本的第二输入源。

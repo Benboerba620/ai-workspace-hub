@@ -5,6 +5,7 @@ from pathlib import Path
 CONFIG_DIRNAME = "config"
 REPORTS_DIRNAME = "daily-watchlist-reports"
 HYPOTHESIS_DIRNAME = "hypothesis"
+EVIDENCE_DIRNAME = "evidence"
 PORTFOLIO_DIRNAME = "portfolio"
 JOURNAL_DIRNAME = "journal"
 ROOT_INTEGRATION_HEADING = "## Daily Watchlist"
@@ -111,6 +112,10 @@ def resolve_template_path(workspace_root: Path) -> Path:
 
 def resolve_hypothesis_dir(workspace_root: Path) -> Path:
     return workspace_root / HYPOTHESIS_DIRNAME
+
+
+def resolve_evidence_dir(workspace_root: Path) -> Path:
+    return workspace_root / EVIDENCE_DIRNAME
 
 
 def resolve_portfolio_dir(workspace_root: Path) -> Path:

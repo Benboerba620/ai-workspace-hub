@@ -1,9 +1,17 @@
 ---
+id: {ID}
+type: hypothesis
 certainty: {INITIAL_CERTAINTY}
 status: 新建
 created: {DATE}
+updated_at: {DATE}
+last_reviewed_at:
+next_review_at:
 scope: theme
 time_horizon: {TIME_HORIZON}
+linked_research: []
+linked_entities:
+  - {TICKER_1}
 tags:
   - hypothesis
   - active
@@ -14,8 +22,7 @@ aliases:
 # {ID}: {NAME}
 
 > 创建日期：{DATE}
-> 当前确定性：{INITIAL_CERTAINTY}%
-> 状态：新建
+> 当前状态与确定性以文件顶部 frontmatter 为唯一准则；本页日志只保存历史变化。
 
 ---
 

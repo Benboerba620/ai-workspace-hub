@@ -97,10 +97,18 @@ Core Mode 显示 `READY` 即可开始使用。
 
 ```text
 首次研究引导 → 研究偏好 v0.1 → 研究结论 → 可验证假设
-      → 跟踪指标 → daily-watch 日报 → 假设复盘 → 长期知识
+      → 跟踪指标 → daily-watch 日报 → 独立证据 → 假设复盘 → 长期知识
 ```
 
 `START-HERE.md` 是安装后的用户首页。信息摄入只是输入环节；系统的主线是让研究结论进入假设，并通过日报持续验证。
+
+每份研究、假设和证据都有稳定 ID；当前状态只保存在 Markdown frontmatter。需要用户确认的 wiki 沉淀、假设调整、股票池新增和研究偏好变化会进入持久待确认队列。直接说：
+
+```text
+看看我的研究系统现在有什么需要处理。
+```
+
+Agent 会汇总进行中的研究、待复盘证据、到期假设和待确认动作，并给出下一步。
 
 ## 🧩 六大能力
 
@@ -109,7 +117,7 @@ Core Mode 显示 `READY` 即可开始使用。
 | 📚 | **wiki** | "把这篇文章整理进知识库" | `wiki/` | 不需要 |
 | 🔬 | **research** | "帮我研究一下某公司 / 某行业" | `output/research/` | 不需要 |
 | 🔍 | **screen** | "帮我筛选 AI 产业链股票" | `output/screen/` | 可选 |
-| 📊 | **daily-watch** | "生成今天的盯盘日报" | `daily-watchlist-reports/` | 可选 |
+| 📊 | **daily-watch** | "生成今天的盯盘日报" | `daily-watchlist-reports/` + `evidence/` | 可选 |
 | 🧪 | **hypothesis** | "把这个投资假设建档并追踪" | `hypothesis/` | 不需要 |
 | 🎙️ | **podcast** | "扫一下这几个播客并写进 wiki" | `wiki/sources/` + `output/pod2wiki/` | 需要 LLM key |
 
@@ -121,24 +129,25 @@ Core Mode 显示 `READY` 即可开始使用。
 
 ## 🔄 工作流程
 
-```text
-               ┌──────────────────────────────────────────────┐
-               │            AI Workspace Hub                  │
-               │                                              │
-  inbox/       │   wiki/          output/       hypothesis/   │
-  ┌─────┐      │   ┌─────┐       ┌─────────┐   ┌──────────┐  │
-  │ PDF │──────│──▸│     │──────▸│research/│   │ H1.md    │  │
-  │ 播客 │──────│──▸│知识库│──────▸│screen/  │   │ H2.md    │  │
-  │ 笔记 │──────│──▸│     │──────▸│pod2wiki/│   │ ...      │  │
-  └─────┘      │   └──┬──┘       └────┬────┘   └────┬─────┘  │
-               │      │    ◂─确认回写──┘             │        │
-               │      │    ◂──────复盘结论───────────┘        │
-               │      ▾                                       │
-               │   active-context.md  ← 断点续传，明天接着干   │
-               └──────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    IN["inbox / web"] --> KB["wiki 知识库"]
+    KB --> R["research R*"]
+    R --> H["hypothesis H*"]
+    H --> W["唯一执行股票池"]
+    W --> D["daily-watch 日报"]
+    D --> E["evidence E-*"]
+    E -->|"用户确认后复盘"| H
+    R --> Q["review-queue Q-*"]
+    H --> Q
+    Q -->|"确认后执行"| KB
+    S["workspace status"] -.-> R
+    S -.-> H
+    S -.-> E
+    S -.-> Q
 ```
 
-核心不是"文件夹长什么样"，而是：**agent 进入目录后知道先读什么、做研究时先查本地 wiki、输出时事实与推测分开、暂停时自动记录进度、明天继续时从断点接上。**
+核心不是"文件夹长什么样"，而是：**agent 进入目录后知道先读什么、做研究时先查本地 wiki、输出时事实与推测分开、证据和判断不混写、待确认动作不会随对话消失、明天继续时能从断点接上。**
 
 > 系统不在某个模型里，而在这套文件协议里。谁读懂这套协议，谁就接上你的工作流。
 
@@ -188,12 +197,13 @@ ai-workspace-hub/
 ├── SMOKE-TEST.md             # 冒烟测试
 ├── ARCHITECTURE.md           # 架构说明
 ├── TROUBLESHOOTING.md        # 故障排查
-├── workspace/                # 项目配置、断点续传、摩擦日志
+├── workspace/                # 项目配置、断点续传、待确认队列
 ├── inbox/                    # 临时输入材料
 ├── wiki/                     # personal wiki
 ├── output/                   # 研究、筛选、播客等输出
-├── monitoring/               # 股票池 / 关注列表
-├── hypothesis/               # 投资假设、证据、复盘
+├── monitoring/               # 用户阅读的监控看板
+├── hypothesis/               # 投资假设和复盘
+├── evidence/                 # 独立证据账本
 ├── daily-watchlist-reports/  # 日报输出
 ├── portfolio/                # 交易记录
 ├── config/                   # 用户配置，不入 git
@@ -224,6 +234,8 @@ ai-workspace-hub/
 
 ```bash
 python3 system/scripts/check_workspace.py          # 总检查
+python3 system/scripts/workspace_status.py         # 当前研究、证据和待办
+python3 system/scripts/review_queue.py list        # 查看持久待确认队列
 python3 -m unittest discover -s tests -v            # 运行测试
 python3 tools/daily-watch/scripts/check_setup.py --init  # 初始化日报配置
 python3 tools/podcast/scripts/fetch_podcasts.py --help   # 播客工具帮助
@@ -263,7 +275,7 @@ Python 工具需要 3.10+。**Windows 用户**用 `python` 代替 `python3`，�
 - 更强的 screen 预设
 - 更完善的 daily-watch 降级策略
 - 更好的 Obsidian 兼容说明
-- 更多 agent 入口适配
+- 证据来源质量分级和跨来源事件去重
 
 ---
 

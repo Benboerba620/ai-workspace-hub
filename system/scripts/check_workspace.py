@@ -24,11 +24,13 @@ CORE_FILES = (
     "CLAUDE.md",
     "workspace/workspace-config.md",
     "workspace/meta/active-context.md",
+    "workspace/review-queue.md",
     "wiki/_schema.md",
     "system/integrations/personal-wiki.md",
     "system/skills/first-ingest.md",
     "system/skills/research.md",
     "system/skills/screen.md",
+    "system/integrations/object-model.md",
 )
 
 # Optional sample material: useful for the first smoke run, but routinely
@@ -45,6 +47,7 @@ CORE_DIRECTORIES = (
     "output/research",
     "output/screen",
     "hypothesis",
+    "evidence",
     "workspace/meta",
 )
 

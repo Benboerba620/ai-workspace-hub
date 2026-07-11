@@ -15,6 +15,7 @@ config/*.md
 # 回收站 / 临时
 _trash/
 _tmp/
+workspace/.hub-backups/
 *.tmp
 
 # Python

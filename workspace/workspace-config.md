@@ -19,14 +19,16 @@
 | `wiki/concepts/` | 概念和主题 |
 | `wiki/explorations/` | 综合判断和阶段性结论 |
 | `output/` | 报告、日报、文章草稿等输出 |
-| `monitoring/` | 监控对象和看板 |
-| `hypothesis/` | 假设、证据、复盘 |
+| `monitoring/` | 用户阅读的监控看板，不驱动日报 |
+| `hypothesis/` | 假设、证据引用和复盘 |
+| `evidence/` | 独立证据账本，保存来源、方向和审核状态 |
 | `daily-watchlist-reports/` | 日报输出 |
 | `portfolio/` | 交易记录 |
 | `config/` | 用户配置文件（不入 git） |
 | `tools/` | 内置工具代码 |
 | `system/` | 机器零件箱 |
 | `workspace/meta/` | active-context 和 friction-log |
+| `workspace/review-queue.md` | 需要用户确认后才能生效的动作 |
 | `workspace/research-profile.md` | 从真实研究中学习的用户研究偏好 |
 
 ## 输出约定
@@ -54,6 +56,8 @@
 1. 输入材料时，先按 `wiki/_schema.md` 分类。
 2. 研究、分析、写作或输出时，先查 `workspace/meta/active-context.md` 和相关 wiki 文件；输出里保留一行 `Wiki check`。
 3. 遇到路径不清、规则不清、工具缺失或重复绕路时，写入 `workspace/meta/friction-log.md`。
+
+对象 ID、frontmatter 当前状态和待确认队列统一遵循 `system/integrations/object-model.md`。
 
 ## 内置核心
 
@@ -117,12 +121,12 @@
 - project_path: `./tools/daily-watch`
 - reads_from:
   - `config/daily-watchlist-watchlist.md`
-  - `monitoring/`
   - `wiki/entities/`
   - `wiki/concepts/`
 - writes_to:
   - `daily-watchlist-reports/`
-  - `hypothesis/`
+  - `evidence/`
+  - `hypothesis/`（只追加证据引用，不自动改变状态）
 
 ## 数据源（配了才用，没配降级不报错）
 

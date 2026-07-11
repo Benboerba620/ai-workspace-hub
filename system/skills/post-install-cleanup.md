@@ -29,7 +29,7 @@
 **判断项（问用户，不要默认删）**：
 - `wiki/concepts/ai-workspace-file-protocol.md`、`wiki/concepts/pdf-to-md-ingest.md` 是讲系统理念的概念页，可能有长期参考价值——问用户保留还是归档。**若选择保留**：这两页里链向 `wiki/sources/2026-06-05-*` / `wiki/explorations/2026-06-05-*` 等 smoke 产物的链接会随归档悬空，必须一并把链接改指 `_archive/...` 或删掉死链，别留断链。
 
-**不要动**：用户自己摄入的 wiki 页面、自己的 output、monitoring、hypothesis、active-context、friction-log、workspace-config，以及任何已部署的模块目录。
+**不要动**：用户自己摄入的 wiki 页面、自己的 output、monitoring、hypothesis、evidence、review-queue、active-context、friction-log、workspace-config，以及任何已部署的模块目录。
 
 ## 第二步：精简每次必读文件
 

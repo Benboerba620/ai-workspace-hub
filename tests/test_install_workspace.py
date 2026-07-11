@@ -42,6 +42,8 @@ class InstallWorkspaceTests(unittest.TestCase):
                 "START-HERE.md",
                 "workspace/workspace-config.md",
                 "workspace/research-profile.md",
+                "workspace/review-queue.md",
+                "evidence/README.md",
                 "wiki/_schema.md",
                 "config/daily-watchlist.yaml",
                 "config/daily-watchlist.env",
@@ -51,10 +53,14 @@ class InstallWorkspaceTests(unittest.TestCase):
                 "tools/podcast/scripts/fetch_podcasts.py",
                 "system/scripts/pdf_to_md.py",
                 "system/scripts/check_workspace.py",
+                "system/scripts/workspace_status.py",
+                "system/scripts/review_queue.py",
+                "system/scripts/upgrade_workspace.py",
                 "system/managed-files.json",
                 "system/skills/first-research.md",
                 "system/skills/research-closeout.md",
                 "system/skills/hypothesis-review.md",
+                "system/integrations/object-model.md",
                 "workspace/.hub-state.json",
             )
             for relative in required:
