@@ -87,6 +87,31 @@ class HypothesisSettingsTests(unittest.TestCase):
         )
         self.assertIn("已将本地可确认信号自动回写", enabled)
 
+    def test_theme_only_signal_does_not_claim_writeback(self) -> None:
+        hypotheses = [
+            {
+                "id": "H1",
+                "title": "主题假设",
+                "certainty": 65,
+                "status": "active",
+                "tickers": {"IFX.DE"},
+            }
+        ]
+        signals = [
+            {
+                "hypothesis_id": "H1",
+                "hypothesis_title": "主题假设",
+                "signal_type": "theme",
+                "ref": "AI 与数据中心",
+                "display": "- 命中主题",
+                "summary": "主题匹配",
+                "auto_writeback": False,
+            }
+        ]
+        section = build_hypothesis_section(hypotheses, signals, {})
+        self.assertIn("等待网页核验", section)
+        self.assertNotIn("已将本地可确认信号自动回写", section)
+
 
 class RelatedTickerExtractionTests(unittest.TestCase):
     """B3: ticker patterns in the 关联标的 table."""
@@ -102,6 +127,7 @@ class RelatedTickerExtractionTests(unittest.TestCase):
             "| 601857.SH | 核心标的 | 油气 |",
             "| 0700.HK | 核心标的 | 互联网 |",
             "| BRK.B | 对照 | 保险 |",
+            "| IFX.DE | 核心标的 | AI 电源 |",
             "| F | 对照 | 汽车 |",
             "| NVDA | 核心标的 | AI |",
             "| Apple | 公司名不该被当 ticker | 硬件 |",
@@ -114,7 +140,10 @@ class RelatedTickerExtractionTests(unittest.TestCase):
 
     def test_cn_hk_dotted_and_single_letter_tickers_are_extracted(self) -> None:
         tickers = extract_related_tickers(self.CONTENT)
-        self.assertEqual(tickers, {"601857.SH", "0700.HK", "BRK.B", "F", "NVDA"})
+        self.assertEqual(
+            tickers,
+            {"601857.SH", "0700.HK", "BRK.B", "IFX.DE", "F", "NVDA"},
+        )
 
     def test_mixed_case_words_are_not_tickers(self) -> None:
         tickers = extract_related_tickers(self.CONTENT)

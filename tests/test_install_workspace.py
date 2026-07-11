@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import io
+import json
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -38,21 +39,37 @@ class InstallWorkspaceTests(unittest.TestCase):
             required = (
                 "AGENTS.md",
                 "CLAUDE.md",
+                "START-HERE.md",
                 "workspace/workspace-config.md",
+                "workspace/research-profile.md",
                 "wiki/_schema.md",
                 "config/daily-watchlist.yaml",
                 "config/daily-watchlist.env",
                 "config/pod2wiki.config.yaml",
+                "requirements.lock",
                 "tools/daily-watch/scripts/check_setup.py",
                 "tools/podcast/scripts/fetch_podcasts.py",
                 "system/scripts/pdf_to_md.py",
                 "system/scripts/check_workspace.py",
+                "system/managed-files.json",
+                "system/skills/first-research.md",
+                "system/skills/research-closeout.md",
+                "system/skills/hypothesis-review.md",
+                "workspace/.hub-state.json",
             )
             for relative in required:
                 self.assertTrue((target / relative).is_file(), relative)
             config = (target / "workspace/workspace-config.md").read_text(encoding="utf-8")
             self.assertIn("name: `SANDBOX`", config)
             self.assertIn("primary_use: `investing`", config)
+            state = json.loads(
+                (target / "workspace/.hub-state.json").read_text(encoding="utf-8")
+            )
+            manifest = json.loads(
+                (target / "system/managed-files.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(state["installed_version"], manifest["hub_version"])
+            self.assertEqual(state["install_mode"], "fresh")
             leaked = [
                 path.relative_to(target).as_posix()
                 for path in target.rglob("*")
@@ -87,6 +104,10 @@ class InstallWorkspaceTests(unittest.TestCase):
                 wiki_root="./wiki",
             )
             self.assertEqual(existing.read_text(encoding="utf-8"), "keep me")
+            state = json.loads(
+                (target / "workspace/.hub-state.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(state["install_mode"], "merge")
 
 
 if __name__ == "__main__":

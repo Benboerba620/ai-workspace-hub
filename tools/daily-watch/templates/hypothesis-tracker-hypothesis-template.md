@@ -2,6 +2,8 @@
 certainty: {INITIAL_CERTAINTY}
 status: 新建
 created: {DATE}
+scope: theme
+time_horizon: {TIME_HORIZON}
 tags:
   - hypothesis
   - active
@@ -40,9 +42,11 @@ aliases:
 
 ## 关联标的
 
-| 公司 | 角色 | 主题 |
-|------|------|------|
-| {TICKER_1} | 核心标的 | {THEME} |
+> 公司是主题假设的受益映射和验证载体，不是主题假设本身。
+
+| Ticker | 公司 | 角色 | 与主题的关系 | 公司特有风险 |
+|------|------|------|------|------|
+| {TICKER_1} | {COMPANY_1} | 核心标的 | {THEME_LINK_1} | {COMPANY_RISK_1} |
 
 ---
 

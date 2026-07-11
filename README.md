@@ -39,7 +39,7 @@ https://raw.githubusercontent.com/Benboerba620/ai-workspace-hub/main/INSTALL-FOR
 抓不到协议全文就先 git clone 本仓库，再读其中的 INSTALL-FOR-AI.md 逐字执行。
 ```
 
-Agent 会问你 3 个问题，然后自动创建完整工作区。装好后，对它说：
+Agent 会问你 3 个问题，然后自动创建完整工作区。装好后，先用样例确认安装：
 
 ```text
 把 inbox/first-note.md 整理进 personal wiki。
@@ -48,6 +48,15 @@ Agent 会问你 3 个问题，然后自动创建完整工作区。装好后，�
 预期：agent 读 `AGENTS.md` → 按 `wiki/_schema.md` 整理 → 写入 `wiki/sources/` → 在 `active-context.md` 记录进度。
 
 **不需要 API key，不需要联网，不需要写任何代码。**
+
+样例通过后，开始第一份真实股票研究：
+
+```text
+研究一家公司，同时帮我建立第一版研究偏好。
+公司是：____；我现在关注它是因为：____。
+```
+
+这次会同时产出研究报告、研究偏好 v0.1、可验证假设和后续跟踪指标。以后研究其他公司会复用并继续校准这套方法，而不是每次从空白开始。
 
 <details>
 <summary>还没有 AI agent？先花 2 分钟装一个</summary>
@@ -83,6 +92,15 @@ Core Mode 显示 `READY` 即可开始使用。
 </details>
 
 ---
+
+## 📈 股票研究主流程
+
+```text
+首次研究引导 → 研究偏好 v0.1 → 研究结论 → 可验证假设
+      → 跟踪指标 → daily-watch 日报 → 假设复盘 → 长期知识
+```
+
+`START-HERE.md` 是安装后的用户首页。信息摄入只是输入环节；系统的主线是让研究结论进入假设，并通过日报持续验证。
 
 ## 🧩 六大能力
 

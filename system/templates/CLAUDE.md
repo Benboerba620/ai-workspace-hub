@@ -22,12 +22,14 @@
 | 开始工作 | `workspace/workspace-config.md` | 按任务决定 |
 | 继续上下文 | `workspace/meta/active-context.md` | `workspace/meta/active-context.md` |
 | 摄入材料 | `wiki/_schema.md` + `system/integrations/personal-wiki.md`；笔记走 `system/skills/first-ingest.md`，PDF 走 `system/skills/pdf-ingest.md` | `wiki/` |
-| 研究主题 | `system/skills/research.md` + `wiki/` + websearch | `output/research/` → 确认后回写 `wiki/explorations/` |
+| 首次股票研究 | `system/skills/first-research.md` + `workspace/research-profile.md` | `output/research/` + 研究偏好 v0.1 |
+| 后续研究 | `workspace/research-profile.md` + `system/skills/research.md`；结束走 `system/skills/research-closeout.md` | `output/research/` → 知识与假设分流 |
 | 快速筛选 | `system/skills/screen.md` | `output/screen/` |
 | 播客摄入 | `system/skills/podcast.md` | `wiki/sources/` + `wiki/raw/podcasts/` + `output/pod2wiki/` |
 | 日报监控 | `system/skills/daily-watch.md`（接线细节见 `system/integrations/daily-watchlist.md`） | `daily-watchlist-reports/` + `hypothesis/` |
 | 管理股票池 | `system/skills/daily-watch-import.md` | `config/daily-watchlist-watchlist.md` |
 | 假设操作 | `system/skills/daily-watch-ht.md` | `hypothesis/` + `portfolio/` |
+| 假设复盘 | `system/skills/hypothesis-review.md` + 相关研究和日报 | `hypothesis/` → 确认后更新 `wiki/explorations/` |
 | 生成输出 | `workspace/meta/active-context.md` + 相关 wiki 文件 | `output/` |
 | 遇到摩擦 | 相关文件 | `workspace/meta/friction-log.md` |
 

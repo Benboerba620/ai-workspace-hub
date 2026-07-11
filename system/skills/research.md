@@ -4,6 +4,8 @@
 > 外挂数据源（tushare / gangtise / 自有 API）是**可选数据源**，配了就用，没配就跳过并标注 `[待验证]`，绝不编造数字。
 > 目标是形成闭环：**查已有 → 补外部 → 按要点输出 → 讨论升级 → 确认后回写 wiki**。
 
+开始前读取 `workspace/research-profile.md`。若版本为“未建立”，改走 `system/skills/first-research.md`；已有偏好则用于调整关注要点和表达，不机械套模板。研究结束统一走 `system/skills/research-closeout.md`。
+
 ## 触发词
 
 用户说"研究 X" / "research X" / "帮我研究 / 分析一下 {主题}" / "深挖 {公司 / 行业 / 问题}"。

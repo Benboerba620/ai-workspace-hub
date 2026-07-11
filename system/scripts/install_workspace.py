@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -29,15 +30,19 @@ DIRECTORIES = (
 )
 
 FILE_MAPPINGS = (
+    ("START-HERE.md", "START-HERE.md"),
     ("system/templates/AGENTS.md", "AGENTS.md"),
     ("system/templates/CLAUDE.md", "CLAUDE.md"),
     ("system/templates/workspace-config.md", "workspace/workspace-config.md"),
     ("system/templates/active-context.md", "workspace/meta/active-context.md"),
     ("system/templates/friction-log.md", "workspace/meta/friction-log.md"),
+    ("system/templates/research-profile.md", "workspace/research-profile.md"),
     ("system/templates/interfaces-README.md", "system/interfaces/README.md"),
     ("wiki/_schema.md", "wiki/_schema.md"),
     ("requirements.txt", "requirements.txt"),
+    ("requirements.lock", "requirements.lock"),
     ("requirements-pdf.txt", "requirements-pdf.txt"),
+    ("system/managed-files.json", "system/managed-files.json"),
     (".gitignore", ".gitignore"),
     ("LICENSE", "LICENSE"),
     ("inbox/first-note.md", "inbox/first-note.md"),
@@ -134,6 +139,30 @@ def customize_workspace_config(
     config_path.write_text(text, encoding="utf-8")
 
 
+def read_hub_version(source_root: Path) -> str:
+    manifest_path = source_root / "system" / "managed-files.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    version = manifest.get("hub_version")
+    if not isinstance(version, str) or not version.strip():
+        raise ValueError(f"Invalid hub_version in {manifest_path}")
+    return version
+
+
+def write_hub_state(target_root: Path, version: str, merge: bool) -> str:
+    state_path = target_root / "workspace" / ".hub-state.json"
+    if state_path.exists():
+        return "skipped"
+    state = {
+        "schema_version": 1,
+        "installed_version": version,
+        "install_mode": "merge" if merge else "fresh",
+    }
+    state_path.write_text(
+        json.dumps(state, ensure_ascii=True, indent=2) + "\n", encoding="utf-8"
+    )
+    return "created"
+
+
 def install(
     source_root: Path,
     target_root: Path,
@@ -149,6 +178,7 @@ def install(
         raise ValueError("Source and target workspace must be different directories")
     if not (source_root / "INSTALL-FOR-AI.md").is_file():
         raise FileNotFoundError(f"Invalid AI Workspace Hub source: {source_root}")
+    hub_version = read_hub_version(source_root)
 
     if target_root.exists() and not target_root.is_dir():
         raise ValueError(f"Target exists but is not a directory: {target_root}")
@@ -180,6 +210,9 @@ def install(
     workspace_config = target_root / "workspace/workspace-config.md"
     if workspace_config_created:
         customize_workspace_config(workspace_config, name, primary_use, wiki_root)
+    state_result = write_hub_state(target_root, hub_version, merge)
+    created += state_result == "created"
+    skipped += state_result == "skipped"
     return created, skipped
 
 
@@ -193,7 +226,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="AI Workspace Hub source checkout",
     )
     parser.add_argument("--name", default="MY_AI_WORKSPACE")
-    parser.add_argument("--primary-use", default="mixed")
+    parser.add_argument("--primary-use", default="investing")
     parser.add_argument("--wiki-root", default="./wiki")
     parser.add_argument(
         "--merge",

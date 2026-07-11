@@ -35,6 +35,8 @@ Agent 首次使用时检查上述条件，缺什么补什么。
 5. Agent 扫描 `hypothesis/H*.md`，把当日发现关联到相关假设
 6. 最终报告写入，更新 `workspace/meta/active-context.md`
 
+日报默认只处理上一份日报之后的新证据，避免重复堆积；这仍是现有 `daily-watch`，不是新的日报类型。日报不自动改变假设确定性或状态。命中证伪条件、关键催化剂、财报或连续多条同方向证据时，提示按 `system/skills/hypothesis-review.md` 启动复盘。
+
 ## 数据源优先级
 
 | 优先级 | 数据源 | 市场 | env key | 费用 | 获取 |

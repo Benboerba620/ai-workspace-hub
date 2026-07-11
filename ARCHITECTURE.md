@@ -164,4 +164,18 @@ podcast ──► wiki ──► daily-watch ──► output/ ──► hypothe
 
 基座保证 `inbox → wiki → output + research`。其余能力按配置渐进亮灯。
 
+---
+
+## 文件归属与升级边界
+
+Hub 用 `system/managed-files.json` 记录三类文件，安装时在
+`workspace/.hub-state.json` 记录来源版本和安装方式。这是未来做升级预览与迁移的基础，
+当前版本仍不会自动覆盖任何已有文件。
+
+| 类型 | 典型路径 | 未来升级规则 |
+|------|----------|--------------|
+| Hub 管理 | `system/`、`tools/`、依赖清单 | 展示差异后可以更新 |
+| 用户所有 | `wiki/`、`config/`、`output/`、`hypothesis/`、`portfolio/` 等 | 永不自动覆盖 |
+| 混合文件 | Agent 入口、`wiki/_schema.md`、`workspace/workspace-config.md` | 保留本地修改，只提示合并 |
+
 <!-- 文件说明：系统架构、能力分层和目录关系说明。 -->

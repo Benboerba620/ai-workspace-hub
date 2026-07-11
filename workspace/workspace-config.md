@@ -27,6 +27,7 @@
 | `tools/` | 内置工具代码 |
 | `system/` | 机器零件箱 |
 | `workspace/meta/` | active-context 和 friction-log |
+| `workspace/research-profile.md` | 从真实研究中学习的用户研究偏好 |
 
 ## 输出约定
 
@@ -73,6 +74,7 @@
 
 - status: `enabled`（基座能力，wiki + websearch 零依赖起步）
 - skill: `system/skills/research.md`
+- profile: `workspace/research-profile.md`（首次研究生成 v0.1，至少 3 次后再固化模板）
 - inputs: `wiki/` + `websearch` + `data_sources`（可选）
 - writes_to: `output/research/` → 确认后回写 `wiki/explorations/`
 - focus_points: 默认 `业务/驱动因子, 竞争格局, 关键数据, 风险, 催化剂`（按需自定义）

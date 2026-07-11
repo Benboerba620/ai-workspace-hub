@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "hub_version": "0.5.0",
+  "ownership": {
+    "managed": [
+      "system/**",
+      "tools/**",
+      "workspace/.hub-state.json",
+      "START-HERE.md",
+      "requirements.txt",
+      "requirements.lock",
+      "requirements-pdf.txt"
+    ],
+    "user_owned": [
+      "config/**",
+      "daily-watchlist-reports/**",
+      "hypothesis/**",
+      "inbox/**",
+      "monitoring/**",
+      "output/**",
+      "portfolio/**",
+      "wiki/concepts/**",
+      "wiki/entities/**",
+      "wiki/explorations/**",
+      "wiki/raw/**",
+      "wiki/sources/**",
+      "workspace/meta/**"
+    ],
+    "mixed": [
+      ".gitignore",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "wiki/_schema.md",
+      "workspace/research-profile.md",
+      "workspace/workspace-config.md"
+    ]
+  },
+  "upgrade_policy": {
+    "managed": "Hub upgrades may replace these files after showing a diff.",
+    "user_owned": "Hub upgrades must never overwrite these files.",
+    "mixed": "Hub upgrades must preserve local changes and require an explicit merge."
+  }
+}

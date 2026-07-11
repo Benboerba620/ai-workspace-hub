@@ -571,8 +571,11 @@ def build_hypothesis_section(
     signals: list[dict[str, Any]],
     config: dict[str, Any],
 ) -> str:
+    enabled, auto_writeback = hypothesis_settings(config)
     hypothesis_config = config.get("hypothesis_tracking") or {}
-    if not hypothesis_config.get("enabled", True):
+    if not isinstance(hypothesis_config, dict):
+        hypothesis_config = {}
+    if not enabled:
         return "### 模块关闭\n\n- `hypothesis_tracking.enabled` 已关闭。"
 
     if not hypotheses:
@@ -608,12 +611,13 @@ def build_hypothesis_section(
     lines.append("### 操作建议")
     lines.append("")
     if signals:
-        if hypothesis_config.get("auto_writeback", True):
+        writeback_signals = [signal for signal in signals if signal.get("auto_writeback")]
+        if auto_writeback and writeback_signals:
             lines.append("- 已将本地可确认信号自动回写到对应 `hypothesis/H*.md`。")
+        elif auto_writeback:
+            lines.append("- 当前只有主题匹配，等待网页核验后再决定是否写入假设证据。")
         else:
-            lines.append(
-                "- `auto_writeback` 已关闭：以上信号仅在日报中展示，未回写假设文件。"
-            )
+            lines.append("- `auto_writeback` 已关闭，本次信号仅展示，不回写假设文件。")
         lines.append("- 如需整体回看当前假设状态，运行 `/ht-status`。")
     else:
         lines.append(
