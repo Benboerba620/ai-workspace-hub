@@ -203,6 +203,9 @@ class UpgradeWorkspaceTests(unittest.TestCase):
             (source / "system/templates/queue.md").write_text(
                 "empty queue", encoding="utf-8"
             )
+            (source / "system/templates/profile.md").write_text(
+                "empty profile", encoding="utf-8"
+            )
             manifest = {
                 "hub_version": "9.9.9",
                 "ownership": {"managed": [], "user_owned": [], "mixed": []},
@@ -212,21 +215,29 @@ class UpgradeWorkspaceTests(unittest.TestCase):
                         {
                             "source": "system/templates/queue.md",
                             "target": "workspace/review-queue.md",
+                        },
+                        {
+                            "source": "system/templates/profile.md",
+                            "target": "workspace/research-profile.md",
                         }
                     ],
                 },
             }
             changes = UPGRADE.compare(source, target, manifest)
             applied, _ = UPGRADE.apply_managed(source, target, manifest, changes)
-            self.assertEqual(applied, 2)
+            self.assertEqual(applied, 3)
             self.assertTrue((target / "evidence").is_dir())
             queue = target / "workspace/review-queue.md"
             self.assertEqual(queue.read_text(encoding="utf-8"), "empty queue")
+            profile = target / "workspace/research-profile.md"
+            self.assertEqual(profile.read_text(encoding="utf-8"), "empty profile")
 
             queue.write_text("user content", encoding="utf-8")
+            profile.write_text("user profile", encoding="utf-8")
             changes = UPGRADE.compare(source, target, manifest)
             UPGRADE.apply_managed(source, target, manifest, changes)
             self.assertEqual(queue.read_text(encoding="utf-8"), "user content")
+            self.assertEqual(profile.read_text(encoding="utf-8"), "user profile")
 
 
 if __name__ == "__main__":

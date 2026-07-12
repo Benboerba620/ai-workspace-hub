@@ -54,6 +54,10 @@
       {
         "source": "system/templates/review-queue.md",
         "target": "workspace/review-queue.md"
+      },
+      {
+        "source": "system/templates/research-profile.md",
+        "target": "workspace/research-profile.md"
       }
     ]
   }
