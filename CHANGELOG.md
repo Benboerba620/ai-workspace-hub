@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### 新增
+
+- 新增分层知识编译链：`source -> exploration -> pattern -> rule`，被证伪且可能重复出现的直觉进入 `false-beliefs.md`。
+- 新增 exploration 和 pattern 两个短索引。研究开始先读索引，按结构特征命中后才加载页面全文。
+- 新增 `knowledge-lifecycle.md`，定义 exploration 验证、pattern 归因、跨案例晋级和用户确认边界。
+
+### 改进
+
+- 安装器、安全升级清单和 Core Mode 检查器接入新索引与空白模板，旧工作区只补缺失文件、不覆盖用户知识。
+
 ## 0.6.0 - 2026-07-11
 
 ### 新增

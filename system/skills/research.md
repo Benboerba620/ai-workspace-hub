@@ -23,11 +23,12 @@
 
 按顺序，能在前一层解决就不必往后：
 
-1. **wiki/（本地，最先查）**：检索 `wiki/sources/`、`wiki/entities/`、`wiki/concepts/`、`wiki/explorations/` 里已有的相关页面。
+1. **知识路由索引（小文件，先全文读）**：读 `wiki/explorations/_index.md` 和 `workspace/patterns/_index.md`，用产业链位置、周期阶段、约束类型、催化类型和决策场景做结构匹配。命中后才读对应全文；没命中就继续，不强套类比。详见 `system/skills/knowledge-lifecycle.md`。
+2. **wiki/（本地，最先查）**：检索 `wiki/sources/`、`wiki/entities/`、`wiki/concepts/`、`wiki/explorations/` 里已有的相关页面。
    - **矛盾扫描**：发现新材料与 wiki 已有结论冲突，直接指出"与 `{文件}` 不一致：`{具体矛盾}`"——补盲点，不是证错。
    - 避免重复研究：已有 exploration 覆盖的，先读它再决定要不要更新。
-2. **websearch（联网补充）**：wiki 不够时联网。每条结论标来源；抓不到全文就走 `WebFetch` / 代理，全失败标注"待人工搜索"。
-3. **可选数据源（用户自有 API）**：如 tushare（A股行情财务）、gangtise（卖方纪要）或用户自己的 API。
+3. **websearch（联网补充）**：wiki 不够时联网。每条结论标来源；抓不到全文就走 `WebFetch` / 代理，全失败标注"待人工搜索"。
+4. **可选数据源（用户自有 API）**：如 tushare（A股行情财务）、gangtise（卖方纪要）或用户自己的 API。
    - 这些是**可选数据源**，照 `system/integrations/_template.md` 接入，在 `workspace/workspace-config.md` 的 `data_sources:` 段登记 endpoint / 取数方式（key 走环境变量，不写进 repo）。
    - **没配置就跳过**，把需要它的数字标 `[待验证]` 并说明"需 {数据源} 补"，**不要编造**。
 

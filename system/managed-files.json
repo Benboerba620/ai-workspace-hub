@@ -25,6 +25,9 @@
       "wiki/explorations/**",
       "wiki/raw/**",
       "wiki/sources/**",
+      "wiki/rules.md",
+      "wiki/false-beliefs.md",
+      "workspace/patterns/**",
       "workspace/meta/**",
       "workspace/review-queue.md"
     ],
@@ -44,7 +47,8 @@
   },
   "migrations": {
     "additive_directories": [
-      "evidence"
+      "evidence",
+      "workspace/patterns"
     ],
     "additive_files": [
       {
@@ -58,6 +62,26 @@
       {
         "source": "system/templates/research-profile.md",
         "target": "workspace/research-profile.md"
+      },
+      {
+        "source": "wiki/explorations/_index.md",
+        "target": "wiki/explorations/_index.md"
+      },
+      {
+        "source": "workspace/patterns/_index.md",
+        "target": "workspace/patterns/_index.md"
+      },
+      {
+        "source": "workspace/patterns/_template.md",
+        "target": "workspace/patterns/_template.md"
+      },
+      {
+        "source": "wiki/rules.md",
+        "target": "wiki/rules.md"
+      },
+      {
+        "source": "wiki/false-beliefs.md",
+        "target": "wiki/false-beliefs.md"
       }
     ]
   }

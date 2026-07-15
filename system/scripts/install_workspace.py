@@ -12,6 +12,7 @@ from pathlib import Path
 
 DIRECTORIES = (
     "workspace/meta",
+    "workspace/patterns",
     "wiki/raw",
     "wiki/sources",
     "wiki/entities",
@@ -41,6 +42,11 @@ FILE_MAPPINGS = (
     ("system/templates/review-queue.md", "workspace/review-queue.md"),
     ("system/templates/interfaces-README.md", "system/interfaces/README.md"),
     ("wiki/_schema.md", "wiki/_schema.md"),
+    ("wiki/explorations/_index.md", "wiki/explorations/_index.md"),
+    ("wiki/rules.md", "wiki/rules.md"),
+    ("wiki/false-beliefs.md", "wiki/false-beliefs.md"),
+    ("workspace/patterns/_index.md", "workspace/patterns/_index.md"),
+    ("workspace/patterns/_template.md", "workspace/patterns/_template.md"),
     ("evidence/README.md", "evidence/README.md"),
     ("requirements.txt", "requirements.txt"),
     ("requirements.lock", "requirements.lock"),

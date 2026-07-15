@@ -138,6 +138,7 @@ ai-workspace-hub/
 │   ├── workspace-config.md         # 项目配置
 │   ├── research-profile.md         # 从真实研究校准的方法偏好
 │   ├── review-queue.md             # 待用户确认的动作
+│   ├── patterns/                   # 跨案例模式卡 + 短索引
 │   └── meta/
 │       ├── active-context.md       # 工作记忆
 │       └── friction-log.md         # 摩擦日志
@@ -145,6 +146,7 @@ ai-workspace-hub/
 ├── wiki/                           # 知识库
 │   ├── _schema.md
 │   ├── raw/ / sources/ / entities/ / concepts/ / explorations/
+│   └── rules.md / false-beliefs.md # 已确认规则 / 已证伪信念
 │
 ├── inbox/                          # 输入
 ├── output/                         # 输出（research/ screen/ pod2wiki/ 等子目录）
@@ -176,6 +178,17 @@ research ──► hypothesis ──► watchlist ──► daily-watch ──�
 ```
 
 基座保证 `inbox → wiki → output + research`。其余能力按配置渐进亮灯。
+
+## 知识编译层
+
+```text
+raw → source → entity/concept → exploration → pattern → rule
+                                             └→ false belief（被证伪且易复发）
+```
+
+`wiki/explorations/_index.md` 与 `workspace/patterns/_index.md` 是小型加载路由。Agent 研究开始时全文读索引，再用产业链位置、周期阶段、约束类型和催化类型等结构特征选择全文。详细证据不进索引，避免 wiki 越大、每次上下文越重。
+
+exploration 验证、pattern 新建/合并、rule 晋级都先进 `workspace/review-queue.md`。Pattern 只统计主归因案例，跨案例主归因确认至少 3 次才建议晋级 rule。
 
 ---
 

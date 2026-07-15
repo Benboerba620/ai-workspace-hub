@@ -26,6 +26,10 @@ CORE_FILES = (
     "workspace/meta/active-context.md",
     "workspace/research-profile.md",
     "workspace/review-queue.md",
+    "workspace/patterns/_index.md",
+    "wiki/explorations/_index.md",
+    "wiki/rules.md",
+    "wiki/false-beliefs.md",
     "wiki/_schema.md",
     "system/integrations/personal-wiki.md",
     "system/skills/first-ingest.md",
@@ -50,6 +54,7 @@ CORE_DIRECTORIES = (
     "hypothesis",
     "evidence",
     "workspace/meta",
+    "workspace/patterns",
 )
 
 ENV_FILES = (

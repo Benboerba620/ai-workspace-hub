@@ -10,6 +10,7 @@
 4. 可复用主题、框架、概念写 `concepts/`。
 5. 任务产物先写 `output/`；只有长期有用的判断才回写 wiki。
 6. 事实、推测、待验证必须分开。
+7. 索引是加载路由，不是缩短版报告；详细证据保留在页面正文。
 
 ## 分类决策树
 
@@ -72,6 +73,8 @@ status: processed
 tags: []
 ---
 ```
+
+新建或审核 exploration 后同步 `wiki/explorations/_index.md`。`status` 使用 `tentative / validated / invalidated / promoted`。只有通过跨案例审查的可迁移机制才进入 `workspace/patterns/`，详见 `system/skills/knowledge-lifecycle.md`。
 
 ### `wiki/entities/`
 
@@ -181,4 +184,3 @@ tags: []
 4. 如有阶段性判断，写 `wiki/explorations/`
 5. 一份 `output/` 测试报告
 6. 更新 `workspace/meta/active-context.md`
-

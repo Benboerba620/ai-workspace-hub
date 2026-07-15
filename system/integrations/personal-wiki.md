@@ -32,6 +32,14 @@ inbox / pod2wiki / manual notes
   -> wiki/explorations/
 ```
 
+## 知识编译与加载
+
+- `wiki/explorations/_index.md` 保留阶段判断的短索引。
+- `workspace/patterns/_index.md` 保留跨案例模式的短索引。
+- 研究开始只常驻读这两个索引，再按结构特征选择全文，避免 wiki 增长后全量加载。
+- 提炼链路为 `source -> exploration -> pattern -> rule`；被证伪且可能重复出现的直觉记入 `wiki/false-beliefs.md`。
+- 完整的验证、归因和晋级规则见 `system/skills/knowledge-lifecycle.md`。
+
 ## 目录职责
 
 | 目录 | 职责 |

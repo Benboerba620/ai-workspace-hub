@@ -28,6 +28,7 @@
 | `tools/` | 内置工具代码 |
 | `system/` | 机器零件箱 |
 | `workspace/meta/` | active-context 和 friction-log |
+| `workspace/patterns/` | 跨案例可迁移模式，用短索引按结构特征加载 |
 | `workspace/review-queue.md` | 需要用户确认后才能生效的动作 |
 | `workspace/research-profile.md` | 从真实研究中学习的用户研究偏好 |
 
@@ -54,7 +55,7 @@
 ## 简单规则
 
 1. 输入材料时，先按 `wiki/_schema.md` 分类。
-2. 研究、分析、写作或输出时，先查 `workspace/meta/active-context.md` 和相关 wiki 文件；输出里保留一行 `Wiki check`。
+2. 研究、分析、写作或输出时，先查 `workspace/meta/active-context.md`、`wiki/explorations/_index.md`、`workspace/patterns/_index.md` 和相关 wiki 文件；输出里保留一行 `Wiki check`。
 3. 遇到路径不清、规则不清、工具缺失或重复绕路时，写入 `workspace/meta/friction-log.md`。
 
 对象 ID、frontmatter 当前状态和待确认队列统一遵循 `system/integrations/object-model.md`。
@@ -73,6 +74,10 @@
   - `wiki/entities/`
   - `wiki/concepts/`
   - `wiki/explorations/`
+- loading_indexes:
+  - `wiki/explorations/_index.md`
+  - `workspace/patterns/_index.md`
+- distillation: `source -> exploration -> pattern -> rule`
 
 ### research（研究闭环）
 
