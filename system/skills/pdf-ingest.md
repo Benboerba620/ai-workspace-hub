@@ -35,8 +35,10 @@ agent 第一次执行本能力时，先确认依赖，没有就自己装，不�
    - 若报 "No extractable text" → 大概率是扫描件/图片 PDF，走"适用边界"的兜底。
 4. 把生成的 Markdown 当作输入材料，按 `wiki/_schema.md` 分类。
 5. 原 PDF 保留在 `wiki/raw/` 或 `inbox/`；结构化摘要写入 `wiki/sources/`。
-6. 生成一份任务报告到 `output/`。
-7. 更新 `workspace/meta/active-context.md`，记录本次摄入。
+6. 摘要页写好后，按 `system/skills/first-ingest.md` 调用 `system/scripts/wiki_tagger.py tag ... --apply`，补齐统一结构化标签；API 失败要写进任务报告，不编造标签。
+7. 根据 `ticker / concepts / related` 建立或更新对应 entity / concept 页面；新页面也调用同一个打标器补空字段。
+8. 生成一份任务报告到 `output/`。
+9. 更新 `workspace/meta/active-context.md`，记录本次摄入。
 
 ## 自检冒烟
 

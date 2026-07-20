@@ -11,13 +11,14 @@
    - 公司长期事实档案 -> `wiki/entities/`
    - 可复用概念或框架 -> `wiki/concepts/`
    - 跨来源阶段性判断 -> `wiki/explorations/`
-   - 新建或更新 exploration 时，同步 `wiki/explorations/_index.md` 的一行路由摘要。
+   - 新建或更新 exploration 时补齐生命周期字段，并运行 `knowledge_lifecycle.py rebuild-index --apply` 重建三类短索引。
+   - 新建 wiki 页面后，调用 `system/scripts/wiki_tagger.py tag ... --apply` 补齐统一结构化标签；API 失败写入收口回执，不编造或静默跳过。
 4. 筛选投资假设。只有同时满足“影响决策、可验证/证伪、有时间范围”才进入 `hypothesis/`。默认把共同驱动抽象为自上而下的主题假设，公司作为受益映射；不要把同一产业逻辑复制成多个公司假设。
 5. 每条假设必须包含：核心逻辑、当前确定性、时间范围、支持与反方证据、跟踪指标、催化剂、证伪条件、关联标的、来源研究报告。
 6. 将关联标的加入股票池前先征得用户确认；日报只跟踪已确认对象。
 7. 所有尚未当场执行的确认项写入 `workspace/review-queue.md`：wiki 沉淀、假设建立/调整、股票池新增、研究偏好固化。确认后执行并把状态改为 `done`。
 8. 更新 `workspace/meta/active-context.md`，写清下一次复盘触发条件。
-9. 若本次产生可迁移结构，只记为待复盘的 exploration；不在单次研究中直接晋级成 rule。后续按 `system/skills/knowledge-lifecycle.md` 做跨案例验证和归因。
+9. 若本次产生可迁移结构，只记为待复盘的 exploration；不在单次研究中直接晋级成 rule。后续按 `system/skills/knowledge-lifecycle.md` 做跨案例验证、归因、升降级和调用复盘。
 
 ## 统一回执
 

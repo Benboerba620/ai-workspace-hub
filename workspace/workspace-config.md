@@ -28,7 +28,8 @@
 | `tools/` | 内置工具代码 |
 | `system/` | 机器零件箱 |
 | `workspace/meta/` | active-context 和 friction-log |
-| `workspace/patterns/` | 跨案例可迁移模式，用短索引按结构特征加载 |
+| `wiki/patterns/` | 跨案例可迁移模式卡；按召回信号选择性加载 |
+| `wiki/rules/` | 已达到独立验证门槛的决策规则；按适用范围调用 |
 | `workspace/review-queue.md` | 需要用户确认后才能生效的动作 |
 | `workspace/research-profile.md` | 从真实研究中学习的用户研究偏好 |
 
@@ -55,7 +56,7 @@
 ## 简单规则
 
 1. 输入材料时，先按 `wiki/_schema.md` 分类。
-2. 研究、分析、写作或输出时，先查 `workspace/meta/active-context.md`、`wiki/explorations/_index.md`、`workspace/patterns/_index.md` 和相关 wiki 文件；输出里保留一行 `Wiki check`。
+2. 研究、分析、写作或输出时，先查 `workspace/meta/active-context.md`，再用 `knowledge_lifecycle.py load --context ...` 选择性加载 `rule / pattern / exploration`；输出里保留一行 `Wiki check`。
 3. 遇到路径不清、规则不清、工具缺失或重复绕路时，写入 `workspace/meta/friction-log.md`。
 
 对象 ID、frontmatter 当前状态和待确认队列统一遵循 `system/integrations/object-model.md`。
@@ -74,10 +75,21 @@
   - `wiki/entities/`
   - `wiki/concepts/`
   - `wiki/explorations/`
+  - `wiki/patterns/`
+  - `wiki/rules/`
 - loading_indexes:
   - `wiki/explorations/_index.md`
-  - `workspace/patterns/_index.md`
+  - `wiki/patterns/_index.md`
+  - `wiki/rules/_index.md`
 - distillation: `source -> exploration -> pattern -> rule`
+- lifecycle_script: `system/scripts/knowledge_lifecycle.py`
+- usage_log: `workspace/knowledge-usage.jsonl`
+- auto_tagging:
+  - script: `system/scripts/wiki_tagger.py`
+  - env: `config/pod2wiki.env`
+  - fields: `domain / ticker / concepts / related / entity_salience / tags`
+  - policy: `只补空字段；单文件摄入自动写入；历史 backfill 默认预览`
+  - cache: `workspace/cache/wiki_tagger.json（预览与 apply 复用，不保存正文或 key）`
 
 ### research（研究闭环）
 

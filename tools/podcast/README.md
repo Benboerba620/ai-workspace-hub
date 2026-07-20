@@ -2,6 +2,8 @@
 
 播客和博客摄入工具。把 YouTube/RSS/博客转成双语摘要，写入 personal wiki。
 
+写入 Hub wiki 时默认调用 `system/scripts/wiki_tagger.py`，补齐统一结构化标签；需要保留摘要但跳过标签时加 `--no-auto-tag`。
+
 原始项目：[pod2wiki](https://github.com/Benboerba620/pod2wiki)
 
 ## 快速使用

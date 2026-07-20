@@ -139,6 +139,52 @@ def collect_status(root: Path) -> dict[str, Any]:
                 }
             )
 
+    knowledge_counts: dict[str, dict[str, int]] = {}
+    overdue_knowledge_reviews: list[dict[str, str]] = []
+    knowledge_promotion_candidates: list[dict[str, str]] = []
+    knowledge_locations = {
+        "exploration": (root / "wiki/explorations",),
+        "pattern": (root / "wiki/patterns", root / "workspace/patterns"),
+        "rule": (root / "wiki/rules",),
+    }
+    for knowledge_type, folders in knowledge_locations.items():
+        for folder in folders:
+            if not folder.is_dir():
+                continue
+            for path in sorted(folder.glob("*.md")):
+                if path.name.startswith("_") or path.name.lower() == "readme.md":
+                    continue
+                meta = parse_frontmatter(path)
+                status = str(meta.get("status") or "missing")
+                knowledge_counts.setdefault(knowledge_type, {})[status] = (
+                    knowledge_counts.setdefault(knowledge_type, {}).get(status, 0) + 1
+                )
+                item_id = str(meta.get("id") or path.stem)
+                if is_overdue(meta.get("review_due")):
+                    overdue_knowledge_reviews.append(
+                        {"id": item_id, "type": knowledge_type, "path": relative(path, root)}
+                    )
+                confirmations = meta.get(
+                    "primary_confirmations"
+                    if knowledge_type == "pattern"
+                    else "independent_confirmations"
+                )
+                try:
+                    confirmation_count = int(confirmations or 0)
+                except (TypeError, ValueError):
+                    confirmation_count = 0
+                reason = ""
+                if knowledge_type == "exploration" and status == "validated":
+                    reason = "复盘是否提炼为 pattern"
+                elif knowledge_type == "pattern" and status == "active" and confirmation_count >= 3:
+                    reason = "已达到 rule 的案例数量门槛"
+                elif knowledge_type == "rule" and status == "candidate" and confirmation_count >= 3:
+                    reason = "可确认是否启用"
+                if reason:
+                    knowledge_promotion_candidates.append(
+                        {"id": item_id, "type": knowledge_type, "reason": reason, "path": relative(path, root)}
+                    )
+
     queue = pending_queue_rows(root / "workspace" / "review-queue.md")
     watchlist = root / "config" / "daily-watchlist-watchlist.md"
     profile_path = root / "workspace" / "research-profile.md"
@@ -159,6 +205,10 @@ def collect_status(root: Path) -> dict[str, Any]:
         recommendations.append(f"处理 {len(queue)} 条待确认动作。")
     if overdue_reviews:
         recommendations.append("复盘已到期假设：" + "、".join(overdue_reviews) + "。")
+    if overdue_knowledge_reviews:
+        recommendations.append(f"复盘 {len(overdue_knowledge_reviews)} 张已到期知识卡。")
+    if knowledge_promotion_candidates:
+        recommendations.append(f"审查 {len(knowledge_promotion_candidates)} 张知识卡是否应晋级。")
     if active_research:
         recommendations.append("继续或收口进行中的研究。")
     if not watchlist.is_file():
@@ -173,6 +223,11 @@ def collect_status(root: Path) -> dict[str, Any]:
         "pending_evidence": pending_evidence,
         "pending_reviews": queue,
         "overdue_hypothesis_reviews": overdue_reviews,
+        "knowledge_lifecycle": {
+            "counts": knowledge_counts,
+            "overdue_reviews": overdue_knowledge_reviews,
+            "promotion_candidates": knowledge_promotion_candidates,
+        },
         "watchlist_ready": watchlist.is_file(),
         "research_profile": {
             "version": version_match.group(1).strip() if version_match else "unknown",
@@ -191,6 +246,8 @@ def render_text(status: dict[str, Any]) -> str:
             f"待复盘证据：{len(status['pending_evidence'])}",
             f"待确认动作：{len(status['pending_reviews'])}",
             f"已到期复盘：{len(status['overdue_hypothesis_reviews'])}",
+            f"到期知识卡：{len(status['knowledge_lifecycle']['overdue_reviews'])}",
+            f"知识晋级候选：{len(status['knowledge_lifecycle']['promotion_candidates'])}",
             f"执行股票池：{'READY' if status['watchlist_ready'] else 'MISSING'}",
             "",
             "建议下一步：",

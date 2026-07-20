@@ -21,7 +21,7 @@ whisper:
 llm:
   provider: deepseek
   model: deepseek-v4-flash
-  max_tokens: 4096
+  max_tokens: 8000
   translation_max_tokens: 4096
   report_max_tokens: 6000
 

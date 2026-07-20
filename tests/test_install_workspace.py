@@ -12,6 +12,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INSTALLER_PATH = REPO_ROOT / "system" / "scripts" / "install_workspace.py"
 CHECKER_PATH = REPO_ROOT / "system" / "scripts" / "check_workspace.py"
+DOCTOR_PATH = REPO_ROOT / "system" / "scripts" / "workspace_doctor.py"
 SPEC = importlib.util.spec_from_file_location("install_workspace", INSTALLER_PATH)
 assert SPEC and SPEC.loader
 INSTALLER = importlib.util.module_from_spec(SPEC)
@@ -20,6 +21,10 @@ CHECKER_SPEC = importlib.util.spec_from_file_location("check_workspace", CHECKER
 assert CHECKER_SPEC and CHECKER_SPEC.loader
 CHECKER = importlib.util.module_from_spec(CHECKER_SPEC)
 CHECKER_SPEC.loader.exec_module(CHECKER)
+DOCTOR_SPEC = importlib.util.spec_from_file_location("workspace_doctor", DOCTOR_PATH)
+assert DOCTOR_SPEC and DOCTOR_SPEC.loader
+DOCTOR = importlib.util.module_from_spec(DOCTOR_SPEC)
+DOCTOR_SPEC.loader.exec_module(DOCTOR)
 
 
 class InstallWorkspaceTests(unittest.TestCase):
@@ -36,6 +41,7 @@ class InstallWorkspaceTests(unittest.TestCase):
             )
             self.assertGreater(created, 50)
             self.assertEqual(skipped, 0)
+            self.assertTrue((target / "workspace/cache").is_dir())
             required = (
                 "AGENTS.md",
                 "CLAUDE.md",
@@ -43,11 +49,14 @@ class InstallWorkspaceTests(unittest.TestCase):
                 "workspace/workspace-config.md",
                 "workspace/research-profile.md",
                 "workspace/review-queue.md",
-                "workspace/patterns/_index.md",
-                "workspace/patterns/_template.md",
                 "evidence/README.md",
                 "wiki/_schema.md",
                 "wiki/explorations/_index.md",
+                "wiki/explorations/_template.md",
+                "wiki/patterns/_index.md",
+                "wiki/patterns/_template.md",
+                "wiki/rules/_index.md",
+                "wiki/rules/_template.md",
                 "wiki/rules.md",
                 "wiki/false-beliefs.md",
                 "config/daily-watchlist.yaml",
@@ -58,10 +67,13 @@ class InstallWorkspaceTests(unittest.TestCase):
                 "tools/podcast/scripts/fetch_podcasts.py",
                 "system/scripts/pdf_to_md.py",
                 "system/scripts/check_workspace.py",
+                "system/scripts/wiki_tagger.py",
+                "system/scripts/knowledge_lifecycle.py",
                 "system/scripts/workspace_status.py",
                 "system/scripts/review_queue.py",
                 "system/scripts/upgrade_workspace.py",
                 "system/managed-files.json",
+                "system/lib/llm_client.py",
                 "system/skills/first-research.md",
                 "system/skills/research-closeout.md",
                 "system/skills/hypothesis-review.md",
@@ -74,6 +86,13 @@ class InstallWorkspaceTests(unittest.TestCase):
             config = (target / "workspace/workspace-config.md").read_text(encoding="utf-8")
             self.assertIn("name: `SANDBOX`", config)
             self.assertIn("primary_use: `investing`", config)
+            watchlist = (target / "config/daily-watchlist-watchlist.md").read_text(
+                encoding="utf-8"
+            )
+            self.assertIn("唯一执行股票池", watchlist)
+            self.assertNotIn("| AAPL |", watchlist)
+            doctor = DOCTOR.validate(target)
+            self.assertEqual(doctor["errors"], 0, doctor["findings"])
             state = json.loads(
                 (target / "workspace/.hub-state.json").read_text(encoding="utf-8")
             )

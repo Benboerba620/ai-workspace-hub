@@ -114,16 +114,16 @@ Agent 会汇总进行中的研究、待复盘证据、到期假设和待确认�
 
 | | 能力 | 你可以怎么说 | 写入哪里 | API key |
 |:--:|------|-------------|----------|---------|
-| 📚 | **wiki** | "把这篇文章整理进知识库" | `wiki/` | 不需要 |
+| 📚 | **wiki** | "把这篇文章整理进知识库" | `wiki/` | 推荐（自动标签） |
 | 🔬 | **research** | "帮我研究一下某公司 / 某行业" | `output/research/` | 不需要 |
 | 🔍 | **screen** | "帮我筛选 AI 产业链股票" | `output/screen/` | 可选 |
 | 📊 | **daily-watch** | "生成今天的盯盘日报" | `daily-watchlist-reports/` + `evidence/` | 可选 |
 | 🧪 | **hypothesis** | "把这个投资假设建档并追踪" | `hypothesis/` | 不需要 |
 | 🎙️ | **podcast** | "扫一下这几个播客并写进 wiki" | `wiki/sources/` + `output/pod2wiki/` | 需要 LLM key |
 
-> **零 key 可用**：wiki、research、hypothesis、screen（websearch 模式）、daily-watch（报告骨架 + 美股降级源）。
+> **零 key 可用**：wiki 仍可摄入，但跳过脚本自动标签；research、hypothesis、screen（websearch 模式）、daily-watch（报告骨架 + 美股降级源）照常可用。
 >
-> **按需增强**：DeepSeek / Kimi / GLM / Qwen（播客摘要）· tushare（A 股）· FMP（全球行情）· [Longbridge Skill](https://open.longbridge.com/zh-CN/skill/)（多市场查询）。
+> **默认建议配置**：自己的 DeepSeek / Kimi / GLM / Qwen key 用于 wiki 自动标签和播客摘要；tushare（A 股）· FMP（全球行情）· [Longbridge Skill](https://open.longbridge.com/zh-CN/skill/)（多市场查询）按需开启。
 
 ---
 
@@ -131,7 +131,8 @@ Agent 会汇总进行中的研究、待复盘证据、到期假设和待确认�
 
 ```mermaid
 flowchart LR
-    IN["inbox / web"] --> KB["wiki 知识库"]
+    IN["inbox / web"] --> TAG["统一自动标签"]
+    TAG --> KB["wiki 知识库"]
     KB --> R["research R*"]
     R --> H["hypothesis H*"]
     H --> W["唯一执行股票池"]
@@ -149,7 +150,9 @@ flowchart LR
 
 核心不是"文件夹长什么样"，而是：**agent 进入目录后知道先读什么、做研究时先查本地 wiki、输出时事实与推测分开、证据和判断不混写、待确认动作不会随对话消失、明天继续时能从断点接上。**
 
-wiki 变大后也不会每次全量加载。Agent 先读 exploration 和 pattern 的两个短索引，用产业链位置、周期阶段、约束类型和催化类型做结构匹配，命中后才读全文。知识按 `source -> exploration -> pattern -> rule` 逐级提炼，每次晋级都保留用户确认节点。
+wiki 变大后也不会每次全量加载。Agent 用 `knowledge_lifecycle.py load --context ...` 按产业链位置、周期阶段、约束类型、催化类型和决策场景匹配三类短索引，按 `rule -> pattern -> exploration` 只加载命中的卡片。知识按 `source -> exploration -> pattern -> rule` 逐级提炼；每次晋级、降级或退役都保留用户确认、复审日期和失效条件。
+
+材料进入 wiki 时由同一个打标器补齐 `domain / ticker / concepts / related / entity_salience / tags`。新材料直接写入，历史补标默认只预览；已有人工字段不会被覆盖。
 
 > 系统不在某个模型里，而在这套文件协议里。谁读懂这套协议，谁就接上你的工作流。
 
@@ -159,10 +162,10 @@ wiki 变大后也不会每次全量加载。Agent 先读 exploration 和 pattern
 
 | 模式 | API key | 能做什么 | 适合 |
 |------|---------|----------|------|
-| **Core** | 不需要 | wiki 摄入、研究草稿、快速筛选、假设建档、断点续传 | 首次试跑、日常 Markdown 工作流 |
-| **Enhanced** | 按需填写 | 播客摘要、行情日报、A 股 / 全球市场数据、自动监控 | 启用自动化流程时 |
+| **Core** | 不需要 | wiki 摄入（无脚本自动标签）、研究草稿、快速筛选、假设建档、断点续传 | 临时未配置 API 时 |
+| **Enhanced** | 建议填写 | wiki 自动标签、播客摘要、行情日报、A 股 / 全球市场数据、自动监控 | 默认日常使用 |
 
-推荐路径：**Core 先跑通** → `check_workspace.py` 看状态 → 按需填 key 到 `config/*.env`。
+推荐路径：安装后运行 `check_workspace.py` → 把自己的 LLM key 填到 `config/pod2wiki.env` → 用第一篇材料验证自动标签。暂时没有 key 时仍可先跑 Core Mode。
 
 ---
 
@@ -170,12 +173,12 @@ wiki 变大后也不会每次全量加载。Agent 先读 exploration 和 pattern
 
 | 天数 | 动作 | 目标 |
 |:----:|------|------|
-| Day 1 | 跑通 `inbox/first-note.md → wiki` | 确认 agent 读得懂工作区 |
+| Day 1 | 配置自己的 LLM key，跑通 `inbox/first-note.md → wiki` | 确认摘要、自动标签和分类都能工作 |
 | Day 2 | 放入 3-5 条真实材料 | 建立第一批知识库 |
 | Day 3 | 让 agent 研究一个公司 / 行业 | 生成第一篇结构化报告 |
 | Day 4 | `check_workspace.py`，按需配 tushare / FMP | 增强行情能力 |
 | Day 5 | 做一次主题筛选 | 形成候选池 |
-| Day 6 | 配 LLM key，扫一次播客 / 博客 | 建立外部信息流 |
+| Day 6 | 扫一次播客 / 博客 | 建立外部信息流 |
 | Day 7 | 运行结构体检，删掉没用规则 | 防止系统变胖 |
 
 ---
@@ -201,7 +204,7 @@ ai-workspace-hub/
 ├── TROUBLESHOOTING.md        # 故障排查
 ├── workspace/                # 项目配置、断点续传、待确认队列
 ├── inbox/                    # 临时输入材料
-├── wiki/                     # personal wiki
+├── wiki/                     # personal wiki（exploration / pattern / rule）
 ├── output/                   # 研究、筛选、播客等输出
 ├── monitoring/               # 用户阅读的监控看板
 ├── hypothesis/               # 投资假设和复盘
@@ -237,7 +240,11 @@ ai-workspace-hub/
 ```bash
 python3 system/scripts/check_workspace.py          # 总检查
 python3 system/scripts/workspace_status.py         # 当前研究、证据和待办
+python3 system/scripts/knowledge_lifecycle.py --root . summary  # 知识状态、到期复审和晋级候选
+python3 system/scripts/knowledge_lifecycle.py --root . load --context "你的研究问题" --record --research-id R-...  # 加载并记录命中的规则/模式
+python3 system/scripts/knowledge_lifecycle.py --root . rebuild-index --apply  # 重建三个短索引
 python3 system/scripts/review_queue.py list        # 查看持久待确认队列
+python3 system/scripts/wiki_tagger.py --root . backfill wiki  # 预览历史 wiki 补标
 python3 -m unittest discover -s tests -v            # 运行测试
 python3 tools/daily-watch/scripts/check_setup.py --init  # 初始化日报配置
 python3 tools/podcast/scripts/fetch_podcasts.py --help   # 播客工具帮助
@@ -261,6 +268,9 @@ Python 工具需要 3.10+。**Windows 用户**用 `python` 代替 `python3`，�
 
 **Q：API key 会不会泄露？**
 `config/` 已被 `.gitignore` 排除，不会被 git 提交。
+
+**Q：自动标签会把什么发给大模型？**
+会把当前 wiki 页面的 frontmatter 和正文发送给你在 `config/pod2wiki.env` 选择的模型服务商，只用于返回结构化标签。敏感材料应先确认所选服务商的数据政策，或跳过自动标签。
 
 **Q：可以和 Obsidian 一起用吗？**
 可以。把 `wiki/` 添加为 Obsidian vault 即可，所有笔记都是标准 Markdown。

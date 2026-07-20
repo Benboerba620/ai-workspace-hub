@@ -4,13 +4,20 @@
 
 ### 新增
 
+- 新增统一 wiki 自动打标器，新材料与历史补标共用 `domain / ticker / concepts / related / entity_salience / tags` schema。
+- 新增 Hub 共享 LLM 客户端，支持严格 JSON、瞬时网络重试，并保留 podcast 原导入路径兼容。
 - 新增分层知识编译链：`source -> exploration -> pattern -> rule`，被证伪且可能重复出现的直觉进入 `false-beliefs.md`。
-- 新增 exploration 和 pattern 两个短索引。研究开始先读索引，按结构特征命中后才加载页面全文。
-- 新增 `knowledge-lifecycle.md`，定义 exploration 验证、pattern 归因、跨案例晋级和用户确认边界。
+- 新增 `exploration / pattern / rule` 三类独立知识卡、状态机、复审日期、替代关系和失效条件；规则从单文件入口升级为 `wiki/rules/` 卡片目录，旧 `wiki/rules.md` 保留兼容入口。
+- 新增 `knowledge_lifecycle.py`：支持生命周期汇总、三类短索引重建、按场景选择性加载、实际调用记录和带确认门槛的升降级迁移。
+- 新增 `wiki/explorations/_index.md`、`wiki/patterns/_index.md`、`wiki/rules/_index.md` 自动摘要索引；默认只加载生效知识，弱化/退役内容需显式复盘加载。
+- 新增 `knowledge-lifecycle.md` 可执行协议，定义跨案例晋级、降级、归档、复审和调用记录边界。
 
 ### 改进
 
+- 笔记、PDF 和 pod2wiki 来源统一接入自动标签；只补空字段，历史批量处理默认预览并缓存结果，确认写入不重复调用 API。
 - 安装器、安全升级清单和 Core Mode 检查器接入新索引与空白模板，旧工作区只补缺失文件、不覆盖用户知识。
+- Doctor 与 `workspace_status.py` 增加知识卡 ID、来源链、生命周期状态、复审日期、晋级门槛和失效信号检查；旧卡缺字段只提示渐进迁移。
+- 修正冷安装仍复制演示股票池的问题；新工作区和仓库默认股票池为空，Doctor 不再因不存在的示例假设报错。
 
 ## 0.6.0 - 2026-07-11
 

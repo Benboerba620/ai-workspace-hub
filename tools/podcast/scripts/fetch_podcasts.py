@@ -24,6 +24,7 @@ from llm_client import LLMError, chat, extract_json
 from llm_client import load_dotenv as load_llm_dotenv
 from podcast_batch_summarize import detect_reversal_flags
 from proxy_config import PROXY, requests_proxy
+from system.scripts.wiki_tagger import collect_vocabulary, validate_payload  # noqa: E402
 
 # Windows 控制台可能默认 cp1252/GBK，统一 UTF-8 输出避免中文触发 UnicodeEncodeError
 for _stream in (sys.stdout, sys.stderr):
@@ -855,7 +856,15 @@ def summarize_without_llm(item: dict[str, Any], config: dict[str, Any]) -> dict[
     return data
 
 
-def summarize_item(item: dict[str, Any], config: dict[str, Any], locale: str, no_llm: bool = False) -> dict[str, Any]:
+def summarize_item(
+    item: dict[str, Any],
+    config: dict[str, Any],
+    locale: str,
+    no_llm: bool = False,
+    *,
+    auto_tag: bool = True,
+    tag_vocabulary: tuple[list[str], list[str]] | None = None,
+) -> dict[str, Any]:
     if no_llm:
         return summarize_without_llm(item, config)
     text = item.get("raw_text") or ""
@@ -864,12 +873,24 @@ def summarize_item(item: dict[str, Any], config: dict[str, Any], locale: str, no
         text = text[: int(max_chars * 0.75)] + "\n\n[... omitted ...]\n\n" + text[-int(max_chars * 0.2) :]
     hypotheses = config.get("hypotheses") or {}
     system = "You summarize podcasts and long-form research articles for an investment knowledge base. Output strict JSON only."
+    tag_keys = ", entity_salience, tags" if auto_tag else ""
+    tag_rules = ""
+    if auto_tag:
+        existing_tags, existing_concepts = tag_vocabulary or ([], [])
+        tag_rules = f"""
+Tagging rules:
+- entity_salience maps every related ticker to core, reference, or mention.
+- tags contains at most 5 cross-page retrieval labels. Reuse existing labels and do not repeat tickers or concepts.
+- Existing tags: {json.dumps(existing_tags, ensure_ascii=False)}
+- Existing concepts: {json.dumps(existing_concepts, ensure_ascii=False)}
+"""
     user = f"""Summarize this source for a karpathy-claude-wiki compatible source-summary page.
 
 Language preference: {locale}
 
 Return JSON with keys:
-summary, core_views, key_data, related_tickers, related_concepts, predictions, h_links, speakers, key_quotes.
+summary, core_views, key_data, related_tickers, related_concepts, predictions, h_links, speakers, key_quotes{tag_keys}.
+{tag_rules}
 
 Hypotheses:
 {json.dumps(hypotheses, ensure_ascii=False, indent=2)}
@@ -889,7 +910,9 @@ Source text:
         [{"role": "system", "content": system}, {"role": "user", "content": user}],
         provider=llm_cfg.get("provider"),
         model=llm_cfg.get("model"),
-        max_tokens=int(llm_cfg.get("max_tokens") or 4096),
+        max_tokens=max(8000, int(llm_cfg.get("max_tokens") or 8000)),
+        json_mode=True,
+        max_attempts=3,
     )
     data = extract_json(content)
     data["verification_warnings"] = detect_reversal_flags(
@@ -1023,7 +1046,16 @@ def yaml_list(values: list[str]) -> str:
     return "[" + ", ".join(json.dumps(v, ensure_ascii=False) for v in values) + "]"
 
 
-def write_source(item: dict[str, Any], structured: dict[str, Any], source_dir: Path, raw_ref: str, domain: str, locale: str) -> Path:
+def write_source(
+    item: dict[str, Any],
+    structured: dict[str, Any],
+    source_dir: Path,
+    raw_ref: str,
+    domain: str,
+    locale: str,
+    *,
+    auto_tagged: bool = False,
+) -> Path:
     source_dir.mkdir(parents=True, exist_ok=True)
     filename = f"{item['date']}-{slugify(item['channel'])}-{slugify(item['title'])}.md"
     related = []
@@ -1038,10 +1070,33 @@ def write_source(item: dict[str, Any], structured: dict[str, Any], source_dir: P
     h_links = structured.get("h_links") or []
     transcribed_by = item.get("transcribed_by")
     transcribed_line = f"transcribed_by: {transcribed_by}\n" if transcribed_by else ""
+    tagging_lines = ""
+    if auto_tagged:
+        tagging = validate_payload(
+            {
+                "domain": [domain],
+                "ticker": structured.get("related_tickers") or [],
+                "concepts": structured.get("related_concepts") or [],
+                "related": [
+                    *(structured.get("related_tickers") or []),
+                    *(structured.get("related_concepts") or []),
+                ],
+                "entity_salience": structured.get("entity_salience") or {},
+                "tags": structured.get("tags") or [],
+            }
+        )
+        related = tagging["related"]
+        tagging_lines = (
+            f"ticker: {yaml_list(tagging['ticker'])}\n"
+            f"concepts: {yaml_list(tagging['concepts'])}\n"
+            f"entity_salience: {json.dumps(tagging['entity_salience'], ensure_ascii=False)}\n"
+            f"tags: {yaml_list(tagging['tags'])}\n"
+            "tagging: {status: completed, schema_version: 1}\n"
+        )
     body = f"""---
 title: {json.dumps(item['title'], ensure_ascii=False)}
 type: source-summary
-domain: {domain}
+domain: {yaml_list([domain])}
 sources: [{json.dumps(raw_ref, ensure_ascii=False)}]
 related: {yaml_list(related)}
 created: {item['date']}
@@ -1049,7 +1104,7 @@ updated: {datetime.now().date().isoformat()}
 confidence: {structured.get('confidence') or 'medium'}
 speakers: {yaml_list(structured.get('speakers') or [])}
 language: {locale}
-{transcribed_line}---
+{transcribed_line}{tagging_lines}---
 
 ## TL;DR / 一句话摘要
 
@@ -1208,6 +1263,7 @@ def main() -> int:
     parser.add_argument("--source-url", help="Original URL override for a single --input-file run.")
     parser.add_argument("--date", help="YYYY-MM-DD override for local files.")
     parser.add_argument("--no-llm", action="store_true", help="Write an extractive low-confidence source page without calling an LLM.")
+    parser.add_argument("--no-auto-tag", action="store_true", help="Skip structured wiki auto-tagging after source pages are written.")
     parser.add_argument("--max-items", type=int, help="Global limit on items to summarize/write after collection.")
     parser.add_argument("--max-items-per-feed", type=int, help="Limit RSS/blog items collected from each feed. Defaults to config max_items_per_feed.")
     parser.add_argument("--mode", choices=["all", "rss", "youtube"], default="all", help="Discovery mode when --input-file is not used.")
@@ -1313,13 +1369,27 @@ def main() -> int:
     else:
         wiki_source_dir = None
         wiki_root = OUTPUT
+    workspace_root = Path(__file__).resolve().parents[3] if wiki_source_dir else None
+    tag_vocabulary = (
+        collect_vocabulary(workspace_root, wiki_root)
+        if workspace_root and not args.no_llm and not args.no_auto_tag
+        else None
+    )
+    auto_tag = not args.no_llm and not args.no_auto_tag
 
     try:
         for item in items:
             if not item.get("raw_text"):
                 continue
             try:
-                structured = summarize_item(item, config, args.locale, no_llm=args.no_llm)
+                structured = summarize_item(
+                    item,
+                    config,
+                    args.locale,
+                    no_llm=args.no_llm,
+                    auto_tag=auto_tag,
+                    tag_vocabulary=tag_vocabulary,
+                )
             except (LLMError, json.JSONDecodeError) as exc:
                 eprint(f"- LLM skipped: {item.get('title')} ({exc})")
                 processing_errors.append(f"{item.get('title')}: {exc}")
@@ -1327,14 +1397,30 @@ def main() -> int:
             raw_path = write_raw(item, wiki_root)
             raw_ref = str(raw_path.relative_to(wiki_root)).replace("\\", "/")
             local_raw_copy = write_raw(item, OUTPUT)
-            local_source = write_source(item, structured, local_source_dir, raw_ref, args.domain, args.locale)
+            local_source = write_source(
+                item,
+                structured,
+                local_source_dir,
+                raw_ref,
+                args.domain,
+                args.locale,
+                auto_tagged=auto_tag,
+            )
             item_translation_pages: list[str] = []
             raw_pages.append(str(local_raw_copy))
             if wiki_source_dir:
                 raw_pages.append(str(raw_path))
             source_pages.append(str(local_source))
             if wiki_source_dir:
-                wiki_source = write_source(item, structured, wiki_source_dir, raw_ref, args.domain, args.locale)
+                wiki_source = write_source(
+                    item,
+                    structured,
+                    wiki_source_dir,
+                    raw_ref,
+                    args.domain,
+                    args.locale,
+                    auto_tagged=auto_tag,
+                )
                 source_pages.append(str(wiki_source))
             if args.translate_full and not args.no_llm:
                 try:

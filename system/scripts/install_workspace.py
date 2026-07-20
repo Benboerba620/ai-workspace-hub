@@ -12,12 +12,14 @@ from pathlib import Path
 
 DIRECTORIES = (
     "workspace/meta",
-    "workspace/patterns",
+    "workspace/cache",
     "wiki/raw",
     "wiki/sources",
     "wiki/entities",
     "wiki/concepts",
     "wiki/explorations",
+    "wiki/patterns",
+    "wiki/rules",
     "inbox",
     "output/research",
     "output/screen",
@@ -43,10 +45,13 @@ FILE_MAPPINGS = (
     ("system/templates/interfaces-README.md", "system/interfaces/README.md"),
     ("wiki/_schema.md", "wiki/_schema.md"),
     ("wiki/explorations/_index.md", "wiki/explorations/_index.md"),
+    ("wiki/explorations/_template.md", "wiki/explorations/_template.md"),
+    ("wiki/patterns/_index.md", "wiki/patterns/_index.md"),
+    ("wiki/patterns/_template.md", "wiki/patterns/_template.md"),
+    ("wiki/rules/_index.md", "wiki/rules/_index.md"),
+    ("wiki/rules/_template.md", "wiki/rules/_template.md"),
     ("wiki/rules.md", "wiki/rules.md"),
     ("wiki/false-beliefs.md", "wiki/false-beliefs.md"),
-    ("workspace/patterns/_index.md", "workspace/patterns/_index.md"),
-    ("workspace/patterns/_template.md", "workspace/patterns/_template.md"),
     ("evidence/README.md", "evidence/README.md"),
     ("requirements.txt", "requirements.txt"),
     ("requirements.lock", "requirements.lock"),
@@ -59,6 +64,7 @@ FILE_MAPPINGS = (
 )
 
 DIRECTORY_MAPPINGS = (
+    ("system/lib", "system/lib"),
     ("system/skills", "system/skills"),
     ("system/integrations", "system/integrations"),
     ("system/templates", "system/templates"),
@@ -77,7 +83,7 @@ CONFIG_MAPPINGS = (
         "config/daily-watchlist.env",
     ),
     (
-        "tools/daily-watch/config-examples/daily-watchlist.watchlist.example.md",
+        "tools/daily-watch/config-examples/daily-watchlist.watchlist.empty.md",
         "config/daily-watchlist-watchlist.md",
     ),
     (

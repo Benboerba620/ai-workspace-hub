@@ -109,11 +109,24 @@ class WorkspaceStatusTests(unittest.TestCase):
             research.write_text(
                 "---\nid: R1\nstatus: active\n---\n", encoding="utf-8"
             )
+            pattern = root / "wiki/patterns/PAT-1.md"
+            pattern.parent.mkdir(parents=True)
+            pattern.write_text(
+                "---\nid: PAT-1\ntype: pattern\nstatus: active\n"
+                "review_due: 2020-01-01\nprimary_confirmations: 3\n---\n",
+                encoding="utf-8",
+            )
 
             status = STATUS.collect_status(root)
             self.assertEqual(len(status["active_research"]), 1)
             self.assertEqual(len(status["pending_evidence"]), 1)
             self.assertEqual(len(status["pending_reviews"]), 1)
+            self.assertEqual(
+                len(status["knowledge_lifecycle"]["overdue_reviews"]), 1
+            )
+            self.assertEqual(
+                len(status["knowledge_lifecycle"]["promotion_candidates"]), 1
+            )
             self.assertFalse(status["watchlist_ready"])
 
 

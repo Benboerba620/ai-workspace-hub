@@ -6,7 +6,10 @@
 - status: `enabled`
 - wiki_root: `./wiki`
 - schema: `karpathy-claude-wiki compatible`
-- owns: `wiki/raw/`, `wiki/sources/`, `wiki/entities/`, `wiki/concepts/`, `wiki/explorations/`
+- owns: `wiki/raw/`, `wiki/sources/`, `wiki/entities/`, `wiki/concepts/`, `wiki/explorations/`, `wiki/patterns/`, `wiki/rules/`
+- lifecycle: `system/scripts/knowledge_lifecycle.py`
+- load_order: `rule -> pattern -> exploration`
+- usage_log: `workspace/knowledge-usage.jsonl`
 
 ## podcast
 - status: `enabled`

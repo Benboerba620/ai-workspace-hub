@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "hub_version": "0.6.0",
+  "hub_version": "0.7.0",
   "ownership": {
     "managed": [
       "system/**",
@@ -23,13 +23,17 @@
       "wiki/concepts/**",
       "wiki/entities/**",
       "wiki/explorations/**",
+      "wiki/patterns/**",
       "wiki/raw/**",
+      "wiki/rules/**",
       "wiki/sources/**",
       "wiki/rules.md",
       "wiki/false-beliefs.md",
       "workspace/patterns/**",
+      "workspace/cache/**",
       "workspace/meta/**",
-      "workspace/review-queue.md"
+      "workspace/review-queue.md",
+      "workspace/knowledge-usage.jsonl"
     ],
     "mixed": [
       ".gitignore",
@@ -48,7 +52,8 @@
   "migrations": {
     "additive_directories": [
       "evidence",
-      "workspace/patterns"
+      "wiki/patterns",
+      "wiki/rules"
     ],
     "additive_files": [
       {
@@ -68,12 +73,24 @@
         "target": "wiki/explorations/_index.md"
       },
       {
-        "source": "workspace/patterns/_index.md",
-        "target": "workspace/patterns/_index.md"
+        "source": "wiki/explorations/_template.md",
+        "target": "wiki/explorations/_template.md"
       },
       {
-        "source": "workspace/patterns/_template.md",
-        "target": "workspace/patterns/_template.md"
+        "source": "wiki/patterns/_index.md",
+        "target": "wiki/patterns/_index.md"
+      },
+      {
+        "source": "wiki/patterns/_template.md",
+        "target": "wiki/patterns/_template.md"
+      },
+      {
+        "source": "wiki/rules/_index.md",
+        "target": "wiki/rules/_index.md"
+      },
+      {
+        "source": "wiki/rules/_template.md",
+        "target": "wiki/rules/_template.md"
       },
       {
         "source": "wiki/rules.md",

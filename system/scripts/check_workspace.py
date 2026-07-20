@@ -26,15 +26,22 @@ CORE_FILES = (
     "workspace/meta/active-context.md",
     "workspace/research-profile.md",
     "workspace/review-queue.md",
-    "workspace/patterns/_index.md",
     "wiki/explorations/_index.md",
+    "wiki/explorations/_template.md",
+    "wiki/patterns/_index.md",
+    "wiki/patterns/_template.md",
+    "wiki/rules/_index.md",
+    "wiki/rules/_template.md",
     "wiki/rules.md",
     "wiki/false-beliefs.md",
     "wiki/_schema.md",
     "system/integrations/personal-wiki.md",
+    "system/lib/llm_client.py",
     "system/skills/first-ingest.md",
     "system/skills/research.md",
     "system/skills/screen.md",
+    "system/scripts/wiki_tagger.py",
+    "system/scripts/knowledge_lifecycle.py",
     "system/integrations/object-model.md",
 )
 
@@ -48,13 +55,15 @@ CORE_DIRECTORIES = (
     "inbox",
     "wiki",
     "wiki/sources",
+    "wiki/explorations",
+    "wiki/patterns",
+    "wiki/rules",
     "output",
     "output/research",
     "output/screen",
     "hypothesis",
     "evidence",
     "workspace/meta",
-    "workspace/patterns",
 )
 
 ENV_FILES = (
@@ -193,14 +202,19 @@ def check(root: Path) -> int:
     print(status_line(module_available("requests"), "dependency: requests"))
     print(status_line(module_available("dotenv"), "dependency: python-dotenv / dotenv"))
     print(status_line(module_available("yaml"), "dependency: pyyaml / yaml"))
-    print(status_line(has_key(values, "LLM_API_KEY"), "LLM_API_KEY for podcast summaries"))
+    print(
+        status_line(
+            has_key(values, "LLM_API_KEY"),
+            "LLM_API_KEY for wiki auto-tagging and podcast summaries",
+        )
+    )
     print(status_line(has_key(values, "FMP_API_KEY"), "FMP_API_KEY for global market data"))
     print(status_line(has_key(values, "TUSHARE_TOKEN"), "TUSHARE_TOKEN for China A-share data"))
 
     print()
     print("Interpretation:")
     print("- Missing API keys only disable optional automation.")
-    print("- Configure your own API keys if you want podcast, market data, or daily-watch automation.")
+    print("- Configure your own API keys for wiki auto-tagging, podcast, market data, or daily-watch automation.")
     print("- Keep keys in local config/*.env files; do not commit real secrets.")
     print("- Core Mode remains useful for Markdown wiki, research drafts, and hypothesis files.")
     return 0 if core_ok else 2

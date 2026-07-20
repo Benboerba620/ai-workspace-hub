@@ -37,6 +37,7 @@ python3 tools/podcast/scripts/fetch_podcasts.py \
 - `--days N`：扫描最近 N 天
 - `--dry-run`：只检查配置，不调 LLM
 - `--no-llm`：跳过摘要生成
+- `--no-auto-tag`：保留摘要但跳过写入 wiki 后的统一自动标签
 - `--input-file PATH`：本地文件摄入（不联网）
 - `--mode rss|youtube|all`：选择输入源
 - `--translate-full`：生成全文翻译
@@ -80,5 +81,6 @@ python3 tools/podcast/scripts/fetch_podcasts.py \
 ## 边界
 
 - 只负责把外部材料变成 wiki 页面，不做投资判断。
+- 写入 wiki 的 source 默认调用统一 `wiki_tagger`，与笔记/PDF 摄入使用同一套标签 schema。
 - 不修改 `hypothesis/`（后续关联由 daily-watch 或 research 处理）。
 - YouTube 有请求频率限制，单次建议不超过 5 个视频。

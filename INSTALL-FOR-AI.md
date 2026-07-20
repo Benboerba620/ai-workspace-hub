@@ -250,9 +250,9 @@ python3 "{用户工作区}/system/scripts/check_workspace.py" --root "{用户工
 - Enhanced Mode 里的 API key 警告：只代表可选自动化未开启，不是安装失败。
 - 如果 Python 不可用，但核心文件都已经复制完成，也可以让用户直接用 AI agent 执行 `inbox/first-note.md → wiki` 的 Markdown 试跑。
 
-### Step 6：可选配置数据源（Enhanced Mode）
+### Step 6：默认建议配置自己的 LLM API（Enhanced Mode）
 
-只有用户想启用播客摘要、行情日报、A 股 / 全球市场数据时，才进入本步骤。不要把 API key 当成安装前置条件，但要明确告诉用户：自动化功能要稳定运行，建议填写自己的 API key。
+默认询问用户是否要填写自己的 LLM API key，用于 wiki 自动标签和播客摘要。不要把 key 当成安装成功的硬前置；用户暂时不填时，明确说明 Core Mode 仍可运行，但脚本自动标签会跳过。行情类数据源继续按需配置。
 
 问用户追踪哪些市场，然后设置对应配置：
 
@@ -270,7 +270,7 @@ python3 "{用户工作区}/system/scripts/check_workspace.py" --root "{用户工
 | 功能 | 需要填的 key | 没填时 | 获取方式 |
 |------|-------------|--------|---------|
 | 日报（A 股） | `TUSHARE_TOKEN` | 跳过 A 股 | [tushare](https://tushare.pro/register) |
-| 播客摘要 | `LLM_API_KEY`（DeepSeek 等） | `--no-llm` 模式 | [DeepSeek](https://platform.deepseek.com/) |
+| wiki 自动标签 + 播客摘要 | `LLM_API_KEY`（DeepSeek 等） | wiki 保留空标签；播客用 `--no-llm` | [DeepSeek](https://platform.deepseek.com/) |
 | 日报（全球市场） | `FMP_API_KEY` | 美股尝试 Nasdaq 等降级源 | [FMP](https://financialmodelingprep.com/) |
 
 Longbridge 不是上述脚本的环境变量数据源。它是独立 Agent Skill/CLI/MCP；用户需要时，按[官方安装说明](https://open.longbridge.com/zh-CN/skill/)另行安装和授权，可用于 screen / research 的行情查询。

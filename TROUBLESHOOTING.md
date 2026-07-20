@@ -48,7 +48,21 @@
 
 ---
 
-## 3. 播客工具
+## 3. Wiki 自动标签
+
+### 页面生成了，但标签还是空的
+
+**原因**：`config/pod2wiki.env` 没有真实 `LLM_API_KEY`、模型返回值未通过校验，或摄入命令没有执行 `wiki_tagger.py ... --apply`。
+
+**解决**：先运行预览命令查看具体错误：`python system/scripts/wiki_tagger.py --root . --env-file config/pod2wiki.env tag <页面.md> --json`。确认结果后再加 `--apply`。打标器不会覆盖已有人工字段。
+
+### 想给历史 wiki 补标签
+
+先运行 `python system/scripts/wiki_tagger.py --root . --env-file config/pod2wiki.env backfill wiki`。默认不修改文件；检查预览后再加 `--apply`。预览结果会进入本地缓存，确认写入不会再次调用 API；要忽略缓存重算时加 `--refresh`。
+
+---
+
+## 4. 播客工具
 
 ### `yt-dlp` 报错
 
@@ -70,7 +84,7 @@
 
 ---
 
-## 4. 日报工具
+## 5. 日报工具
 
 ### 报告全是 `[待补充]`
 

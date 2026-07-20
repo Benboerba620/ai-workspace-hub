@@ -1,6 +1,6 @@
 # 系统架构 · AI Workspace Hub
 
-> 截至 2026-07-11（v0.6.0）。给"想看懂这套系统怎么搭"的人看的参照图，不是每次必读文件。
+> 截至 2026-07-20（v0.7.0）。给"想看懂这套系统怎么搭"的人看的参照图，不是每次必读文件。
 > 一句话：**一个 all-in-one AI 研究工作系统——六大能力开箱即用，数据源按需配置，零 key 也能跑。**
 
 ---
@@ -16,7 +16,7 @@ flowchart TB
     end
 
     subgraph BASE["基座 · 零依赖"]
-        IN["输入<br/>inbox/"] --> KB["知识库 wiki/<br/>raw · sources · entities · concepts · explorations"]
+        IN["输入<br/>inbox/"] --> KB["知识库 wiki/<br/>raw · sources · entities · concepts · explorations · patterns · rules"]
         KB --> OUT["输出<br/>output/"]
         RES["research 研究闭环"]
         KB -->|"先查已有"| RES
@@ -138,15 +138,17 @@ ai-workspace-hub/
 │   ├── workspace-config.md         # 项目配置
 │   ├── research-profile.md         # 从真实研究校准的方法偏好
 │   ├── review-queue.md             # 待用户确认的动作
-│   ├── patterns/                   # 跨案例模式卡 + 短索引
+│   ├── knowledge-usage.jsonl       # 实际调用的知识 ID（追加式记录）
 │   └── meta/
 │       ├── active-context.md       # 工作记忆
 │       └── friction-log.md         # 摩擦日志
 │
 ├── wiki/                           # 知识库
 │   ├── _schema.md
-│   ├── raw/ / sources/ / entities/ / concepts/ / explorations/
-│   └── rules.md / false-beliefs.md # 已确认规则 / 已证伪信念
+│   ├── raw/ / sources/ / entities/ / concepts/
+│   ├── explorations/               # 阶段判断卡 + 索引
+│   ├── patterns/                   # 可迁移机制卡 + 索引
+│   └── rules/                      # 可调用决策规则 + 索引
 │
 ├── inbox/                          # 输入
 ├── output/                         # 输出（research/ screen/ pod2wiki/ 等子目录）
@@ -157,10 +159,11 @@ ai-workspace-hub/
 ├── portfolio/                      # 交易记录
 │
 ├── system/                         # 机器零件箱
+│   ├── lib/                        #   共享运行库（LLM client）
 │   ├── skills/                     #   能力说明书
 │   ├── integrations/               #   内部接线说明
 │   ├── interfaces/                 #   已启用工具总览
-│   ├── scripts/                    #   基座脚本（install_workspace.py / check_workspace.py / pdf_to_md.py）
+│   ├── scripts/                    #   基座脚本（安装 / 检查 / wiki_tagger / PDF）
 │   └── templates/                  #   安装时复制的模板文件
 │
 └── _archive/                       # 归档区
@@ -179,6 +182,17 @@ research ──► hypothesis ──► watchlist ──► daily-watch ──�
 
 基座保证 `inbox → wiki → output + research`。其余能力按配置渐进亮灯。
 
+## Wiki 自动标签层
+
+```text
+note / PDF / podcast source
+  -> system/scripts/wiki_tagger.py
+  -> domain + ticker + concepts + related + entity_salience + tags
+  -> entity / concept / exploration
+```
+
+所有入口共用 `system/lib/llm_client.py` 和同一套字段校验。摄入单文件时明确加 `--apply`；历史 `backfill` 默认只预览。打标器只补空字段，并用 `tagging.status: completed` 防止合法空值触发重复 API 调用。
+
 ## 知识编译层
 
 ```text
@@ -186,9 +200,9 @@ raw → source → entity/concept → exploration → pattern → rule
                                              └→ false belief（被证伪且易复发）
 ```
 
-`wiki/explorations/_index.md` 与 `workspace/patterns/_index.md` 是小型加载路由。Agent 研究开始时全文读索引，再用产业链位置、周期阶段、约束类型和催化类型等结构特征选择全文。详细证据不进索引，避免 wiki 越大、每次上下文越重。
+`knowledge_lifecycle.py` 维护三类短索引，并按当前研究 context 选择性加载。加载顺序是 `rule -> pattern -> exploration`；默认排除 draft、weakened、invalidated、retired、deprecated 和 archived。详细证据不进索引，实际命中的知识 ID 追加到 `workspace/knowledge-usage.jsonl`，避免 wiki 越大、每次上下文越重。
 
-exploration 验证、pattern 新建/合并、rule 晋级都先进 `workspace/review-queue.md`。Pattern 只统计主归因案例，跨案例主归因确认至少 3 次才建议晋级 rule。
+exploration 验证、pattern 新建/合并、rule 晋级、降级和退役都先进 `workspace/review-queue.md`。Pattern 先满足两个独立 exploration 和两个 primary 确认，Rule 再满足三个独立案例、scope 与失效信号；脚本只执行合法迁移，最终状态仍需用户确认。
 
 ---
 

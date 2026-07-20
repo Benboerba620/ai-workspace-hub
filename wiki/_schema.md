@@ -70,11 +70,16 @@ source_path:
 source_url:
 raw_path:
 status: processed
+domain: []
+ticker: []
+concepts: []
+related: []
+entity_salience: {}
 tags: []
 ---
 ```
 
-新建或审核 exploration 后同步 `wiki/explorations/_index.md`。`status` 使用 `tentative / validated / invalidated / promoted`。只有通过跨案例审查的可迁移机制才进入 `workspace/patterns/`，详见 `system/skills/knowledge-lifecycle.md`。
+新建或审核 exploration 后运行 `knowledge_lifecycle.py rebuild-index --apply`。`status` 使用 `tentative / validated / weakened / invalidated / promoted / archived`。只有通过跨案例审查的可迁移机制才进入 `wiki/patterns/`；规则进入 `wiki/rules/`，详见 `system/skills/knowledge-lifecycle.md`。
 
 ### `wiki/entities/`
 
@@ -142,10 +147,66 @@ tags: []
 title:
 date:
 type: exploration
+id:
 status: tentative
+summary:
+created_at:
+updated_at:
+last_reviewed_at:
+review_due:
+based_on: []
+promoted_to:
+domain: []
+ticker: []
+concepts: []
+related: []
+entity_salience: {}
 tags: []
+recall_signals: []
+decision_scenarios: []
 ---
 ```
+
+### `wiki/patterns/` 与 `wiki/rules/`
+
+这两个目录是一条规则一张卡，不再把所有内容堆进单个长文件。
+
+| 类型 | 默认状态 | 生效门槛 | 默认是否加载 |
+|---|---|---|---|
+| pattern | `draft` | 至少两个独立 exploration、两次 `primary` 确认、写失效信号 | `active` / `promoted` |
+| rule | `candidate` | 至少三个独立案例、限定 `scope`、写 `invalidation_signals` | `active` |
+
+三类知识都要填写 `id / summary / review_due / recall_signals / decision_scenarios`。状态变化走 `knowledge_lifecycle.py transition`，用户确认后才加 `--apply --confirmed`。`wiki/patterns/_index.md` 和 `wiki/rules/_index.md` 是自动生成的短摘要；`wiki/rules.md` 与 `workspace/patterns/` 仅为旧版本兼容入口。
+
+## 自动标签契约
+
+新建 source 或 exploration 后，调用同一个打标器：
+
+```bash
+python3 system/scripts/wiki_tagger.py --root . --env-file config/pod2wiki.env tag <页面.md> --apply
+```
+
+它只补空字段，不覆盖人工已有值：
+
+| 字段 | 用途 | 约束 |
+|---|---|---|
+| `domain` | 一级领域 | 只用 `investing / reading / tech / life / philosophy / meta` |
+| `ticker` | 上市标的代码 | 只写材料直接相关标的 |
+| `concepts` | 可复用主题或框架 | 优先复用 `wiki/concepts/` 已有名称 |
+| `related` | 页面关联 | 使用带引号的 `"[[页面]]"` wikilink |
+| `entity_salience` | source 对标的的重要度 | 只用 `core / reference / mention` |
+| `tags` | 跨页面检索捷径 | 最多 5 个，复用旧标签，避免 ticker 和 concept 重复 |
+
+`entity_salience` 的含义：`core` 是材料主角或影响判断，`reference` 是重要对照，`mention` 是顺带出现。批量补历史页面复用同一逻辑，默认只预览：
+
+成功写入后会增加 `tagging: {status: completed, schema_version: 1}`。即使某些字段合法为空，也能据此避免重复调用 API。
+
+```bash
+python3 system/scripts/wiki_tagger.py --root . --env-file config/pod2wiki.env backfill wiki
+# 确认预览后再加 --apply
+```
+
+预览结果缓存在 `workspace/cache/wiki_tagger.json`，随后执行同一命令并加 `--apply` 会直接复用，不重复计费。页面内容或已有标签词表变化后缓存自动失效；需要强制重算时加 `--refresh`。
 
 ## `output/` 和 wiki 的边界
 
@@ -180,7 +241,8 @@ tags: []
 
 1. `wiki/raw/{date}-{slug}.md`
 2. `wiki/sources/{date}-{slug}.md`
-3. 至少一个 `wiki/concepts/` 或 `wiki/entities/` 分类页
-4. 如有阶段性判断，写 `wiki/explorations/`
-5. 一份 `output/` 测试报告
-6. 更新 `workspace/meta/active-context.md`
+3. source 的结构化字段完成自动标签，或在报告里明确记录 API 失败
+4. 至少一个 `wiki/concepts/` 或 `wiki/entities/` 分类页
+5. 如有阶段性判断，写 `wiki/explorations/`
+6. 一份 `output/` 测试报告
+7. 更新 `workspace/meta/active-context.md`

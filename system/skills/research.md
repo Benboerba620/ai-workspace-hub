@@ -23,8 +23,8 @@
 
 按顺序，能在前一层解决就不必往后：
 
-1. **知识路由索引（小文件，先全文读）**：读 `wiki/explorations/_index.md` 和 `workspace/patterns/_index.md`，用产业链位置、周期阶段、约束类型、催化类型和决策场景做结构匹配。命中后才读对应全文；没命中就继续，不强套类比。详见 `system/skills/knowledge-lifecycle.md`。
-2. **wiki/（本地，最先查）**：检索 `wiki/sources/`、`wiki/entities/`、`wiki/concepts/`、`wiki/explorations/` 里已有的相关页面。
+1. **可复用知识加载**：先分配本次研究 ID，再用产业链位置、周期阶段、约束类型、催化类型和决策场景组成 context，运行 `knowledge_lifecycle.py load --context "..." --record --research-id {R-ID}`。加载顺序为 rule → pattern → exploration；只读命中的卡片，并记录命中原因、适用范围和失效条件。没命中就继续，不强套类比。详见 `system/skills/knowledge-lifecycle.md`。
+2. **wiki/（本地，最先查）**：检索 `wiki/sources/`、`wiki/entities/`、`wiki/concepts/` 和加载器命中的 `wiki/explorations/`、`wiki/patterns/`、`wiki/rules/` 页面。
    - **矛盾扫描**：发现新材料与 wiki 已有结论冲突，直接指出"与 `{文件}` 不一致：`{具体矛盾}`"——补盲点，不是证错。
    - 避免重复研究：已有 exploration 覆盖的，先读它再决定要不要更新。
 3. **websearch（联网补充）**：wiki 不够时联网。每条结论标来源；抓不到全文就走 `WebFetch` / 代理，全失败标注"待人工搜索"。
@@ -102,6 +102,8 @@ Wiki check: 查了 wiki/ 的 {x} 篇，{命中/未命中/有矛盾}。
 | 新出现、未来会反复查的公司 / 人 / 产品 | `wiki/entities/{name}.md` |
 | 可复用的概念 / 框架 / 行业认知 | `wiki/concepts/{slug}.md` |
 | 引用到的单篇外部来源摘要 | `wiki/sources/YYYY-MM-DD-{slug}.md` |
+
+新建 source、entity、concept 或 exploration 页面后，按 `wiki/_schema.md` 调用统一 `wiki_tagger.py tag ... --apply` 补空字段；已有 `tagging.status: completed` 的页面不会重复调用 API。
 
 回写时维护**双向关联**：新 exploration 链接到引用的 sources / entities；更新 entity 时检查相关页面的关联网络。
 

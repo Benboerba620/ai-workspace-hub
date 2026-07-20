@@ -23,10 +23,10 @@
 | 继续上下文 | `workspace/meta/active-context.md` | `workspace/meta/active-context.md` |
 | 查看当前待办 | `system/skills/workspace-status.md` + `workspace/review-queue.md` | 只读汇总，不修改判断 |
 | 升级工作区 | `system/skills/upgrade-workspace.md` | 先预览，确认后只更新受管文件 |
-| 摄入材料 | `wiki/_schema.md` + `system/integrations/personal-wiki.md`；笔记走 `system/skills/first-ingest.md`，PDF 走 `system/skills/pdf-ingest.md` | `wiki/` |
+| 摄入材料 | `wiki/_schema.md` + `system/integrations/personal-wiki.md`；笔记走 `system/skills/first-ingest.md` 并自动打标签，PDF 走 `system/skills/pdf-ingest.md` | `wiki/` |
 | 首次股票研究 | `system/skills/first-research.md` + `workspace/research-profile.md` | `output/research/` + 研究偏好 v0.1 |
 | 后续研究 | `workspace/research-profile.md` + `system/skills/research.md` + 两个知识索引；结束走 `system/skills/research-closeout.md` | `output/research/` → 知识与假设分流 |
-| 知识复盘 / 提炼 | `system/skills/knowledge-lifecycle.md` + `wiki/explorations/_index.md` + `workspace/patterns/_index.md` | exploration 验证 → pattern → rule |
+| 知识复盘 / 提炼 / 加载规则 | `system/skills/knowledge-lifecycle.md` + `knowledge_lifecycle.py` | exploration 验证 → pattern → rule；按场景选择性加载 |
 | 快速筛选 | `system/skills/screen.md` | `output/screen/` |
 | 播客摄入 | `system/skills/podcast.md` | `wiki/sources/` + `wiki/raw/podcasts/` + `output/pod2wiki/` |
 | 日报监控 | `system/skills/daily-watch.md`（接线细节见 `system/integrations/daily-watchlist.md`） | `daily-watchlist-reports/` + `evidence/` + 假设引用 |
@@ -55,7 +55,8 @@
 - Markdown frontmatter 是研究、假设和证据“当前状态”的唯一来源；正文只保存分析与历史。
 - `config/daily-watchlist-watchlist.md` 是日报执行股票池的唯一来源；`monitoring/` 只是用户看板。
 - wiki 沉淀、假设状态调整、股票池新增、研究偏好固化等需要确认的动作，先追加到 `workspace/review-queue.md`，不能只留在对话里。
-- 研究开始时先读 `wiki/explorations/_index.md` 和 `workspace/patterns/_index.md`，按结构特征命中后才读全文；不用共享关键词强套类比。
+- 研究开始时先用 `knowledge_lifecycle.py load --context ...` 匹配 `rule / pattern / exploration`，只加载命中的卡片；记录命中原因、适用范围和失效条件，不用共享关键词强套类比。
+- 新建、复盘或改变知识状态后运行 `knowledge_lifecycle.py rebuild-index --apply`；三类 `_index.md` 是自动生成的加载路由，不手工堆证据。
 - 用户说“看看现在该做什么”时，运行 `python system/scripts/workspace_status.py`（macOS/Linux 可用 `python3`）。
 
 ## active-context：断点续传
