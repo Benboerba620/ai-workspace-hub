@@ -19,20 +19,40 @@
 
 确认这次研究的**关注要点**。默认套用下面的「研究要点模板」；用户有自己的要点清单（如只看"竞争格局 + 估值"）就按用户的来，可在 `workspace/workspace-config.md` 的 `research:` 段固化常用要点。
 
-## 第 1 步：输入源（本地优先，逐层外扩）
+## 第 1 步：Research Preflight（必须先扫描本地）
+
+先创建研究文件并分配稳定 ID，再把公司/主题、ticker、产业链位置、周期阶段、约束类型、催化类型和决策场景写成一组明确关键词。运行：
+
+```bash
+python3 system/scripts/research_preflight.py --root . \
+  --context "英飞凌 IFX.DE 功率半导体 800V 碳化硅 供给瓶颈 公司研究" \
+  --research-id {R-ID} --research-file output/research/{报告文件}.md \
+  --ticker IFX.DE --record
+```
+
+Windows 只有 `python` 时用 `python`。扫描器读取 `workspace-config.md` 的 `wiki_root`，一次完成：
+
+1. 按 `rule → pattern → exploration` 匹配仍然生效的可复用知识；默认排除弱化、失效、退役和归档卡。
+2. 扫描 `entities / concepts / sources` 的标题、ticker、concepts、tags、related、摘要和正文；默认不扫 `raw/`。
+3. 标出显式过期状态、到期复审、来源字段缺失和已经填写的反方/冲突章节。
+4. 生成 `output/research/preflight/{R-ID}.md` 回执；`--research-file` 自动把 `preflight_id / knowledge_used / wiki_pages_loaded` 写进研究报告 frontmatter，研究 ID 不一致时拒绝写入。
+
+Agent 必须打开命中的知识卡和 Wiki 页面全文，再开始外部搜索。关键词命中只是召回，不代表页面结论正确；看到“无关”、反例或冲突时按正文语义判断。脚本失败时允许用本地搜索降级，但必须在 `Wiki check` 写明失败和人工扫描范围，不能静默跳过。
+
+## 第 2 步：输入源（本地优先，逐层外扩）
 
 按顺序，能在前一层解决就不必往后：
 
-1. **可复用知识加载**：先分配本次研究 ID，再用产业链位置、周期阶段、约束类型、催化类型和决策场景组成 context，运行 `knowledge_lifecycle.py load --context "..." --record --research-id {R-ID}`。加载顺序为 rule → pattern → exploration；只读命中的卡片，并记录命中原因、适用范围和失效条件。没命中就继续，不强套类比。详见 `system/skills/knowledge-lifecycle.md`。
-2. **wiki/（本地，最先查）**：检索 `wiki/sources/`、`wiki/entities/`、`wiki/concepts/` 和加载器命中的 `wiki/explorations/`、`wiki/patterns/`、`wiki/rules/` 页面。
+1. **Preflight 命中的 Wiki 页面**：先读 Rule / Pattern / Exploration，再读 Entity / Concept / Source。
    - **矛盾扫描**：发现新材料与 wiki 已有结论冲突，直接指出"与 `{文件}` 不一致：`{具体矛盾}`"——补盲点，不是证错。
    - 避免重复研究：已有 exploration 覆盖的，先读它再决定要不要更新。
+2. **补充本地检索**：Preflight 未命中但存在别名、旧文件名或弱结构页面时，用本地全文搜索补查，并把新增页面加入 `wiki_pages_loaded`。
 3. **websearch（联网补充）**：wiki 不够时联网。每条结论标来源；抓不到全文就走 `WebFetch` / 代理，全失败标注"待人工搜索"。
 4. **可选数据源（用户自有 API）**：如 tushare（A股行情财务）、gangtise（卖方纪要）或用户自己的 API。
    - 这些是**可选数据源**，照 `system/integrations/_template.md` 接入，在 `workspace/workspace-config.md` 的 `data_sources:` 段登记 endpoint / 取数方式（key 走环境变量，不写进 repo）。
    - **没配置就跳过**，把需要它的数字标 `[待验证]` 并说明"需 {数据源} 补"，**不要编造**。
 
-## 第 2 步：按研究要点输出
+## 第 3 步：按研究要点输出
 
 写到 `output/research/YYYY-MM-DD-{topic}.md`。默认结构（用户要点优先）：
 
@@ -47,12 +67,18 @@ mode: 收敛 / 发散
 tags: []
 linked_hypotheses: []
 linked_entities: []
+preflight_id:
+knowledge_used: []
+wiki_pages_loaded: []
 ---
 
 # {研究主题}
 
 ## 研究问题与范围
 - 要回答什么、边界在哪。收敛任务在此列出 2-4 条可验证条件。
+
+## 本地知识加载
+- Preflight 回执、命中的知识卡和 Wiki 页面、过期/冲突提示。
 
 ## 关注要点
 - 逐条对应本次要点清单（默认：业务/驱动因子、竞争格局、关键数据、风险、催化剂）。
@@ -75,18 +101,18 @@ linked_entities: []
 ## 下一步
 - 具体动作。
 
-Wiki check: 查了 wiki/ 的 {x} 篇，{命中/未命中/有矛盾}。
+Wiki check: 引用 Preflight 回执；扫描 {x} 篇，命中知识卡 {y} 张、普通 Wiki {z} 篇，{无复审提示/有过期或冲突提示}。
 ```
 
 **硬规则**：每个事实 / 数字都带来源标注；`[本地]` / `[网页]` / `[数据]` / `[推测]` / `[待验证]` 分清楚。投资决策依赖这份输出，把推测包装成事实会误导判断。
 
-## 第 3 步：讨论升级（闭环的中段）
+## 第 4 步：讨论升级（闭环的中段）
 
 输出交付后，用户往往会继续追问、挑战、要求深挖某一点。这一轮交互里产生的新判断、被推翻的旧假设、达成的共识，都是研究的真正增量——**不要让它们停在对话里蒸发**。
 
 跟进讨论时持续维护同一份 `output/research/` 文件（用 Edit 更新，不要每轮新建）。
 
-## 第 4 步：闭环回写 wiki（确认后才写）
+## 第 5 步：闭环回写 wiki（确认后才写）
 
 研究告一段落、或讨论出明确结论时，**主动提示一次**（一次对话最多提 1-2 次，避免噪音）：
 

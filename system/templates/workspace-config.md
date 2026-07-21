@@ -97,6 +97,8 @@
 - skill: `system/skills/research.md`
 - profile: `workspace/research-profile.md`（首次研究生成 v0.1，至少 3 次后再固化模板）
 - inputs: `wiki/` + `websearch` + `data_sources`（可选）
+- preflight: `system/scripts/research_preflight.py`（先扫描 Rule / Pattern / Exploration + Entity / Concept / Source）
+- preflight_receipts: `output/research/preflight/`
 - writes_to: `output/research/` → 确认后回写 `wiki/explorations/`
 - focus_points: 默认 `业务/驱动因子, 竞争格局, 关键数据, 风险, 催化剂`（按需自定义）
 

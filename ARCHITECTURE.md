@@ -193,6 +193,21 @@ note / PDF / podcast source
 
 所有入口共用 `system/lib/llm_client.py` 和同一套字段校验。摄入单文件时明确加 `--apply`；历史 `backfill` 默认只预览。打标器只补空字段，并用 `tagging.status: completed` 防止合法空值触发重复 API 调用。
 
+## Research Preflight 层
+
+```text
+研究问题 + ticker + 结构关键词
+  -> 加载 active Rule / Pattern / Exploration
+  -> 扫描 Entity / Concept / Source
+  -> 返回命中理由、摘要片段、过期/反方提示
+  -> output/research/preflight/{R-ID}.md
+  -> Agent 打开命中全文后再联网
+```
+
+`research_preflight.py` 读取 `workspace-config.md` 的 `wiki_root`，因此本地 Wiki 和外部 Wiki 使用同一入口。它是标准库本地扫描，不调用 LLM；复杂度与 Markdown 页数线性相关。默认不扫描 `raw/`，并限制知识卡和普通 Wiki 的返回数量，控制上下文成本。关键词命中只是召回，不能替代对否定语义、反例和来源质量的判断。
+
+研究报告通过 `preflight_id / knowledge_used / wiki_pages_loaded` 引用扫描回执。这样“先查本地知识”从行为建议变成可验证步骤；扫描失败允许人工全文搜索降级，但必须在 `Wiki check` 留下失败原因和范围。
+
 ## 知识编译层
 
 ```text

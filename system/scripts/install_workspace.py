@@ -22,6 +22,7 @@ DIRECTORIES = (
     "wiki/rules",
     "inbox",
     "output/research",
+    "output/research/preflight",
     "output/screen",
     "output/pod2wiki",
     "monitoring",

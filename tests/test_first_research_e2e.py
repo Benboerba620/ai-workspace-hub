@@ -34,6 +34,9 @@ STATUS = load_module(
 QUEUE = load_module(
     "e2e_review_queue", REPO_ROOT / "system/scripts/review_queue.py"
 )
+PREFLIGHT = load_module(
+    "e2e_research_preflight", REPO_ROOT / "system/scripts/research_preflight.py"
+)
 
 
 def replace_once(path: Path, old: str, new: str) -> None:
@@ -69,11 +72,25 @@ def test_fresh_stock_research_reaches_reviewed_evidence_loop() -> None:
             "mode: 收敛\n"
             "linked_hypotheses: [H1]\n"
             "linked_entities: [IFX.DE]\n"
+            "preflight_id:\n"
+            "knowledge_used: []\n"
+            "wiki_pages_loaded: []\n"
             "---\n\n"
             "# Infineon research\n\n"
             "## 核心结论\n\n"
             "[推测] AI 电源架构升级可能扩大高压功率器件需求。\n",
             encoding="utf-8",
+        )
+        preflight = PREFLIGHT.build_preflight(
+            root,
+            context="Infineon IFX.DE AI power architecture",
+            research_id="R20260711-01",
+            tickers=["IFX.DE"],
+        )
+        PREFLIGHT.update_research_file(root, research_path, preflight)
+        PREFLIGHT.save_receipt(root, preflight)
+        PREFLIGHT.lifecycle.record_load(
+            root, preflight["context"], preflight["knowledge"], "R20260711-01"
         )
 
         hypothesis_path = root / "hypothesis/H1-ai-power-architecture.md"

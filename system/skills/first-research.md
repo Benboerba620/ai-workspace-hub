@@ -10,7 +10,7 @@
 
 1. 一次只确认一个关键问题：`为什么现在研究这家公司，最终想支持什么决定？`
 2. 建立简短 research brief：分配稳定研究 ID（`RYYYYMMDD-NN`），记录研究对象、决策背景、时间范围、2-4 个可验证问题。
-3. 读取 `workspace/research-profile.md`、相关 wiki 和已有假设，再按 `system/skills/research.md` 补充外部证据。
+3. 读取 `workspace/research-profile.md` 和已有假设；用 research brief 的关键词和研究 ID 运行 `research_preflight.py --record`，打开命中的 Rule / Pattern / Exploration 与相关 Entity / Concept / Source 后，再按 `system/skills/research.md` 补充外部证据。
 4. 报告必须回答：核心驱动、市场预期、反方证据、估值或预期差、什么会改变判断、未来跟踪什么。
 5. 和用户讨论报告。优先记录用户的删改、追问和反驳，不用问一套调查问卷。
 6. 研究收口时执行 `system/skills/research-closeout.md`。

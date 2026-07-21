@@ -11,6 +11,8 @@
 - 新增 `knowledge_lifecycle.py`：支持生命周期汇总、三类短索引重建、按场景选择性加载、实际调用记录和带确认门槛的升降级迁移。
 - 新增 `wiki/explorations/_index.md`、`wiki/patterns/_index.md`、`wiki/rules/_index.md` 自动摘要索引；默认只加载生效知识，弱化/退役内容需显式复盘加载。
 - 新增 `knowledge-lifecycle.md` 可执行协议，定义跨案例晋级、降级、归档、复审和调用记录边界。
+- 新增 `research_preflight.py`：研究开始前一次加载有效 Rule / Pattern / Exploration，并扫描配置 Wiki 的 Entity / Concept / Source；支持外部 `wiki_root`，默认不扫 raw、不调用 LLM。
+- 新增研究前置回执 `output/research/preflight/{R-ID}.md`；研究报告记录 `preflight_id / knowledge_used / wiki_pages_loaded`，使“先查本地”可验证。
 
 ### 改进
 
@@ -18,6 +20,7 @@
 - 安装器、安全升级清单和 Core Mode 检查器接入新索引与空白模板，旧工作区只补缺失文件、不覆盖用户知识。
 - Doctor 与 `workspace_status.py` 增加知识卡 ID、来源链、生命周期状态、复审日期、晋级门槛和失效信号检查；旧卡缺字段只提示渐进迁移。
 - 修正冷安装仍复制演示股票池的问题；新工作区和仓库默认股票池为空，Doctor 不再因不存在的示例假设报错。
+- 研究入口统一改走 Research Preflight；命中结果附带相关度原因、摘要片段和显式过期/弱化/反方章节提示，之后才进入联网补充。
 
 ## 0.6.0 - 2026-07-11
 

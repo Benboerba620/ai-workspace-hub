@@ -69,6 +69,7 @@ class InstallWorkspaceTests(unittest.TestCase):
                 "system/scripts/check_workspace.py",
                 "system/scripts/wiki_tagger.py",
                 "system/scripts/knowledge_lifecycle.py",
+                "system/scripts/research_preflight.py",
                 "system/scripts/workspace_status.py",
                 "system/scripts/review_queue.py",
                 "system/scripts/upgrade_workspace.py",

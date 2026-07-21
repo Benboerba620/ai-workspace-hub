@@ -92,6 +92,7 @@ def is_overdue(value: Any) -> bool:
 
 def collect_status(root: Path) -> dict[str, Any]:
     active_research: list[dict[str, str]] = []
+    research_without_preflight: list[str] = []
     for path in sorted((root / "output" / "research").glob("*.md")):
         meta = parse_frontmatter(path)
         status = str(meta.get("status") or "draft").lower()
@@ -101,8 +102,11 @@ def collect_status(root: Path) -> dict[str, Any]:
                     "id": str(meta.get("id") or path.stem),
                     "path": relative(path, root),
                     "status": status,
+                    "preflight_id": str(meta.get("preflight_id") or ""),
                 }
             )
+            if not meta.get("preflight_id"):
+                research_without_preflight.append(str(meta.get("id") or path.stem))
 
     open_hypotheses: list[dict[str, Any]] = []
     overdue_reviews: list[str] = []
@@ -211,6 +215,10 @@ def collect_status(root: Path) -> dict[str, Any]:
         recommendations.append(f"审查 {len(knowledge_promotion_candidates)} 张知识卡是否应晋级。")
     if active_research:
         recommendations.append("继续或收口进行中的研究。")
+    if research_without_preflight:
+        recommendations.append(
+            "为进行中研究补 Research Preflight：" + "、".join(research_without_preflight) + "。"
+        )
     if not watchlist.is_file():
         recommendations.append("初始化唯一执行股票池 config/daily-watchlist-watchlist.md。")
     if not recommendations:
@@ -219,6 +227,10 @@ def collect_status(root: Path) -> dict[str, Any]:
     return {
         "workspace": str(root),
         "active_research": active_research,
+        "research_preflight": {
+            "receipts": len(list((root / "output/research/preflight").glob("*.md"))),
+            "missing_for_active_research": research_without_preflight,
+        },
         "open_hypotheses": open_hypotheses,
         "pending_evidence": pending_evidence,
         "pending_reviews": queue,
@@ -242,6 +254,7 @@ def render_text(status: dict[str, Any]) -> str:
     lines.extend(
         [
             f"进行中研究：{len(status['active_research'])}",
+            f"Preflight 回执：{status['research_preflight']['receipts']}（进行中缺失 {len(status['research_preflight']['missing_for_active_research'])}）",
             f"开放假设：{len(status['open_hypotheses'])}",
             f"待复盘证据：{len(status['pending_evidence'])}",
             f"待确认动作：{len(status['pending_reviews'])}",

@@ -336,7 +336,9 @@ def collect_knowledge(
 
 
 def validate(root: Path) -> dict[str, Any]:
-    research, findings = collect_objects(root, "output/research/**/*.md", "R")
+    research, findings = collect_objects(root, "output/research/*.md", "R")
+    preflights, more = collect_objects(root, "output/research/preflight/*.md", "PF-")
+    findings.extend(more)
     hypotheses, more = collect_objects(root, "hypothesis/H*.md", "H")
     findings.extend(more)
     evidence, more = collect_objects(root, "evidence/**/*.md", "E-")
@@ -345,6 +347,7 @@ def validate(root: Path) -> dict[str, Any]:
     findings.extend(more)
 
     research_ids = {item["id"] for item in research}
+    preflight_by_id = {item["id"]: item for item in preflights}
     hypothesis_ids = {item["id"] for item in hypotheses}
     knowledge_ids = {item["id"] for item in knowledge if item["id"]}
     exploration_ids = {
@@ -395,6 +398,46 @@ def validate(root: Path) -> dict[str, Any]:
                         f"关联假设 `{hypothesis_id}` 不存在",
                     )
                 )
+        preflight_id = str(meta.get("preflight_id") or "").strip()
+        if not preflight_id and status in {"active", "closed"}:
+            findings.append(
+                finding(
+                    "WARN",
+                    "missing-research-preflight",
+                    item["path"],
+                    "进行中或已收口研究缺少 Research Preflight 回执",
+                )
+            )
+        elif preflight_id and preflight_id not in preflight_by_id:
+            findings.append(
+                finding(
+                    "ERROR",
+                    "broken-research-preflight",
+                    item["path"],
+                    f"引用的 preflight `{preflight_id}` 不存在",
+                )
+            )
+        elif preflight_id:
+            receipt = preflight_by_id[preflight_id]
+            if str(receipt["meta"].get("research_id") or "") != item["id"]:
+                findings.append(
+                    finding(
+                        "ERROR",
+                        "preflight-research-mismatch",
+                        item["path"],
+                        f"回执 `{preflight_id}` 属于另一研究",
+                    )
+                )
+            for field in ("knowledge_used", "wiki_pages_loaded"):
+                if set(as_list(meta.get(field))) != set(as_list(receipt["meta"].get(field))):
+                    findings.append(
+                        finding(
+                            "ERROR",
+                            "preflight-load-mismatch",
+                            item["path"],
+                            f"报告与回执的 `{field}` 不一致",
+                        )
+                    )
 
     for item in hypotheses:
         meta = item["meta"]
@@ -524,6 +567,7 @@ def validate(root: Path) -> dict[str, Any]:
         "workspace": str(root),
         "objects": {
             "research": len(research),
+            "preflights": len(preflights),
             "hypotheses": len(hypotheses),
             "evidence": len(evidence),
             "knowledge": len(knowledge),
@@ -539,7 +583,7 @@ def render_text(result: dict[str, Any]) -> str:
     lines = [
         "AI Workspace Hub 结构验证",
         f"工作区：{result['workspace']}",
-        f"对象：研究 {objects['research']} / 假设 {objects['hypotheses']} / 证据 {objects['evidence']}",
+        f"对象：研究 {objects['research']} / Preflight {objects['preflights']} / 假设 {objects['hypotheses']} / 证据 {objects['evidence']}",
         f"知识：{objects['knowledge']} 张生命周期卡",
         f"结果：{result['errors']} errors / {result['warnings']} warnings",
     ]

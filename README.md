@@ -150,7 +150,7 @@ flowchart LR
 
 核心不是"文件夹长什么样"，而是：**agent 进入目录后知道先读什么、做研究时先查本地 wiki、输出时事实与推测分开、证据和判断不混写、待确认动作不会随对话消失、明天继续时能从断点接上。**
 
-wiki 变大后也不会每次全量加载。Agent 用 `knowledge_lifecycle.py load --context ...` 按产业链位置、周期阶段、约束类型、催化类型和决策场景匹配三类短索引，按 `rule -> pattern -> exploration` 只加载命中的卡片。知识按 `source -> exploration -> pattern -> rule` 逐级提炼；每次晋级、降级或退役都保留用户确认、复审日期和失效条件。
+wiki 变大后也不会每次全量加载。每次研究先运行 Research Preflight：按 `rule -> pattern -> exploration` 加载相关可复用知识，同时扫描 `entities / concepts / sources`，只返回少量命中页面、命中理由和过期/冲突提示，再决定哪些问题需要联网。扫描不调用大模型，并生成可检查的回执。知识按 `source -> exploration -> pattern -> rule` 逐级提炼；每次晋级、降级或退役都保留用户确认、复审日期和失效条件。
 
 材料进入 wiki 时由同一个打标器补齐 `domain / ticker / concepts / related / entity_salience / tags`。新材料直接写入，历史补标默认只预览；已有人工字段不会被覆盖。
 
@@ -240,8 +240,8 @@ ai-workspace-hub/
 ```bash
 python3 system/scripts/check_workspace.py          # 总检查
 python3 system/scripts/workspace_status.py         # 当前研究、证据和待办
+python3 system/scripts/research_preflight.py --root . --context "你的研究问题和关键词" --research-id R-... --research-file output/research/报告.md --record  # 扫描 Wiki 并更新研究报告
 python3 system/scripts/knowledge_lifecycle.py --root . summary  # 知识状态、到期复审和晋级候选
-python3 system/scripts/knowledge_lifecycle.py --root . load --context "你的研究问题" --record --research-id R-...  # 加载并记录命中的规则/模式
 python3 system/scripts/knowledge_lifecycle.py --root . rebuild-index --apply  # 重建三个短索引
 python3 system/scripts/review_queue.py list        # 查看持久待确认队列
 python3 system/scripts/wiki_tagger.py --root . backfill wiki  # 预览历史 wiki 补标

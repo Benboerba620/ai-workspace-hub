@@ -42,6 +42,7 @@ CORE_FILES = (
     "system/skills/screen.md",
     "system/scripts/wiki_tagger.py",
     "system/scripts/knowledge_lifecycle.py",
+    "system/scripts/research_preflight.py",
     "system/integrations/object-model.md",
 )
 
@@ -60,6 +61,7 @@ CORE_DIRECTORIES = (
     "wiki/rules",
     "output",
     "output/research",
+    "output/research/preflight",
     "output/screen",
     "hypothesis",
     "evidence",

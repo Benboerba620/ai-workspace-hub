@@ -119,6 +119,9 @@ class WorkspaceStatusTests(unittest.TestCase):
 
             status = STATUS.collect_status(root)
             self.assertEqual(len(status["active_research"]), 1)
+            self.assertEqual(
+                status["research_preflight"]["missing_for_active_research"], ["R1"]
+            )
             self.assertEqual(len(status["pending_evidence"]), 1)
             self.assertEqual(len(status["pending_reviews"]), 1)
             self.assertEqual(

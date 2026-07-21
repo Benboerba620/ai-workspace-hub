@@ -29,6 +29,13 @@
 - skill: `system/skills/screen.md`
 - writes_to: `output/screen/`
 
+## research preflight
+- status: `enabled`
+- script: `system/scripts/research_preflight.py`
+- reads_from: configured `wiki_root` 的 `rules/`, `patterns/`, `explorations/`, `entities/`, `concepts/`, `sources/`
+- writes_to: `output/research/preflight/`, `workspace/knowledge-usage.jsonl`
+- boundary: 本地确定性召回，不调用 LLM；命中不等于结论正确
+
 ## 假设追踪（基座自带）
 - status: `enabled`
 - 契约: `system/integrations/hypothesis-tracker.md`

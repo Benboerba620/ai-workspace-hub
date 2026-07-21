@@ -26,6 +26,7 @@
 | 摄入材料 | `wiki/_schema.md` + `system/integrations/personal-wiki.md`；笔记走 `system/skills/first-ingest.md` 并自动打标签，PDF 走 `system/skills/pdf-ingest.md` | `wiki/` |
 | 首次股票研究 | `system/skills/first-research.md` + `workspace/research-profile.md` | `output/research/` + 研究偏好 v0.1 |
 | 后续研究 | `workspace/research-profile.md` + `system/skills/research.md` + 两个知识索引；结束走 `system/skills/research-closeout.md` | `output/research/` → 知识与假设分流 |
+| 开始研究 / 扫描本地知识 | `research_preflight.py` + `system/skills/research.md` | 一次加载 Rule / Pattern / Exploration，并扫描 Entity / Concept / Source |
 | 知识复盘 / 提炼 / 加载规则 | `system/skills/knowledge-lifecycle.md` + `knowledge_lifecycle.py` | exploration 验证 → pattern → rule；按场景选择性加载 |
 | 快速筛选 | `system/skills/screen.md` | `output/screen/` |
 | 播客摄入 | `system/skills/podcast.md` | `wiki/sources/` + `wiki/raw/podcasts/` + `output/pod2wiki/` |
@@ -55,7 +56,8 @@
 - Markdown frontmatter 是研究、假设和证据“当前状态”的唯一来源；正文只保存分析与历史。
 - `config/daily-watchlist-watchlist.md` 是日报执行股票池的唯一来源；`monitoring/` 只是用户看板。
 - wiki 沉淀、假设状态调整、股票池新增、研究偏好固化等需要确认的动作，先追加到 `workspace/review-queue.md`，不能只留在对话里。
-- 研究开始时先用 `knowledge_lifecycle.py load --context ...` 匹配 `rule / pattern / exploration`，只加载命中的卡片；记录命中原因、适用范围和失效条件，不用共享关键词强套类比。
+- 研究开始时必须先运行 `research_preflight.py --context ... --research-id ... --research-file ... --record`，加载命中的 `rule / pattern / exploration` 并扫描相关 `entity / concept / source`；打开命中页面全文后才联网。
+- 研究报告必须记录 `preflight_id / knowledge_used / wiki_pages_loaded` 和 `Wiki check`；扫描失败可以人工降级，但不能静默跳过。
 - 新建、复盘或改变知识状态后运行 `knowledge_lifecycle.py rebuild-index --apply`；三类 `_index.md` 是自动生成的加载路由，不手工堆证据。
 - 用户说“看看现在该做什么”时，运行 `python system/scripts/workspace_status.py`（macOS/Linux 可用 `python3`）。
 

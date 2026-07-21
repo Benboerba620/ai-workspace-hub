@@ -21,6 +21,7 @@ ID 创建后不因标题、文件名或观点变化而改变。旧文件没有 `
 
 - 假设的当前 `status`、`certainty`、`updated_at`、`last_reviewed_at` 只认 frontmatter。
 - 研究的当前 `status` 只认 frontmatter；建议值为 `draft / active / closed / archived`。
+- 研究开始前的本地扫描只认对应 `output/research/preflight/{R-ID}.md` 回执；研究 frontmatter 用 `preflight_id / knowledge_used / wiki_pages_loaded` 引用，不把“我记得查过”当记录。
 - 证据的当前审核状态只认 `review_status`；建议值为 `pending / confirmed / rejected`。
 - Exploration、Pattern、Rule 的当前 `status`、`review_due`、适用范围和失效信号只认各自知识卡 frontmatter；短索引是自动生成的路由，不是状态真相。
 - 规则调用事实只追加到 `workspace/knowledge-usage.jsonl`，调用次数不能覆盖证据和生命周期状态。

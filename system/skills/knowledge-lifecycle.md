@@ -60,7 +60,7 @@ python3 system/scripts/knowledge_lifecycle.py --root . summary
 
 ## 加载机制
 
-不要每次全文读取 Wiki。先用当前研究的产业链位置、周期阶段、约束类型、催化类型和决策问题组成 `context`，再调用加载器：
+正式研究默认使用 `research_preflight.py`，它会同时加载生命周期知识并扫描 Entity / Concept / Source。下面的直接加载命令用于单独调试规则召回、复盘知识卡，或不需要普通 Wiki 扫描的任务：
 
 ```bash
 python3 system/scripts/knowledge_lifecycle.py --root . load \
