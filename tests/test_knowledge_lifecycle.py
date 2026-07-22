@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -287,6 +288,55 @@ invalidation_signals: [反例]
         self.assertIn("broken-knowledge-link", codes)
         self.assertIn("rule-confirmations", codes)
         self.assertEqual(result["objects"]["knowledge"], 2)
+
+    def test_cycle_top_example_keeps_mother_cases_out_of_confirmations(self) -> None:
+        fixture = REPO_ROOT / "examples/knowledge-lifecycle-cycle-top/wiki"
+        shutil.copytree(fixture, self.root / "wiki", dirs_exist_ok=True)
+
+        summary = KNOWLEDGE.summarize(self.root)
+        self.assertEqual(summary["counts"]["exploration"]["promoted"], 2)
+        self.assertEqual(summary["counts"]["pattern"]["draft"], 1)
+        self.assertEqual(summary["promotion_candidates"], [])
+
+        default_matches = KNOWLEDGE.load_knowledge(
+            self.root,
+            context="制造业扩产 ROIC 设备订单 周期见顶",
+            selected_types={"pattern"},
+            limit=8,
+            include_review=False,
+            all_active=False,
+            filters=EMPTY_FILTERS,
+        )
+        self.assertEqual(default_matches, [])
+
+        review_matches = KNOWLEDGE.load_knowledge(
+            self.root,
+            context="制造业扩产 ROIC 设备订单 周期见顶",
+            selected_types={"pattern"},
+            limit=8,
+            include_review=True,
+            all_active=False,
+            filters=EMPTY_FILTERS,
+        )
+        self.assertEqual(
+            [item["id"] for item in review_matches], ["PAT-EXAMPLE-CYCLE-TOP-01"]
+        )
+
+        pattern_page = next(
+            page
+            for page in KNOWLEDGE.iter_pages(self.root, {"pattern"})
+            if page["meta"].get("id") == "PAT-EXAMPLE-CYCLE-TOP-01"
+        )
+        errors = KNOWLEDGE.transition_errors(pattern_page, "active")
+        self.assertIn("pattern 至少需要两次 primary confirmation 才能 active", errors)
+
+        independently_confirmed = {
+            **pattern_page,
+            "meta": {**pattern_page["meta"], "primary_confirmations": 2},
+        }
+        self.assertEqual(
+            KNOWLEDGE.transition_errors(independently_confirmed, "active"), []
+        )
 
 
 if __name__ == "__main__":
