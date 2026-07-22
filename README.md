@@ -154,6 +154,12 @@ wiki 变大后也不会每次全量加载。每次研究先运行 Research Prefl
 
 材料进入 wiki 时由同一个打标器补齐 `domain / ticker / concepts / related / entity_salience / tags`。新材料直接写入，历史补标默认只预览；已有人工字段不会被覆盖。
 
+### 用真实案例理解 Wiki 晋级
+
+[产能扩张周期见顶案例](examples/knowledge-lifecycle-cycle-top/README.md) 把一条真实研究判断拆成 4 个 Source、2 个已提炼 Exploration 和 1 张 draft Pattern：光伏与锂电是产生该 Pattern 的母案例，因此不能再次冒充独立确认，`primary_confirmations` 保持为 0。日常研究默认不会加载这张草稿卡；复盘模式可以找到它，未来经过两次新的独立事前验证并由用户确认后，才允许变成 active Pattern。累计三次独立确认后，再讨论是否形成可执行 Rule。
+
+案例目录可以独立运行 `summary` 和 `load`，仓库测试同时守住“母案例不计确认、draft 不进入日常加载、满足门槛后才可晋级”三条边界。
+
 > 系统不在某个模型里，而在这套文件协议里。谁读懂这套协议，谁就接上你的工作流。
 
 ---
