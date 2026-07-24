@@ -139,6 +139,8 @@ ai-workspace-hub/
 │   ├── research-profile.md         # 从真实研究校准的方法偏好
 │   ├── review-queue.md             # 待用户确认的动作
 │   ├── knowledge-usage.jsonl       # 实际调用的知识 ID（追加式记录）
+│   ├── monitoring/                  # 用户阅读的监控看板
+│   ├── archive/                     # 退出主流程的历史材料
 │   └── meta/
 │       ├── active-context.md       # 工作记忆
 │       └── friction-log.md         # 摩擦日志
@@ -151,11 +153,9 @@ ai-workspace-hub/
 │   └── rules/                      # 可调用决策规则 + 索引
 │
 ├── inbox/                          # 输入
-├── output/                         # 输出（research/ screen/ pod2wiki/ 等子目录）
-├── monitoring/                     # 用户阅读的监控看板
+├── output/                         # 输出（research/ screen/ pod2wiki/ daily-watch/）
 ├── hypothesis/                     # 假设追踪与复盘
 ├── evidence/                       # 独立证据账本
-├── daily-watchlist-reports/        # 日报输出
 ├── portfolio/                      # 交易记录
 │
 ├── system/                         # 机器零件箱
@@ -165,8 +165,6 @@ ai-workspace-hub/
 │   ├── interfaces/                 #   已启用工具总览
 │   ├── scripts/                    #   基座脚本（安装 / 检查 / wiki_tagger / PDF）
 │   └── templates/                  #   安装时复制的模板文件
-│
-└── _archive/                       # 归档区
 ```
 
 ---
@@ -230,7 +228,7 @@ Hub 用 `system/managed-files.json` 记录三类文件，安装时在
 | 类型 | 典型路径 | 升级规则 |
 |------|----------|--------------|
 | Hub 管理 | `system/`、`tools/`、依赖清单 | 展示差异后可以更新 |
-| 用户所有 | `wiki/`、`config/`、`output/`、`hypothesis/`、`evidence/`、`portfolio/` 等 | 永不自动覆盖 |
+| 用户所有 | `wiki/`、`config/`、`output/`、`hypothesis/`、`evidence/`、`portfolio/`、`workspace/monitoring/` 等 | 永不自动覆盖 |
 | 混合文件 | Agent 入口、`wiki/_schema.md`、`workspace/workspace-config.md` | 保留本地修改，只提示合并 |
 
 ## 状态层
@@ -239,7 +237,7 @@ Hub 用 `system/managed-files.json` 记录三类文件，安装时在
 
 - 研究 `RYYYYMMDD-NN`、假设 `Hn`、证据 `E-*`、待确认动作 `Q-*` 创建后不改 ID。
 - frontmatter 是当前状态唯一来源，正文只保存论证和历史日志。
-- `config/daily-watchlist-watchlist.md` 是唯一执行股票池；`monitoring/` 是展示层。
+- `config/daily-watchlist-watchlist.md` 是唯一执行股票池；`workspace/monitoring/` 是展示层。
 - `workspace/review-queue.md` 保存不能自动生效的动作。
 - `system/scripts/workspace_status.py` 汇总进行中研究、开放假设、待复盘证据、到期复盘和待确认动作。
 

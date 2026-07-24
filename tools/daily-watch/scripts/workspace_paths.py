@@ -3,7 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 CONFIG_DIRNAME = "config"
-REPORTS_DIRNAME = "daily-watchlist-reports"
+REPORTS_DIR = Path("output/daily-watch")
+LEGACY_REPORTS_DIRNAME = "daily-watchlist-reports"
 HYPOTHESIS_DIRNAME = "hypothesis"
 EVIDENCE_DIRNAME = "evidence"
 PORTFOLIO_DIRNAME = "portfolio"
@@ -116,6 +117,15 @@ def resolve_hypothesis_dir(workspace_root: Path) -> Path:
 
 def resolve_evidence_dir(workspace_root: Path) -> Path:
     return workspace_root / EVIDENCE_DIRNAME
+
+
+def resolve_reports_dir(workspace_root: Path) -> Path:
+    """Use the compact output path, while preserving existing workspaces."""
+    preferred = workspace_root / REPORTS_DIR
+    legacy = workspace_root / LEGACY_REPORTS_DIRNAME
+    if legacy.is_dir():
+        return legacy
+    return preferred
 
 
 def resolve_portfolio_dir(workspace_root: Path) -> Path:

@@ -25,7 +25,7 @@ ID 创建后不因标题、文件名或观点变化而改变。旧文件没有 `
 - 证据的当前审核状态只认 `review_status`；建议值为 `pending / confirmed / rejected`。
 - Exploration、Pattern、Rule 的当前 `status`、`review_due`、适用范围和失效信号只认各自知识卡 frontmatter；短索引是自动生成的路由，不是状态真相。
 - 规则调用事实只追加到 `workspace/knowledge-usage.jsonl`，调用次数不能覆盖证据和生命周期状态。
-- `config/daily-watchlist-watchlist.md` 是驱动日报的唯一股票池。`monitoring/` 只做用户看板和专题视图。
+- `config/daily-watchlist-watchlist.md` 是驱动日报的唯一股票池。`workspace/monitoring/` 只做用户看板和专题视图。
 - 正文日志记录“曾经发生过什么”，不能反向覆盖 frontmatter 的当前状态。
 
 ## 证据最小字段
@@ -37,7 +37,7 @@ type: evidence
 observed_at: 2026-07-11
 recorded_at: 2026-07-11
 source_type: daily-watch
-source_path: daily-watchlist-reports/2026-07/2026-07-11.md
+source_path: output/daily-watch/2026-07/2026-07-11.md
 source_url:
 direction: pending
 confidence: pending

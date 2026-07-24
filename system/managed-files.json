@@ -18,6 +18,7 @@
       "hypothesis/**",
       "inbox/**",
       "monitoring/**",
+      "_archive/**",
       "output/**",
       "portfolio/**",
       "wiki/concepts/**",
@@ -31,7 +32,9 @@
       "wiki/false-beliefs.md",
       "workspace/patterns/**",
       "workspace/cache/**",
+      "workspace/archive/**",
       "workspace/meta/**",
+      "workspace/monitoring/**",
       "workspace/review-queue.md",
       "workspace/knowledge-usage.jsonl"
     ],

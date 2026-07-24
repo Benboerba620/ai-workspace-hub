@@ -30,7 +30,7 @@ Agent 首次使用时检查上述条件，缺什么补什么。
    ```bash
    python3 tools/daily-watch/scripts/generate_daily_report.py
    ```
-3. 脚本输出报告骨架到 `daily-watchlist-reports/YYYY-MM/YYYY-MM-DD.md`
+3. 脚本输出报告骨架到 `output/daily-watch/YYYY-MM/YYYY-MM-DD.md`
 4. Agent 用 websearch 补充新闻：异动原因、财报反应、行业动态
 5. Agent 扫描 `hypothesis/H*.md`。可确认的行情/财报信号先写入 `evidence/YYYY-MM/`，再把证据 ID 引用到相关假设；主题匹配仍只提示，不自动造证据
 6. 最终报告写入，更新 `workspace/meta/active-context.md`
@@ -53,7 +53,7 @@ Longbridge Skill/CLI 是独立 Agent 扩展，不是 `tools/daily-watch/` 的内
 
 | 输出 | 路径 |
 |------|------|
-| 日报 | `daily-watchlist-reports/YYYY-MM/YYYY-MM-DD.md` |
+| 日报 | `output/daily-watch/YYYY-MM/YYYY-MM-DD.md` |
 | 独立证据 | `evidence/YYYY-MM/E-*.md` |
 | 假设证据 | `hypothesis/H*.md`（只追加证据引用） |
 | 长期结论 | `wiki/explorations/`（可选沉淀） |

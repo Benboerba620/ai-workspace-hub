@@ -21,7 +21,7 @@
 
 ---
 
-> 🚧 本项目仍在持续更新，我会把自己真实使用中跑通的研究流程、案例和改进陆续同步到这里。当前版本已经可以使用，但文档与工作流还会继续迭代，欢迎 Star 或 Watch 关注后续更新。
+> **最近更新（2026-07-24）**：研究开始前，系统现在会先扫描 Wiki 里的规则、模式、阶段判断和相关资料，再决定哪些信息需要联网补充。知识库也补上了从 Exploration → Pattern → Rule 的完整生命周期，支持按需加载、复审、升降级和调用记录，让一次研究能真正沉淀并在后续复用。
 
 > 对话很聪明，但工作流没有记忆；今天做完，明天又从头解释。
 
@@ -119,7 +119,7 @@ Agent 会汇总进行中的研究、待复盘证据、到期假设和待确认�
 | 📚 | **wiki** | "把这篇文章整理进知识库" | `wiki/` | 推荐（自动标签） |
 | 🔬 | **research** | "帮我研究一下某公司 / 某行业" | `output/research/` | 不需要 |
 | 🔍 | **screen** | "帮我筛选 AI 产业链股票" | `output/screen/` | 可选 |
-| 📊 | **daily-watch** | "生成今天的盯盘日报" | `daily-watchlist-reports/` + `evidence/` | 可选 |
+| 📊 | **daily-watch** | "生成今天的盯盘日报" | `output/daily-watch/` + `evidence/` | 可选 |
 | 🧪 | **hypothesis** | "把这个投资假设建档并追踪" | `hypothesis/` | 不需要 |
 | 🎙️ | **podcast** | "扫一下这几个播客并写进 wiki" | `wiki/sources/` + `output/pod2wiki/` | 需要 LLM key |
 
@@ -210,14 +210,15 @@ ai-workspace-hub/
 ├── SMOKE-TEST.md             # 冒烟测试
 ├── ARCHITECTURE.md           # 架构说明
 ├── TROUBLESHOOTING.md        # 故障排查
-├── workspace/                # 项目配置、断点续传、待确认队列
+├── workspace/                # 配置、断点、看板与归档
+│   ├── monitoring/           # 用户阅读的监控看板
+│   └── archive/              # 退出主流程的历史材料
 ├── inbox/                    # 临时输入材料
 ├── wiki/                     # personal wiki（exploration / pattern / rule）
-├── output/                   # 研究、筛选、播客等输出
-├── monitoring/               # 用户阅读的监控看板
+├── output/                   # 研究、筛选、播客和日报输出
+│   └── daily-watch/          # 日报归档
 ├── hypothesis/               # 投资假设和复盘
 ├── evidence/                 # 独立证据账本
-├── daily-watchlist-reports/  # 日报输出
 ├── portfolio/                # 交易记录
 ├── config/                   # 用户配置，不入 git
 ├── tools/                    # podcast / daily-watch 工具

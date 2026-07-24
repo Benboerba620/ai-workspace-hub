@@ -16,6 +16,7 @@
 
 ### 改进
 
+- 收拢顶层目录：日报归入 `output/daily-watch/`，看板与归档归入 `workspace/`；旧工作区已有的 `daily-watchlist-reports/`、`monitoring/` 和 `_archive/` 仍被识别，不自动搬动用户文件。
 - 笔记、PDF 和 pod2wiki 来源统一接入自动标签；只补空字段，历史批量处理默认预览并缓存结果，确认写入不重复调用 API。
 - 安装器、安全升级清单和 Core Mode 检查器接入新索引与空白模板，旧工作区只补缺失文件、不覆盖用户知识。
 - Doctor 与 `workspace_status.py` 增加知识卡 ID、来源链、生命周期状态、复审日期、晋级门槛和失效信号检查；旧卡缺字段只提示渐进迁移。

@@ -21,6 +21,7 @@ from workspace_paths import (
     resolve_env_path,
     resolve_evidence_dir,
     resolve_hypothesis_dir,
+    resolve_reports_dir,
     resolve_template_path,
 )
 
@@ -825,7 +826,7 @@ def build_report(
         "Sunday": "星期日",
     }
     weekday = weekday_map[today.strftime("%A")]
-    report_dir = workspace_root / "daily-watchlist-reports" / today.strftime("%Y-%m")
+    report_dir = resolve_reports_dir(workspace_root) / today.strftime("%Y-%m")
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / f"{today.isoformat()}.md"
 

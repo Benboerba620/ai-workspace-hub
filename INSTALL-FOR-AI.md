@@ -27,14 +27,13 @@ my-ai-workspace/
 ├── workspace/meta/active-context.md
 ├── workspace/meta/friction-log.md
 ├── workspace/review-queue.md
+├── workspace/monitoring/ / archive/
 ├── wiki/_schema.md
 ├── wiki/raw/ / sources/ / entities/ / concepts/ / explorations/
 ├── inbox/
-├── output/ / output/screen/
-├── monitoring/
+├── output/ / output/screen/ / output/daily-watch/
 ├── hypothesis/
 ├── evidence/
-├── daily-watchlist-reports/
 ├── portfolio/journal/
 ├── config/
 ├── tools/podcast/（含 scripts/ examples/ .env.example requirements.txt）
@@ -99,6 +98,8 @@ python3 "{SOURCE_ROOT}/system/scripts/install_workspace.py" \
 
 ```text
 workspace/meta/
+workspace/monitoring/
+workspace/archive/
 wiki/raw/
 wiki/sources/
 wiki/entities/
@@ -109,10 +110,9 @@ output/
 output/research/
 output/screen/
 output/pod2wiki/
-monitoring/
+output/daily-watch/
 hypothesis/
 evidence/
-daily-watchlist-reports/
 portfolio/journal/
 config/
 tools/podcast/scripts/
@@ -218,7 +218,7 @@ system/templates/
 - status: enabled
 - project_path: ./tools/daily-watch
 - reads_from: config/daily-watchlist-watchlist.md, wiki/entities, wiki/concepts
-- writes_to: daily-watchlist-reports, evidence, hypothesis（证据引用）
+- writes_to: output/daily-watch, evidence, hypothesis（证据引用）
 
 ## screen
 - status: enabled

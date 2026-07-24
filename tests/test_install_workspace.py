@@ -42,6 +42,9 @@ class InstallWorkspaceTests(unittest.TestCase):
             self.assertGreater(created, 50)
             self.assertEqual(skipped, 0)
             self.assertTrue((target / "workspace/cache").is_dir())
+            self.assertTrue((target / "workspace/monitoring").is_dir())
+            self.assertTrue((target / "workspace/archive").is_dir())
+            self.assertTrue((target / "output/daily-watch").is_dir())
             required = (
                 "AGENTS.md",
                 "CLAUDE.md",

@@ -74,7 +74,7 @@ tools/daily-watch/
 
 ```
 config/                       # 实际配置文件（从 config-examples/ 复制）
-daily-watchlist-reports/      # 生成的日报
+output/daily-watch/           # 生成的日报
   └── 2026-06/
       └── 2026-06-24.md
 hypothesis/                   # 假设文件（H1.md, H2.md, ...）
@@ -198,7 +198,7 @@ focus_areas:
 
 ## 输出示例
 
-运行 `generate_daily_report.py` 后在 `daily-watchlist-reports/YYYY-MM/YYYY-MM-DD.md` 生成一份 Markdown 日报。
+运行 `generate_daily_report.py` 后在 `output/daily-watch/YYYY-MM/YYYY-MM-DD.md` 生成一份 Markdown 日报。旧工作区若已有 `daily-watchlist-reports/`，会继续写入旧位置，避免拆分历史记录。
 
 ### 报告结构
 
@@ -238,7 +238,7 @@ VIX / SPY / QQQ / GLD / WTI / BTC 的当前价和涨跌幅表格
 
 - 🟡 **[DW-2026-06-24-mover-nvda-h1] E-2026-06-24-mover-nvda-h1** - NVDA 今日涨跌幅 +4.52%，分类 Technology
   - 证据：evidence/2026-06/E-2026-06-24-mover-nvda-h1.md
-  - 来源：daily-watchlist-reports/2026-06/2026-06-24.md
+  - 来源：output/daily-watch/2026-06/2026-06-24.md
   - 影响：待复盘；本条引用不改变 frontmatter 中的确定性或状态。
 ```
 

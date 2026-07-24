@@ -20,7 +20,7 @@
 
 | 动作 | 路径 |
 |---|---|
-| 读取 | `{wiki/entities/ 或 monitoring/ 或 ...}` |
+| 读取 | `{wiki/entities/ 或 workspace/monitoring/ 或 ...}` |
 | 写入主产物 | `{wiki/sources/ 或 output/{工具名}/ 或 ...}` |
 | 写入原始材料（如有） | `{wiki/raw/{...}/}` |
 | 回写证据（输出侧，如有） | `{hypothesis/}` |

@@ -19,10 +19,11 @@
 | `wiki/concepts/` | 概念和主题 |
 | `wiki/explorations/` | 综合判断和阶段性结论 |
 | `output/` | 报告、日报、文章草稿等输出 |
-| `monitoring/` | 用户阅读的监控看板，不驱动日报 |
+| `workspace/monitoring/` | 用户阅读的监控看板，不驱动日报 |
+| `workspace/archive/` | 已退出主流程但暂时保留的历史材料 |
 | `hypothesis/` | 假设、证据引用和复盘 |
 | `evidence/` | 独立证据账本，保存来源、方向和审核状态 |
-| `daily-watchlist-reports/` | 日报输出 |
+| `output/daily-watch/` | 日报输出 |
 | `portfolio/` | 交易记录 |
 | `config/` | 用户配置文件（不入 git） |
 | `tools/` | 内置工具代码 |
@@ -143,7 +144,7 @@
   - `wiki/entities/`
   - `wiki/concepts/`
 - writes_to:
-  - `daily-watchlist-reports/`
+  - `output/daily-watch/`
   - `evidence/`
   - `hypothesis/`（只追加证据引用，不自动改变状态）
 
