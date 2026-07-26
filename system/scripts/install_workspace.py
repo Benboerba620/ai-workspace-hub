@@ -25,10 +25,11 @@ DIRECTORIES = (
     "output/research/preflight",
     "output/screen",
     "output/pod2wiki",
-    "monitoring",
+    "output/daily-watch",
+    "workspace/monitoring",
+    "workspace/archive",
     "hypothesis",
     "evidence",
-    "daily-watchlist-reports",
     "portfolio/journal",
     "config",
     "system/interfaces",
@@ -99,6 +100,11 @@ CONFIG_MAPPINGS = (
     ("tools/podcast/.env.example", "config/pod2wiki.env"),
 )
 
+OBSIDIAN_READING_HUB_MAPPINGS = (
+    ("system/templates/reading-hub.base", "reading-hub.base"),
+    ("system/templates/reading-hub.md", "reading-hub.md"),
+)
+
 
 def copy_file(source: Path, destination: Path, merge: bool) -> str:
     if destination.exists():
@@ -155,6 +161,11 @@ def customize_workspace_config(
     config_path.write_text(text, encoding="utf-8")
 
 
+def detect_obsidian_vault(target_root: Path) -> bool:
+    """True when the target is (or sits at the root of) an Obsidian vault."""
+    return (target_root / ".obsidian").is_dir()
+
+
 def read_hub_version(source_root: Path) -> str:
     manifest_path = source_root / "system" / "managed-files.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -187,6 +198,7 @@ def install(
     name: str,
     primary_use: str,
     wiki_root: str,
+    obsidian_reading_hub: bool = False,
 ) -> tuple[int, int]:
     source_root = source_root.resolve()
     target_root = target_root.resolve()
@@ -223,6 +235,12 @@ def install(
         created += new_count
         skipped += skipped_count
 
+    if obsidian_reading_hub or detect_obsidian_vault(target_root):
+        for source_rel, target_rel in OBSIDIAN_READING_HUB_MAPPINGS:
+            result = copy_file(source_root / source_rel, target_root / target_rel, merge)
+            created += result == "created"
+            skipped += result == "skipped"
+
     workspace_config = target_root / "workspace/workspace-config.md"
     if workspace_config_created:
         customize_workspace_config(workspace_config, name, primary_use, wiki_root)
@@ -249,6 +267,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Allow a non-empty target and keep every existing file unchanged",
     )
+    parser.add_argument(
+        "--obsidian-reading-hub",
+        action="store_true",
+        help="Also install the Obsidian reading dashboard (reading-hub.base + reading-hub.md). "
+        "Auto-enabled when the target already contains a .obsidian directory.",
+    )
     return parser
 
 
@@ -262,6 +286,7 @@ def main() -> int:
             name=args.name,
             primary_use=args.primary_use,
             wiki_root=args.wiki_root,
+            obsidian_reading_hub=args.obsidian_reading_hub,
         )
     except (FileExistsError, FileNotFoundError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
@@ -271,6 +296,9 @@ def main() -> int:
     print(f"Created files: {created}; preserved existing files: {skipped}")
     print(f'Next: python3 "{target / "system/scripts/check_workspace.py"}" --root "{target}" (verifies Core Mode)')
     print("Enhanced Mode (optional): run tools/daily-watch/scripts/check_setup.py later.")
+    if args.obsidian_reading_hub or detect_obsidian_vault(target):
+        print("Obsidian Reading Hub: installed reading-hub.base + reading-hub.md "
+              "(open reading-hub.md in Obsidian 1.9+).")
     return 0
 
 

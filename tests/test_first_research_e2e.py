@@ -121,7 +121,7 @@ def test_fresh_stock_research_reaches_reviewed_evidence_loop() -> None:
             encoding="utf-8",
         )
 
-        report_path = root / "daily-watchlist-reports/2026-07/2026-07-11.md"
+        report_path = root / "output/daily-watch/2026-07/2026-07-11.md"
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text("# 每日监控简报 - 2026-07-11\n", encoding="utf-8")
         hypotheses = read_hypotheses(root)

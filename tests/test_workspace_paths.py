@@ -9,7 +9,7 @@ from _test_paths import REPO_ROOT  # noqa: F401 (also sets up sys.path)
 
 from check_setup import initialize_config  # noqa: E402
 from fetch_market_data import fetch_nasdaq_quote, load_env  # noqa: E402
-from workspace_paths import find_workspace_root  # noqa: E402
+from workspace_paths import find_workspace_root, resolve_reports_dir  # noqa: E402
 
 
 class WorkspacePathTests(unittest.TestCase):
@@ -43,6 +43,19 @@ class WorkspacePathTests(unittest.TestCase):
             self.assertEqual(len(first), 5)
             self.assertEqual(second, [])
             self.assertTrue((root / "config" / "daily-watchlist.yaml").is_file())
+
+    def test_reports_use_compact_output_path_for_new_workspaces(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.assertEqual(resolve_reports_dir(root), root / "output/daily-watch")
+
+    def test_reports_keep_legacy_path_when_it_already_exists(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            legacy = root / "daily-watchlist-reports"
+            legacy.mkdir()
+            (root / "output/daily-watch").mkdir(parents=True)
+            self.assertEqual(resolve_reports_dir(root), legacy)
 
     def test_placeholder_api_keys_are_ignored(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

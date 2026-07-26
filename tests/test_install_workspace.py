@@ -42,6 +42,9 @@ class InstallWorkspaceTests(unittest.TestCase):
             self.assertGreater(created, 50)
             self.assertEqual(skipped, 0)
             self.assertTrue((target / "workspace/cache").is_dir())
+            self.assertTrue((target / "workspace/monitoring").is_dir())
+            self.assertTrue((target / "workspace/archive").is_dir())
+            self.assertTrue((target / "output/daily-watch").is_dir())
             required = (
                 "AGENTS.md",
                 "CLAUDE.md",
@@ -140,6 +143,52 @@ class InstallWorkspaceTests(unittest.TestCase):
                 (target / "workspace/.hub-state.json").read_text(encoding="utf-8")
             )
             self.assertEqual(state["install_mode"], "merge")
+
+
+class ObsidianReadingHubTests(unittest.TestCase):
+    def test_opt_in_installs_dashboard_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "workspace"
+            INSTALLER.install(
+                REPO_ROOT,
+                target,
+                merge=False,
+                name="SANDBOX",
+                primary_use="investing",
+                wiki_root="./wiki",
+                obsidian_reading_hub=True,
+            )
+            self.assertTrue((target / "reading-hub.base").is_file())
+            self.assertTrue((target / "reading-hub.md").is_file())
+
+    def test_dashboard_files_off_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "workspace"
+            INSTALLER.install(
+                REPO_ROOT,
+                target,
+                merge=False,
+                name="SANDBOX",
+                primary_use="investing",
+                wiki_root="./wiki",
+            )
+            self.assertFalse((target / "reading-hub.base").exists())
+            self.assertFalse((target / "reading-hub.md").exists())
+
+    def test_existing_obsidian_vault_auto_enables(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            (target / ".obsidian").mkdir()
+            INSTALLER.install(
+                REPO_ROOT,
+                target,
+                merge=True,
+                name="SANDBOX",
+                primary_use="investing",
+                wiki_root="./wiki",
+            )
+            self.assertTrue((target / "reading-hub.base").is_file())
+            self.assertTrue((target / "reading-hub.md").is_file())
 
 
 if __name__ == "__main__":

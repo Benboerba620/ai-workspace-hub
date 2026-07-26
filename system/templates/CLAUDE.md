@@ -30,7 +30,7 @@
 | 知识复盘 / 提炼 / 加载规则 | `system/skills/knowledge-lifecycle.md` + `knowledge_lifecycle.py` | exploration 验证 → pattern → rule；按场景选择性加载 |
 | 快速筛选 | `system/skills/screen.md` | `output/screen/` |
 | 播客摄入 | `system/skills/podcast.md` | `wiki/sources/` + `wiki/raw/podcasts/` + `output/pod2wiki/` |
-| 日报监控 | `system/skills/daily-watch.md`（接线细节见 `system/integrations/daily-watchlist.md`） | `daily-watchlist-reports/` + `evidence/` + 假设引用 |
+| 日报监控 | `system/skills/daily-watch.md`（接线细节见 `system/integrations/daily-watchlist.md`） | `output/daily-watch/` + `evidence/` + 假设引用 |
 | 管理股票池 | `system/skills/daily-watch-import.md` | `config/daily-watchlist-watchlist.md` |
 | 假设操作 | `system/skills/daily-watch-ht.md` | `hypothesis/` + `portfolio/` |
 | 假设复盘 | `system/skills/hypothesis-review.md` + 相关研究和日报 | `hypothesis/` → 确认后更新 `wiki/explorations/` |
@@ -54,7 +54,8 @@
 ## 状态与确认
 
 - Markdown frontmatter 是研究、假设和证据“当前状态”的唯一来源；正文只保存分析与历史。
-- `config/daily-watchlist-watchlist.md` 是日报执行股票池的唯一来源；`monitoring/` 只是用户看板。
+- `config/daily-watchlist-watchlist.md` 是日报执行股票池的唯一来源；`workspace/monitoring/` 只是用户看板。
+- 旧工作区如果已有 `daily-watchlist-reports/`、`monitoring/` 或 `_archive/`，继续读取原位置，不自动搬动用户文件；新工作区分别使用 `output/daily-watch/`、`workspace/monitoring/` 和 `workspace/archive/`。
 - wiki 沉淀、假设状态调整、股票池新增、研究偏好固化等需要确认的动作，先追加到 `workspace/review-queue.md`，不能只留在对话里。
 - 研究开始时必须先运行 `research_preflight.py --context ... --research-id ... --research-file ... --record`，加载命中的 `rule / pattern / exploration` 并扫描相关 `entity / concept / source`；打开命中页面全文后才联网。
 - 研究报告必须记录 `preflight_id / knowledge_used / wiki_pages_loaded` 和 `Wiki check`；扫描失败可以人工降级，但不能静默跳过。

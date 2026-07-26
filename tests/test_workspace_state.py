@@ -35,7 +35,7 @@ class EvidenceLedgerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             hypothesis_dir = root / "hypothesis"
-            report = root / "daily-watchlist-reports/2026-07/2026-07-11.md"
+            report = root / "output/daily-watch/2026-07/2026-07-11.md"
             hypothesis_dir.mkdir(parents=True)
             report.parent.mkdir(parents=True)
             report.write_text("# report\n", encoding="utf-8")

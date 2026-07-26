@@ -27,14 +27,13 @@ my-ai-workspace/
 ├── workspace/meta/active-context.md
 ├── workspace/meta/friction-log.md
 ├── workspace/review-queue.md
+├── workspace/monitoring/ / archive/
 ├── wiki/_schema.md
 ├── wiki/raw/ / sources/ / entities/ / concepts/ / explorations/
 ├── inbox/
-├── output/ / output/screen/
-├── monitoring/
+├── output/ / output/screen/ / output/daily-watch/
 ├── hypothesis/
 ├── evidence/
-├── daily-watchlist-reports/
 ├── portfolio/journal/
 ├── config/
 ├── tools/podcast/（含 scripts/ examples/ .env.example requirements.txt）
@@ -47,13 +46,14 @@ my-ai-workspace/
 
 ---
 
-## 安装前只问 3 个问题
+## 安装前只问 4 个问题
 
 一次只问一个问题。
 
 1. 工作区要放在哪里？默认：当前目录。
 2. 主要用途是什么？默认：股票研究；也可以选择写作、播客整理或个人知识库。
 3. 是否已经有 wiki？如果有，路径是什么？
+4. 你用 Obsidian 当阅读器吗？默认：不用。用 → 安装阅读台（Obsidian Bases 仪表盘，自动汇总 inbox / 研究 / 筛选 / 播客 / 日报的新内容）。
 
 如果用户不确定，就用默认值继续，不要卡住。
 
@@ -91,7 +91,7 @@ python3 "{SOURCE_ROOT}/system/scripts/install_workspace.py" \
   --wiki-root "{wiki路径}"
 ```
 
-参数说明：用户没有现成 wiki 时，`--wiki-root` 直接省略（默认值 `./wiki`，即在工作区内新建）；只有用户给出**已存在**的 wiki 路径时才传该参数。
+参数说明：用户没有现成 wiki 时，`--wiki-root` 直接省略（默认值 `./wiki`，即在工作区内新建）；只有用户给出**已存在**的 wiki 路径时才传该参数。用户用 Obsidian 时加 `--obsidian-reading-hub`；目标目录里已有 `.obsidian/`（装进现有 Obsidian 库）时安装器会自动启用，不用手动传参。
 
 安装器成功后跳到 Step 3 继续。没有 Python 时，Agent 按下面的 Step 1-2 使用文件工具完成同样操作。
 
@@ -99,6 +99,8 @@ python3 "{SOURCE_ROOT}/system/scripts/install_workspace.py" \
 
 ```text
 workspace/meta/
+workspace/monitoring/
+workspace/archive/
 wiki/raw/
 wiki/sources/
 wiki/entities/
@@ -109,10 +111,9 @@ output/
 output/research/
 output/screen/
 output/pod2wiki/
-monitoring/
+output/daily-watch/
 hypothesis/
 evidence/
-daily-watchlist-reports/
 portfolio/journal/
 config/
 tools/podcast/scripts/
@@ -140,6 +141,10 @@ system/templates/
 - `system/templates/research-profile.md` -> `workspace/research-profile.md`
 - `system/templates/review-queue.md` -> `workspace/review-queue.md`
 - `system/templates/interfaces-README.md` -> `system/interfaces/README.md`
+
+**可选：Obsidian 阅读台**（仅当用户使用 Obsidian）：
+- `system/templates/reading-hub.base` -> `reading-hub.base`
+- `system/templates/reading-hub.md` -> `reading-hub.md`
 
 **知识库**：
 - `wiki/_schema.md` -> `wiki/_schema.md`
@@ -218,7 +223,7 @@ system/templates/
 - status: enabled
 - project_path: ./tools/daily-watch
 - reads_from: config/daily-watchlist-watchlist.md, wiki/entities, wiki/concepts
-- writes_to: daily-watchlist-reports, evidence, hypothesis（证据引用）
+- writes_to: output/daily-watch, evidence, hypothesis（证据引用）
 
 ## screen
 - status: enabled
@@ -277,11 +282,12 @@ Longbridge 不是上述脚本的环境变量数据源。它是独立 Agent Skill
 
 ### Step 7：完成后告诉用户
 
-给用户 3 个可见结果：
+给用户这些可见结果：
 
 1. `AGENTS.md` 和 `CLAUDE.md` 已创建。
 2. `tools/podcast/` 和 `tools/daily-watch/` 已就位。
 3. `check_workspace.py` 已显示 Core Mode 是否可用；如果用户还没填 API key，说明 Enhanced Mode 可之后再开。
+4. 如果用户用 Obsidian：`reading-hub.md` 已安装为阅读首页（需要 Obsidian 1.9+ 的 Bases 功能），每天从它开始扫新内容。
 
 先用一份材料确认系统能工作：
 
