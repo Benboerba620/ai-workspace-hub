@@ -8,6 +8,8 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
+import yaml
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INSTALLER_PATH = REPO_ROOT / "system" / "scripts" / "install_workspace.py"
@@ -146,6 +148,28 @@ class InstallWorkspaceTests(unittest.TestCase):
 
 
 class ObsidianReadingHubTests(unittest.TestCase):
+    def test_dashboard_base_is_valid_and_has_expected_views(self) -> None:
+        base_path = REPO_ROOT / "system/templates/reading-hub.base"
+        raw = base_path.read_bytes()
+        dashboard = yaml.safe_load(raw)
+        expected_views = {
+            "🎯 今日看什么",
+            "📥 Inbox（未读）",
+            "🔬 研究",
+            "🔍 筛选",
+            "🎙️ Podcast",
+            "📊 日报监控",
+            "📚 Sources（近30天未读）",
+            "⭐ 精读清单",
+            "✅ 最近已读",
+        }
+
+        self.assertFalse(
+            raw.startswith(b"\xef\xbb\xbf"),
+            "Base template should not contain a BOM",
+        )
+        self.assertEqual({view["name"] for view in dashboard["views"]}, expected_views)
+
     def test_opt_in_installs_dashboard_files(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "workspace"

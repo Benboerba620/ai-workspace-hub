@@ -21,7 +21,7 @@
 
 ---
 
-> **最近更新（2026-07-24）**：研究开始前，系统现在会先扫描 Wiki 里的规则、模式、阶段判断和相关资料，再决定哪些信息需要联网补充。知识库也补上了从 Exploration → Pattern → Rule 的完整生命周期，支持按需加载、复审、升降级和调用记录，让一次研究能真正沉淀并在后续复用。
+> **最近更新（2026-08-18）**：新增可选 Obsidian 阅读台，自动汇总 inbox、研究、筛选、Podcast 和日报新内容；同时明确 daily-watch 与 podcast 已随 Hub 内置，无需单独安装。
 
 > 对话很聪明，但工作流没有记忆；今天做完，明天又从头解释。
 
@@ -41,7 +41,7 @@ https://raw.githubusercontent.com/Benboerba620/ai-workspace-hub/main/INSTALL-FOR
 抓不到协议全文就先 git clone 本仓库，再读其中的 INSTALL-FOR-AI.md 逐字执行。
 ```
 
-Agent 会问你 3 个问题，然后自动创建完整工作区。装好后，先用样例确认安装：
+Agent 会问你 4 个问题（路径、用途、现有 wiki、是否使用 Obsidian），然后自动创建完整工作区。装好后，先用样例确认安装：
 
 ```text
 把 inbox/first-note.md 整理进 personal wiki。
@@ -123,6 +123,8 @@ Agent 会汇总进行中的研究、待复盘证据、到期假设和待确认�
 | 🧪 | **hypothesis** | "把这个投资假设建档并追踪" | `hypothesis/` | 不需要 |
 | 🎙️ | **podcast** | "扫一下这几个播客并写进 wiki" | `wiki/sources/` + `output/pod2wiki/` | 需要 LLM key |
 
+> **daily-watch 和 podcast 已经内置在 Hub 中，不需要再单独安装。** 只有行情、自动标签、播客摘要等 Enhanced Mode 能力需要你按需填写 API key。
+>
 > **零 key 可用**：wiki 仍可摄入，但跳过脚本自动标签；research、hypothesis、screen（websearch 模式）、daily-watch（报告骨架 + 美股降级源）照常可用。
 >
 > **默认建议配置**：自己的 DeepSeek / Kimi / GLM / Qwen key 用于 wiki 自动标签和播客摘要；tushare（A 股）· FMP（全球行情）· [Longbridge Skill](https://open.longbridge.com/zh-CN/skill/)（多市场查询）按需开启。
@@ -272,6 +274,9 @@ Python 工具需要 3.10+。**Windows 用户**用 `python` 代替 `python3`，�
 **Q：一定要用 Codex / Claude Code 吗？**
 不一定。任何能读写文件的 AI agent 都可以。Codex 和 Claude Code 效果最好，Cursor 和 Cline 也可以。
 
+**Q：安装 Hub 后，还要单独安装 daily-watchlist 或 pod2wiki 吗？**
+不需要。两套工具及其配置模板已经包含在 `tools/daily-watch/` 和 `tools/podcast/`；你只需要按用途配置自己的 API key 或可选依赖。
+
 **Q：wiki 越来越大怎么办？**
 用 Obsidian 打开 `wiki/` 目录做可视化管理，或让 AI agent 帮你整理归档。
 
@@ -282,7 +287,7 @@ Python 工具需要 3.10+。**Windows 用户**用 `python` 代替 `python3`，�
 会把当前 wiki 页面的 frontmatter 和正文发送给你在 `config/pod2wiki.env` 选择的模型服务商，只用于返回结构化标签。敏感材料应先确认所选服务商的数据政策，或跳过自动标签。
 
 **Q：可以和 Obsidian 一起用吗？**
-可以。把 `wiki/` 添加为 Obsidian vault 即可，所有笔记都是标准 Markdown。
+可以。安装时选择 Obsidian（或在已有 vault 中安装），Hub 会增加 `reading-hub.md` 和 `reading-hub.base`，用 9 个动态视图汇总待读内容；默认不安装，也不影响非 Obsidian 用户。需要 Obsidian 1.9+ 的 Bases 功能。
 
 更多问题见 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)。
 
@@ -295,7 +300,6 @@ Python 工具需要 3.10+。**Windows 用户**用 `python` 代替 `python3`，�
 - 更多真实研究工作流样例
 - 更强的 screen 预设
 - 更完善的 daily-watch 降级策略
-- 更好的 Obsidian 兼容说明
 - 证据来源质量分级和跨来源事件去重
 - 知识索引的自动健康检查与过期提示
 

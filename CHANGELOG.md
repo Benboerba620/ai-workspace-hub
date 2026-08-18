@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.0 - 2026-07-26
+## 0.8.0 - 2026-08-18
 
 ### 新增
 
@@ -17,6 +17,8 @@
 
 ### 改进
 
+- README 明确 daily-watch 与 podcast 已随 Hub 内置，无需单独安装，并补充 Obsidian 阅读台的安装条件和使用边界。
+- 刷新 `requirements.lock` 的可复现依赖版本，移除旧锁定版本中的已知安全漏洞。
 - 收拢顶层目录：日报归入 `output/daily-watch/`，看板与归档归入 `workspace/`；旧工作区已有的 `daily-watchlist-reports/`、`monitoring/` 和 `_archive/` 仍被识别，不自动搬动用户文件。
 - 笔记、PDF 和 pod2wiki 来源统一接入自动标签；只补空字段，历史批量处理默认预览并缓存结果，确认写入不重复调用 API。
 - 安装器、安全升级清单和 Core Mode 检查器接入新索引与空白模板，旧工作区只补缺失文件、不覆盖用户知识。

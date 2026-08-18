@@ -1,6 +1,6 @@
-﻿filters:
+filters:
   and:
-    - 'file.ext == "md"'
+    - file.ext == "md"
     - or:
         - file.inFolder("inbox")
         - file.inFolder("output/research")
@@ -9,34 +9,28 @@
         - file.inFolder("output/daily-watch")
         - file.inFolder("workspace/monitoring")
         - file.inFolder("wiki/sources")
-
 formulas:
-  status: 'if(read_status, read_status, "未读")'
-  status_icon: 'if(read_status == "已读", "✅", if(read_status == "精读", "⭐", if(read_status == "跳过", "⏭️", "📄")))'
-  category: 'if(/(^|\/)inbox\//.matches(file.path), "📥 Inbox", if(/output\/research/.matches(file.path), "🔬 研究", if(/output\/screen/.matches(file.path), "🔍 筛选", if(/output\/pod2wiki/.matches(file.path), "🎙️ Podcast", if(/(output\/daily-watch|workspace\/monitoring)/.matches(file.path), "📊 日报监控", if(/wiki\/sources/.matches(file.path), "📚 Sources", "🗂️ 其他"))))))'
-  days_old: '(now() - file.ctime).days.round(0)'
-
+  status: if(read_status, read_status, "未读")
+  status_icon: if(read_status == "已读", "✅", if(read_status == "精读", "⭐", if(read_status == "跳过", "⏭️", "📄")))
+  category: if(/(^|\/)inbox\//.matches(file.path), "📥 Inbox", if(/output\/research/.matches(file.path), "🔬 研究", if(/output\/screen/.matches(file.path), "🔍 筛选", if(/output\/pod2wiki/.matches(file.path), "🎙️ Podcast", if(/(output\/daily-watch|workspace\/monitoring)/.matches(file.path), "📊 日报监控", if(/wiki\/sources/.matches(file.path), "📚 Sources", "🗂️ 其他"))))))
+  days_old: (now() - file.ctime).days.round(0)
 properties:
   read_status:
     displayName: 阅读状态
   formula.status:
     displayName: 状态
-  formula.status_icon:
-    displayName: ""
   formula.category:
     displayName: 类别
   formula.days_old:
     displayName: 入库天数
-
 views:
   - type: table
-    name: "🎯 今日看什么"
-    limit: 20
+    name: 🎯 今日看什么
     filters:
       and:
-        - '(now() - file.ctime).days <= 3'
-        - 'formula.status != "已读"'
-        - 'formula.status != "跳过"'
+        - (now() - file.ctime).days <= 3
+        - formula.status != "已读"
+        - formula.status != "跳过"
     order:
       - formula.status_icon
       - file.name
@@ -45,13 +39,13 @@ views:
     sort:
       - property: file.ctime
         direction: DESC
-
+    limit: 20
   - type: table
-    name: "📥 Inbox（未读）"
+    name: 📥 Inbox（未读）
     filters:
       and:
         - file.inFolder("inbox")
-        - 'formula.status == "未读"'
+        - formula.status == "未读"
     order:
       - formula.status_icon
       - file.name
@@ -59,13 +53,12 @@ views:
     sort:
       - property: file.ctime
         direction: DESC
-
   - type: table
-    name: "🔬 研究"
+    name: 🔬 研究
     filters:
       and:
         - file.inFolder("output/research")
-        - 'formula.status != "跳过"'
+        - formula.status != "跳过"
     order:
       - formula.status_icon
       - file.name
@@ -73,14 +66,12 @@ views:
     sort:
       - property: file.mtime
         direction: DESC
-
   - type: table
-    name: "🔍 筛选"
-    limit: 30
+    name: 🔍 筛选
     filters:
       and:
         - file.inFolder("output/screen")
-        - 'formula.status != "跳过"'
+        - formula.status != "跳过"
     order:
       - formula.status_icon
       - file.name
@@ -88,13 +79,13 @@ views:
     sort:
       - property: file.ctime
         direction: DESC
-
+    limit: 30
   - type: table
-    name: "🎙️ Podcast"
+    name: 🎙️ Podcast
     filters:
       and:
         - file.inFolder("output/pod2wiki")
-        - 'formula.status == "未读"'
+        - formula.status == "未读"
     order:
       - formula.status_icon
       - file.name
@@ -102,10 +93,8 @@ views:
     sort:
       - property: file.ctime
         direction: DESC
-
   - type: table
-    name: "📊 日报监控"
-    limit: 14
+    name: 📊 日报监控
     filters:
       or:
         - file.inFolder("output/daily-watch")
@@ -117,14 +106,14 @@ views:
     sort:
       - property: file.ctime
         direction: DESC
-
+    limit: 14
   - type: table
-    name: "📚 Sources（近30天未读）"
+    name: 📚 Sources（近30天未读）
     filters:
       and:
         - file.inFolder("wiki/sources")
-        - 'formula.status == "未读"'
-        - '(now() - file.ctime).days <= 30'
+        - formula.status == "未读"
+        - (now() - file.ctime).days <= 30
     order:
       - formula.status_icon
       - file.name
@@ -132,12 +121,11 @@ views:
     sort:
       - property: file.ctime
         direction: DESC
-
   - type: table
-    name: "⭐ 精读清单"
+    name: ⭐ 精读清单
     filters:
       and:
-        - 'read_status == "精读"'
+        - read_status == "精读"
     order:
       - formula.status_icon
       - file.name
@@ -146,13 +134,11 @@ views:
     sort:
       - property: file.ctime
         direction: DESC
-
   - type: table
-    name: "✅ 最近已读"
-    limit: 30
+    name: ✅ 最近已读
     filters:
       and:
-        - 'read_status == "已读"'
+        - read_status == "已读"
     order:
       - formula.status_icon
       - file.name
@@ -161,3 +147,4 @@ views:
     sort:
       - property: file.mtime
         direction: DESC
+    limit: 30

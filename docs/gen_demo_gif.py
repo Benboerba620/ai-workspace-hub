@@ -3,7 +3,7 @@
 
 Renders frames with Pillow: fake terminal window, typing effect for user
 input, line-by-line agent output. Content mirrors the real install and
-first-research flow (3 questions -> installer -> READY -> research profile
+first-research flow (4 questions -> installer -> READY -> research profile
 -> theme hypothesis -> daily watch). Not a screen recording; the README says so.
 
 Usage: python docs/gen_demo_gif.py [output.gif]   (requires Pillow;
@@ -29,12 +29,20 @@ YELLOW = (249, 226, 175)
 MAUVE = (203, 166, 247)
 RED = (243, 139, 168)
 
-try:
-    FONT = ImageFont.truetype("C:/Windows/Fonts/msyh.ttc", FONT_SIZE)
-    FONT_B = ImageFont.truetype("C:/Windows/Fonts/msyhbd.ttc", FONT_SIZE)
-except OSError:
-    FONT = ImageFont.truetype("msyh.ttc", FONT_SIZE)
-    FONT_B = FONT
+FONT_PAIRS = (
+    ("C:/Windows/Fonts/msyh.ttc", "C:/Windows/Fonts/msyhbd.ttc"),
+    ("msyh.ttc", "msyh.ttc"),
+    ("/System/Library/Fonts/Hiragino Sans GB.ttc", "/System/Library/Fonts/STHeiti Medium.ttc"),
+)
+for regular_path, bold_path in FONT_PAIRS:
+    try:
+        FONT = ImageFont.truetype(regular_path, FONT_SIZE)
+        FONT_B = ImageFont.truetype(bold_path, FONT_SIZE)
+        break
+    except OSError:
+        continue
+else:
+    raise OSError("No supported Chinese font found; install Microsoft YaHei or Hiragino Sans GB")
 
 TITLE = "my-ai-workspace — AI agent"
 
@@ -100,16 +108,18 @@ type_line("你 > ", "帮我按这个协议安装 AI Workspace Hub：", speed=45)
 put("     https://raw.githubusercontent.com/Benboerba620/", DIM)
 put("     ai-workspace-hub/main/INSTALL-FOR-AI.md", DIM, ms=1400)
 put()
-put("● 读到安装协议全文（Step 0-8）。安装前只问 3 个问题：", CYAN, ms=1100)
+put("● 读到安装协议全文（Step 0-8）。安装前只问 4 个问题：", CYAN, ms=1100)
 
-# ---- Scene 2: three questions ----------------------------------------
+# ---- Scene 2: four questions -----------------------------------------
 put()
-put("● 1/3 工作区放在哪里？（默认：当前目录）", CYAN, ms=700)
+put("● 1/4 工作区放在哪里？（默认：当前目录）", CYAN, ms=700)
 type_line("你 > ", "D:/my-ai-workspace")
-put("● 2/3 主要用途？（研究 / 写作 / 投研 / 知识库…）", CYAN, ms=700)
+put("● 2/4 主要用途？（研究 / 写作 / 投研 / 知识库…）", CYAN, ms=700)
 type_line("你 > ", "投研 + 个人知识库")
-put("● 3/3 已经有 wiki 吗？", CYAN, ms=700)
+put("● 3/4 已经有 wiki 吗？", CYAN, ms=700)
 type_line("你 > ", "没有")
+put("● 4/4 用 Obsidian 当阅读器吗？（默认：不用）", CYAN, ms=700)
+type_line("你 > ", "用，安装阅读台")
 put()
 
 # ---- Scene 3: installer runs -----------------------------------------
@@ -119,6 +129,7 @@ put("  √ wiki/ —— 个人知识库", GREEN, ms=380)
 put("  √ inbox/ → output/ —— 输入 → 产出", GREEN, ms=380)
 put("  √ hypothesis/ + workspace/monitoring/ —— 假设追踪 + 看板", GREEN, ms=380)
 put("  √ tools/podcast + daily-watch —— 播客摄入 + 日报", GREEN, ms=380)
+put("  √ reading-hub.md / .base —— Obsidian 阅读台", GREEN, ms=380)
 put("  √ workspace/meta/active-context —— 断点续传", GREEN, ms=700)
 put()
 put("$ python check_workspace.py", YELLOW, ms=800)
