@@ -287,7 +287,7 @@ Python 工具需要 3.10+。**Windows 用户**用 `python` 代替 `python3`，�
 会把当前 wiki 页面的 frontmatter 和正文发送给你在 `config/pod2wiki.env` 选择的模型服务商，只用于返回结构化标签。敏感材料应先确认所选服务商的数据政策，或跳过自动标签。
 
 **Q：可以和 Obsidian 一起用吗？**
-可以。安装时选择 Obsidian（或在已有 vault 中安装），Hub 会增加 `reading-hub.md` 和 `reading-hub.base`，用 9 个动态视图汇总待读内容；默认不安装，也不影响非 Obsidian 用户。需要 Obsidian 1.9+ 的 Bases 功能。
+可以。安装时选择 Obsidian（或在已有 vault 中安装），Hub 会增加 `reading-hub.md` 和 `reading-hub.base`，用 9 个动态视图汇总待读内容；可直接在表格中填写 `已读` / `精读` / `跳过`，并优先按资料自身日期而不是本机文件时间排序。默认不安装，也不影响非 Obsidian 用户。需要 Obsidian 1.9+ 的 Bases 功能。
 
 更多问题见 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)。
 

@@ -10,34 +10,40 @@ filters:
         - file.inFolder("workspace/monitoring")
         - file.inFolder("wiki/sources")
 formulas:
-  status: if(read_status, read_status, "未读")
+  status: if(read_status == "已读" || read_status == "精读" || read_status == "跳过", read_status, "未读")
   status_icon: if(read_status == "已读", "✅", if(read_status == "精读", "⭐", if(read_status == "跳过", "⏭️", "📄")))
   category: if(/(^|\/)inbox\//.matches(file.path), "📥 Inbox", if(/output\/research/.matches(file.path), "🔬 研究", if(/output\/screen/.matches(file.path), "🔍 筛选", if(/output\/pod2wiki/.matches(file.path), "🎙️ Podcast", if(/(output\/daily-watch|workspace\/monitoring)/.matches(file.path), "📊 日报监控", if(/wiki\/sources/.matches(file.path), "📚 Sources", "🗂️ 其他"))))))
-  days_old: (now() - file.ctime).days.round(0)
+  content_date: if(source_published_at, date(source_published_at), if(published_at, date(published_at), if(publish_time, date(publish_time), if(date, date(date), if(/^\d{4}-\d{2}-\d{2}/.matches(file.basename), date(file.basename.slice(0, 10)), if(created_at, date(created_at), if(created, date(created), file.ctime)))))))
+  days_old: (now() - formula.content_date).days.floor()
 properties:
   read_status:
-    displayName: 阅读状态
+    displayName: 阅读标记（点击填写）
   formula.status:
     displayName: 状态
   formula.category:
     displayName: 类别
+  formula.content_date:
+    displayName: 资料日期
   formula.days_old:
-    displayName: 入库天数
+    displayName: 距今天数
 views:
   - type: table
     name: 🎯 今日看什么
     filters:
       and:
-        - (now() - file.ctime).days <= 3
+        - formula.days_old >= 0
+        - formula.days_old <= 3
         - formula.status != "已读"
         - formula.status != "跳过"
     order:
       - formula.status_icon
       - file.name
+      - read_status
       - formula.category
+      - formula.content_date
       - formula.days_old
     sort:
-      - property: file.ctime
+      - property: formula.content_date
         direction: DESC
     limit: 20
   - type: table
@@ -49,9 +55,11 @@ views:
     order:
       - formula.status_icon
       - file.name
+      - read_status
+      - formula.content_date
       - formula.days_old
     sort:
-      - property: file.ctime
+      - property: formula.content_date
         direction: DESC
   - type: table
     name: 🔬 研究
@@ -62,6 +70,8 @@ views:
     order:
       - formula.status_icon
       - file.name
+      - read_status
+      - formula.content_date
       - file.mtime
     sort:
       - property: file.mtime
@@ -75,9 +85,10 @@ views:
     order:
       - formula.status_icon
       - file.name
-      - file.ctime
+      - read_status
+      - formula.content_date
     sort:
-      - property: file.ctime
+      - property: formula.content_date
         direction: DESC
     limit: 30
   - type: table
@@ -89,9 +100,11 @@ views:
     order:
       - formula.status_icon
       - file.name
+      - read_status
+      - formula.content_date
       - formula.days_old
     sort:
-      - property: file.ctime
+      - property: formula.content_date
         direction: DESC
   - type: table
     name: 📊 日报监控
@@ -101,10 +114,11 @@ views:
         - file.inFolder("workspace/monitoring")
     order:
       - file.name
+      - read_status
       - formula.category
-      - file.ctime
+      - formula.content_date
     sort:
-      - property: file.ctime
+      - property: formula.content_date
         direction: DESC
     limit: 14
   - type: table
@@ -113,13 +127,16 @@ views:
       and:
         - file.inFolder("wiki/sources")
         - formula.status == "未读"
-        - (now() - file.ctime).days <= 30
+        - formula.days_old >= 0
+        - formula.days_old <= 30
     order:
       - formula.status_icon
       - file.name
+      - read_status
+      - formula.content_date
       - formula.days_old
     sort:
-      - property: file.ctime
+      - property: formula.content_date
         direction: DESC
   - type: table
     name: ⭐ 精读清单
@@ -129,10 +146,12 @@ views:
     order:
       - formula.status_icon
       - file.name
+      - read_status
       - formula.category
+      - formula.content_date
       - formula.days_old
     sort:
-      - property: file.ctime
+      - property: formula.content_date
         direction: DESC
   - type: table
     name: ✅ 最近已读
@@ -142,7 +161,9 @@ views:
     order:
       - formula.status_icon
       - file.name
+      - read_status
       - formula.category
+      - formula.content_date
       - file.mtime
     sort:
       - property: file.mtime

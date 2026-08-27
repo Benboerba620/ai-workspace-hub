@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "hub_version": "0.8.0",
+  "hub_version": "0.8.1",
   "ownership": {
     "managed": [
       "system/**",

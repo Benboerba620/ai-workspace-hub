@@ -3,7 +3,8 @@
 > 工作记忆，支撑“今天停、明天接”的断点续传（协议见 `AGENTS.md` / `CLAUDE.md` 的「active-context：断点续传」段）。
 > 只记录最近 1-2 周仍值得带入对话的上下文，单条一行。不要写成长文、当日记、存长期原则。
 > 结束时 agent 自动往下面追一行，开场说“继续”时 agent 顺着最新一条的「续接锚点」接上。
-> 上限：「最近对话延续」段按 14 天滚动、最多约 20 条；超出的旧条目写断点时自动剪到 `active-context-archive-YYYY-MM.md`。
+> 上限：「最近对话延续」段有三道闸门——14 天滚动、最多约 20 条、单条正文 ≤1500 字节（超长的只留索引行）。
+> 超出的内容剪到 `active-context-archive-YYYY-MM.md`，写断点后跑 `python3 system/scripts/prune_active_context.py --apply` 即可。
 
 ## 最近对话延续
 

@@ -12,6 +12,18 @@
 6. 事实、推测、待验证必须分开。
 7. 索引是加载路由，不是缩短版报告；详细证据保留在页面正文。
 
+## 阅读台可选元数据
+
+使用 Obsidian 阅读台时，可以在任意被阅读台收录的 Markdown 顶部添加：
+
+```yaml
+read_status: 已读
+```
+
+- 可选值为 `已读` / `精读` / `跳过`；字段缺失或留空都视为未读。
+- 阅读台优先把 `source_published_at`、`published_at`、`publish_time` 或 `date` 当作资料日期；其次识别文件名开头的 `YYYY-MM-DD`，再回退到 `created_at`、`created` 和文件时间。
+- `status` 仍表示资料处理或知识生命周期状态，不要拿它代替 `read_status`。
+
 ## 分类决策树
 
 按顺序判断：
@@ -70,6 +82,7 @@ source_path:
 source_url:
 raw_path:
 status: processed
+read_status:
 domain: []
 ticker: []
 concepts: []

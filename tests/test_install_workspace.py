@@ -169,6 +169,32 @@ class ObsidianReadingHubTests(unittest.TestCase):
             "Base template should not contain a BOM",
         )
         self.assertEqual({view["name"] for view in dashboard["views"]}, expected_views)
+        self.assertIn("source_published_at", dashboard["formulas"]["content_date"])
+        self.assertIn("file.basename.slice(0, 10)", dashboard["formulas"]["content_date"])
+        self.assertIn("formula.content_date", dashboard["formulas"]["days_old"])
+        self.assertIn('read_status == "已读"', dashboard["formulas"]["status"])
+        self.assertIn('read_status == "精读"', dashboard["formulas"]["status"])
+        self.assertIn('read_status == "跳过"', dashboard["formulas"]["status"])
+        self.assertNotIn("file.ctime", str(dashboard["views"]))
+        for view in dashboard["views"]:
+            self.assertIn(
+                "read_status",
+                view["order"],
+                f"{view['name']} should support inline reading-state edits",
+            )
+
+    def test_dashboard_guide_is_bom_free_and_explains_inline_status(self) -> None:
+        guide_path = REPO_ROOT / "system/templates/reading-hub.md"
+        raw = guide_path.read_bytes()
+        guide = raw.decode("utf-8")
+
+        self.assertFalse(
+            raw.startswith(b"\xef\xbb\xbf"),
+            "Reading Hub guide should not contain a BOM",
+        )
+        self.assertIn("`read_status` 列", guide)
+        self.assertIn("留空就是未读", guide)
+        self.assertIn("YYYY-MM-DD", guide)
 
     def test_opt_in_installs_dashboard_files(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
